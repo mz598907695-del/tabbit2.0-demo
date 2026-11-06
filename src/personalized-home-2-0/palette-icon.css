@@ -1,0 +1,10 @@
+@scope (.personalized-home) {
+.palette-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.palette-icon svg { display: block; overflow: visible; }
+.palette-icon-layer { transition: opacity 160ms ease; }
+.palette-icon-layer.is-colorful { opacity: 0; }
+.palette-icon.is-active .is-colorful { opacity: 1; }
+.palette-icon.is-active .is-monochrome { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .palette-icon-layer { transition: none; } }
+
+}

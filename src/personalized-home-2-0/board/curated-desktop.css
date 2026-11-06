@@ -1,0 +1,7 @@
+@scope (.personalized-home) {
+/* The second desktop is a single, quiet composition. Keep shared card geometry. */
+.board-item[data-design-item='curated-v1-quote'] .widget-quote-mark { color:#81917a; opacity:.6; }
+.board-item[data-design-item='curated-v1-quote'] .widget-quote-text { color:#344332; }
+.board-item[data-design-item='curated-v1-quote'] .widget-quote-author { font-family:inherit; font-size:9px; letter-spacing:1px; color:#81917a; }
+:scope[data-theme='dark'] .board-item[data-design-item='curated-v1-quote'] .widget-quote-text { color:var(--nine-color-text-title); }
+}

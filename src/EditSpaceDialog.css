@@ -1,0 +1,25 @@
+.edit-space-dialog { width: 400px; text-align: left; overflow: visible; }
+.edit-space-field { display: flex; flex-direction: column; width: 100%; gap: 8px; }
+.edit-space-label { font-size: 14px; line-height: 24px; font-weight: 500; color: var(--color-text-1); }
+.edit-space-input-row { display: flex; width: 100%; height: 36px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--color-border-a1); }
+.edit-space-input-row:focus-within { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .4); }
+[data-mode="dark"] .edit-space-input-row:focus-within { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4); }
+.edit-space-icon-control { position: relative; flex: 0 0 36px; }
+.edit-space-icon-button { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px 0 0 10px; box-shadow: inset -1px 0 var(--color-border-a2); }
+.edit-space-icon-button:hover, .edit-space-icon-button[aria-expanded="true"] { background: var(--color-fill-a3); }
+.edit-space-icon-button img { width: 20px; height: 20px; object-fit: contain; }
+.edit-space-input-row input { flex: 1; min-width: 0; width: 100%; height: 36px; padding: 0 8px; border: 0; outline: none; background: transparent; color: var(--color-text-1); font-size: 14px; line-height: 24px; }
+.edit-space-actions { justify-content: flex-end; }
+.edit-space-actions button { flex: 0 0 88px; }
+.edit-space-confirm { background: var(--nine-color-fill-action-inverse); color: var(--nine-color-text-on-neutral); }
+.edit-space-actions .edit-space-confirm::before { background: #fff; }
+.edit-space-actions .edit-space-confirm:not(:disabled):hover::before { opacity: .15; }
+[data-mode="dark"] .edit-space-actions .edit-space-confirm::before { background: #000; }
+.edit-space-icon-button, .edit-space-icon-grid > button { cursor: pointer; }
+.edit-space-confirm:disabled { opacity: .4; }
+.edit-space-icon-picker { position: absolute; top: calc(100% + 8px); left: 0; z-index: 1; display: flex; flex-direction: column; width: 242px; max-height: min(340px, calc(100vh - 180px)); padding: 4px; gap: 4px; border-radius: 12px; overflow-y: auto; }
+.edit-space-icon-grid { display: grid; grid-template-columns: repeat(6, 32px); width: 100%; padding: 6px; gap: 6px; }
+.edit-space-icon-grid > button { display: grid; place-items: center; width: 32px; height: 32px; min-height: 32px; padding: 0; border-radius: 10px; }
+.edit-space-icon-grid > button img { width: 20px; height: 20px; object-fit: contain; }
+.edit-space-icon-grid > button:not(.selected):hover { background: var(--color-fill-a3); }
+.edit-space-icon-grid > button.selected { background: var(--color-border-a2); }

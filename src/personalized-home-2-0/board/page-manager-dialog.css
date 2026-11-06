@@ -1,0 +1,52 @@
+@scope (.personalized-home) {
+.page-manager-dialog {
+  position: fixed;
+  inset: auto;
+  left: var(--page-manager-left, 16px);
+  top: var(--page-manager-top, 16px);
+  width: min(640px, var(--page-manager-available-width, calc(calc(var(--home-viewport-width) * 1.0) - 32px)));
+  height: min(560px, var(--page-manager-available-height, calc(calc(var(--home-viewport-height) * 1.0) - 32px)));
+  max-height: var(--page-manager-available-height, calc(calc(var(--home-viewport-height) * 1.0) - 32px));
+  margin: 0;
+}
+.page-manager-dialog-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 74px;
+  padding: 18px 26px;
+  border-bottom: 1px solid var(--border);
+}
+.page-manager-dialog-header h2 { margin: 0; color: var(--text); font-size: 16px; font-weight: 500; line-height: 24px; }
+.page-manager-dialog-header .board-dialog-close { margin: 0; color: var(--text); }
+.page-manager-dialog .page-manager { padding: 24px 26px; scrollbar-gutter: stable; }
+.page-manager-dialog .page-manager-list { gap: 10px; }
+.page-manager-dialog .page-manager-row { border-color: var(--border); background: var(--library-card); border-radius: 16px; }
+.page-manager-dialog .page-manager-row-main { min-height: 64px; padding: 10px 14px; }
+.page-manager-dialog .page-manager-drag-ghost { background: var(--library-solid); }
+@media (prefers-reduced-transparency: reduce) {
+  .page-manager-dialog .page-manager-row { background: var(--surface); }
+}
+.page-manager-dialog .page-manager-add-row {
+  background: transparent;
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--muted) 35%, transparent);
+}
+.page-manager-dialog .page-manager-add-trigger {
+  justify-content: center;
+  text-align: center;
+}
+.page-manager-dialog .page-manager-add-trigger small { margin-left: 0; }
+.page-manager-dialog .page-manager-add-trigger:hover:not(:disabled) { background: transparent; }
+.page-manager-dialog .page-manager-add-row:has(.page-manager-add-trigger:hover:not(:disabled)) {
+  border-color: color-mix(in srgb, var(--muted) 65%, transparent);
+}
+@media (max-width: 650px) {
+  .page-manager-dialog-header { padding-inline: 18px; min-height: 64px; }
+  .page-manager-dialog .page-manager { padding: 16px; }
+  .page-manager-dialog .page-manager-row-main { padding-inline: 10px; }
+}
+
+}

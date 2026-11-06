@@ -1,0 +1,109 @@
+@scope (.personalized-home) {
+/* Approved glass material: static highlights and one small capsule lens. */
+:scope[data-material='liquid-glass'][data-theme] {
+  --glass-tint: 255 255 255;
+  --glass-alpha: var(--liquid-fill-opacity-light, .28);
+  --glass-edge: 255 255 255;
+  --glass-edge-alpha: .5;
+  --glass-top-alpha: .6;
+  --glass-shadow: 22 27 35;
+  --glass-rim-opacity: 1;
+  --glass-light: radial-gradient(ellipse at 25% 0%, rgb(255 255 255 / .12), transparent 65%);
+  --liquid-card-solid: #fff;
+  --liquid-solid: var(--liquid-card-solid);
+  --liquid-border: transparent;
+  --liquid-blur: 16px;
+  --liquid-control-blur: 16px;
+  --liquid-shadow: var(--liquid-rim), 0 5px 18px rgb(var(--glass-shadow) / .09), 0 1px 3px rgb(var(--glass-shadow) / .045);
+  --liquid-control-shadow: var(--liquid-small-shadow);
+  --liquid-card-fill: linear-gradient(rgb(var(--glass-tint) / var(--glass-alpha)), rgb(var(--glass-tint) / var(--glass-alpha)));
+  --liquid-fill: var(--liquid-card-fill);
+  --liquid-control-fill: var(--liquid-card-fill);
+  --liquid-card-brightness: 1;
+  --liquid-brightness: 1;
+  --liquid-control-brightness: 1;
+  --liquid-saturation: 1.35;
+  --liquid-small-solid: var(--liquid-card-solid);
+  --liquid-small-fill: var(--liquid-card-fill);
+  --liquid-small-hover-fill: var(--liquid-card-fill);
+  --liquid-small-brightness: 1;
+  --liquid-hover-fill: var(--liquid-card-fill);
+  --liquid-rim: inset 0 0 0 .5px rgb(var(--glass-edge) / var(--glass-edge-alpha)), inset 0 .5px .5px rgb(var(--glass-edge) / var(--glass-top-alpha));
+  --liquid-small-rim: var(--liquid-rim);
+  --liquid-small-shadow: var(--liquid-rim), 0 3px 9px rgb(var(--glass-shadow) / .09), 0 1px 3px rgb(var(--glass-shadow) / .045);
+}
+:scope[data-material='liquid-glass'][data-theme][data-theme='dark'] {
+  --glass-tint: 30 32 38;
+  --glass-alpha: var(--liquid-fill-opacity-dark, .38);
+  --glass-edge: 215 225 240;
+  --glass-edge-alpha: .16;
+  --glass-top-alpha: .18;
+  --glass-shadow: 0 0 0;
+  --glass-rim-opacity: .32;
+  --glass-light: radial-gradient(ellipse at 25% 0%, rgb(255 255 255 / .0384), transparent 65%);
+  --liquid-card-solid: #1e2026;
+}
+
+/* Compact controls retain their existing geometry and one 6px sample. */
+:scope[data-material='liquid-glass'][data-theme] :is(.shortcut-icon, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)) {
+  --liquid-blur: 6px;
+  --liquid-control-blur: 6px;
+}
+
+/* A single static reflection, with no pointer tracking or animation loop. */
+:scope[data-material='liquid-glass'][data-theme] :is(.tb-composer-surface, .promotion-inline-carousel, .promotion-card, .board-widget-card, .shortcut-icon, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
+  --liquid-light: var(--glass-light);
+  --liquid-rim: inset 0 0 0 .5px rgb(var(--glass-edge) / var(--glass-edge-alpha)), inset 0 .5px .5px rgb(var(--glass-edge) / var(--glass-top-alpha));
+  --liquid-shadow: var(--liquid-rim), 0 5px 18px rgb(var(--glass-shadow) / .09), 0 1px 3px rgb(var(--glass-shadow) / .045);
+  --liquid-control-shadow: var(--liquid-small-shadow);
+  --liquid-hover-fill: var(--liquid-card-fill);
+}
+:scope[data-material='liquid-glass'][data-theme] :is(.board-widget-card, .shortcut-icon) {
+  --liquid-shadow: var(--liquid-rim), 0 2px 8px rgb(var(--glass-shadow) / .045);
+  --liquid-control-shadow: var(--liquid-rim), 0 2px 6px rgb(var(--glass-shadow) / .035);
+}
+:scope[data-material='liquid-glass'][data-theme] .tb-task-mount {
+  --task-mount-fill: var(--liquid-card-fill);
+  --task-mount-brightness: 1;
+}
+
+/* Refraction is restricted to this one small, stationary surface. Scale the
+   reference's 18px / 60px frost to our existing 6px / 22px capsule. */
+:scope[data-material='liquid-glass'][data-theme] .page-indicator-capsule {
+  --liquid-shadow: var(--liquid-small-shadow);
+  --liquid-control-shadow: var(--liquid-small-shadow);
+  -webkit-backdrop-filter: blur(6px) var(--glass-lens, blur(0px)) saturate(1.35);
+  backdrop-filter: blur(6px) var(--glass-lens, blur(0px)) saturate(1.35);
+}
+:scope[data-material='liquid-glass'][data-theme] .page-indicator-capsule::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--glass-rim-image, linear-gradient(transparent, transparent)) center / 100% 100% no-repeat;
+  opacity: var(--glass-rim-opacity);
+  pointer-events: none;
+}
+
+/* Material selectors explicitly honor solid and accessibility fallbacks. */
+:scope[data-material='liquid-glass'][data-theme][data-material-opaque='true'] .page-indicator-capsule {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :scope[data-material='liquid-glass'][data-theme] {
+    --liquid-card-fill: linear-gradient(var(--liquid-card-solid), var(--liquid-card-solid));
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :scope[data-material='liquid-glass'][data-theme] {
+    --liquid-card-fill: linear-gradient(var(--liquid-card-solid), var(--liquid-card-solid));
+  }
+  :scope[data-material='liquid-glass'][data-theme] .page-indicator-capsule {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  :scope[data-material='liquid-glass'][data-theme] .page-indicator-capsule::after { content: none; }
+}
+
+}

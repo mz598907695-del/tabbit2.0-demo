@@ -1,0 +1,16 @@
+{
+  "capturedAt": "2026-11-04",
+  "source": "Desktop development WebKit localStorage before theme integration",
+  "spaceNames": {"0":"美团","1":"游戏","2":"娱乐","3":"生活","4":"思考"},
+  "spaces": {
+    "0": {"color":"#f2f7ff","tint":50,"clear":false,"veil":0,"highlight":70,"edge":16},
+    "1": {"color":"#ffe007","tint":50,"clear":false,"veil":0,"highlight":0,"edge":15},
+    "2": {"color":"#ffbfe0","tint":50,"clear":false,"veil":0,"highlight":100,"edge":16},
+    "3": {"color":"#00c7fc","tint":50,"clear":false,"veil":0,"highlight":0,"edge":16},
+    "4": {"color":"#ffaa00","tint":50,"clear":false,"veil":0,"highlight":0,"edge":16},
+    "5": {"color":"#63be3c","tint":50,"clear":false,"veil":0,"highlight":0,"edge":16},
+    "6": {"color":"#ffc400","tint":50,"clear":false,"veil":0,"highlight":70,"edge":16},
+    "7": {"color":"#ffc400","tint":50,"clear":false,"veil":0,"highlight":70,"edge":16},
+    "8": {"color":"#e43cbb","tint":42,"clear":false,"veil":0,"highlight":70,"edge":16}
+  }
+}

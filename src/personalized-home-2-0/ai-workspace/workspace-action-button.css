@@ -1,0 +1,12 @@
+@scope (.personalized-home) {
+  .aiw-content .workspace-action-button {
+    position:relative; display:inline-grid; place-items:center; flex:none;
+    width:28px; height:28px; padding:0; border:0;
+    border-radius:var(--nine-radius-full);
+    color:var(--nine-color-text-primary); background:transparent;
+  }
+  .aiw-content .workspace-action-button:is(:hover,:focus-visible):not(:disabled) {
+    background:var(--nine-color-fill-layer-strong);
+  }
+  .workspace-action-button > svg { width:16px; height:16px; }
+}

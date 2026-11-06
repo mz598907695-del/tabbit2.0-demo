@@ -1,0 +1,271 @@
+@scope (.personalized-home) {
+.promotion-inline-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 0;
+  width: min(760px, 100%);
+  padding: 0;
+  border: var(--home-card-outline);
+  border-radius: var(--home-card-radius);
+  background: var(--home-card-surface);
+  box-shadow: var(--home-card-resting-shadow);
+  color: var(--text, #141414);
+}
+
+.promotion-inline-media {
+  display: flex;
+  flex: none;
+  align-items: center;
+  align-self: stretch;
+  width: max-content;
+  padding: var(--nine-space-xs) 0 var(--nine-space-xs) var(--nine-space-xs);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .promotion-inline-carousel {
+    background: var(--home-card-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .promotion-inline-carousel {
+    background: var(--home-card-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.promotion-inline-stack {
+  position: relative;
+  flex: none;
+  width: calc(var(--spacing-base) * 19);
+  height: calc(var(--spacing-base) * 11);
+  perspective: 360px;
+  perspective-origin: left center;
+  transform-style: preserve-3d;
+  /* Rear artwork sits behind the stack plane; keep that plane out of hit testing. */
+  pointer-events: none;
+}
+
+.promotion-inline-orb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: calc(var(--spacing-base) * 19);
+  height: calc(var(--spacing-base) * 11);
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--radius-base) * 2.5);
+  background: transparent;
+  transform-origin: left center;
+}
+
+/* Scale the landscape artwork together; its front layer remains exactly 76 x 44. */
+.promotion-inline-orb-visual {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 0;
+  border-radius: inherit;
+  background: var(--surface, #fff);
+  pointer-events: none;
+  transform-origin: center;
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.promotion-inline-orb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.promotion-inline-orb:not([data-slot="0"]) {
+  visibility: hidden;
+}
+
+.promotion-inline-copy {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 44px;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 4px;
+  text-align: left;
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.promotion-inline-content {
+  display: flex;
+  flex: 1 1 0%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nine-space-xs);
+  min-width: 0;
+  height: 100%;
+  padding: var(--nine-space-xxs) calc(var(--spacing-base) * 3.5) var(--nine-space-xxs) var(--nine-space-xs);
+}
+
+.promotion-inline-copy-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.promotion-inline-character {
+  display: inline-block;
+  white-space: pre;
+  transform-origin: center;
+}
+
+.promotion-inline-title {
+  display: block;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+  white-space: nowrap;
+  text-overflow: clip;
+  mask-image: linear-gradient(to right, #000 calc(100% - 10px), transparent);
+}
+
+.promotion-inline-description {
+  display: block;
+  height: 20px;
+  overflow: hidden;
+  color: var(--muted, #858a92);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  white-space: nowrap;
+  text-overflow: clip;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+
+.promotion-inline-actions,
+.promotion-inline-controls {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.promotion-inline-actions {
+  gap: var(--nine-space-xs);
+}
+
+.promotion-inline-action {
+  display: block;
+  flex: 0 0 calc(var(--spacing-base) * 22);
+  width: calc(var(--spacing-base) * 22);
+  height: var(--nine-space-2xl);
+  padding: 0 var(--nine-space-sm);
+  overflow: hidden;
+  border-radius: calc(var(--radius-base) * 2.5);
+  background: var(--nine-color-fill-action-inverse);
+  color: var(--nine-color-text-on-neutral);
+  font-size: var(--nine-font-size-14);
+  font-weight: 500;
+  line-height: var(--nine-font-line-height-14);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.promotion-inline-controls {
+  gap: calc(var(--spacing-base) * 0.5);
+  transition: opacity var(--nine-motion-duration-fast) var(--nine-motion-easing-standard);
+}
+
+.promotion-inline-close,
+.promotion-inline-step {
+  display: grid;
+  flex: 0 0 var(--nine-space-2xl);
+  width: var(--nine-space-2xl);
+  height: var(--nine-space-2xl);
+  padding: 0;
+  place-items: center;
+  border-radius: calc(var(--radius-base) * 2.5);
+  color: var(--nine-color-text-tertiary);
+  transition: background-color 160ms ease, transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.promotion-inline-close svg,
+.promotion-inline-step svg {
+  width: var(--nine-space-md);
+  height: var(--nine-space-md);
+}
+
+.promotion-inline-close:active,
+.promotion-inline-step:active {
+  transform: scale(0.96);
+}
+
+.promotion-inline-copy:active {
+  transform: scale(0.99);
+}
+
+.promotion-inline-orb:active .promotion-inline-orb-visual {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .promotion-inline-controls {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .promotion-inline-carousel:is(:hover, :focus-within) .promotion-inline-controls {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .promotion-inline-close:hover,
+  .promotion-inline-step:hover {
+    background: color-mix(in srgb, var(--nine-color-text-title) 5%, transparent);
+  }
+
+}
+
+@media (max-width: 520px) {
+  .promotion-inline-carousel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .promotion-inline-stack {
+    flex-basis: calc(var(--spacing-base) * 19);
+    transform: scale(0.8);
+    transform-origin: left center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promotion-inline-orb-visual,
+  .promotion-inline-copy,
+  .promotion-inline-close,
+  .promotion-inline-step {
+    transition: none;
+  }
+
+  .promotion-inline-copy:active,
+  .promotion-inline-close:active,
+  .promotion-inline-step:active,
+  .promotion-inline-orb:active .promotion-inline-orb-visual {
+    transform: none;
+  }
+}
+
+}

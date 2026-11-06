@@ -1,0 +1,131 @@
+@scope (.personalized-home) {
+/* Keep the expanded flow slot: scrolling transforms the same controls, not the board. */
+.home-feed > .tb-composer-wrap {
+  --dock-progress: 0;
+  --dock-secondary-opacity: 1;
+  position: sticky;
+  top: 16px;
+  z-index: 12;
+  flex: 0 0 auto;
+  pointer-events: none;
+}
+.tb-composer-wrap .tb-composer,
+.tb-composer-wrap .tb-composer:focus-within {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none;
+}
+.tb-composer-surface {
+  position: absolute;
+  top: -.5px;
+  left: -.5px;
+  width: calc(100% + 1px);
+  height: var(--dock-surface-height, calc(100% + 1px));
+  box-sizing: border-box;
+  border: 0;
+  border-radius: calc(var(--nine-radius-xl) + var(--nine-radius-xxs) * var(--dock-progress));
+  background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(30px) saturate(100%);
+  backdrop-filter: blur(30px) saturate(100%);
+  box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.04), inset 0px 0px 0px 0.5px rgba(0, 0, 0, 0.15);
+  pointer-events: auto;
+  z-index: -1;
+  transition: box-shadow 300ms var(--nine-motion-easing-standard);
+}
+.tb-composer:focus-within .tb-composer-surface,
+.tb-composer-wrap[data-editing='true'] .tb-composer-surface {
+  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.04), inset 0px 0px 0px 0.5px rgba(0, 0, 0, 0.15);
+}
+.tb-composer-input-frame { position: relative; flex: 0 0 auto; height: var(--composer-input-height, 50px); min-width: 0; }
+.tb-composer-input-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  visibility: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  font-family: inherit;
+  font-size: var(--nine-font-size-14);
+  line-height: var(--nine-font-line-height-14);
+  pointer-events: none;
+}
+.tb-composer .tb-composer-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - (48px + var(--dock-end-width, 148px)) * var(--dock-progress));
+  height: calc(var(--composer-input-height, 50px) * (1 - var(--dock-progress)) + 24px * var(--dock-progress));
+  min-height: 0;
+  transform: translate(calc(40px * var(--dock-progress)), calc(var(--dock-input-shift, 4px) * var(--dock-progress)));
+  pointer-events: auto;
+}
+.tb-composer-wrap[data-docked='true'] .tb-composer-input { white-space: pre; overflow-x: auto; scrollbar-width: none; }
+.tb-composer-toolbar { transform: translateY(calc(var(--dock-toolbar-shift, -64px) * var(--dock-progress))); }
+.tb-composer-toolbar button { pointer-events: auto; }
+.tb-composer-wrap [data-dock-secondary] {
+  opacity: var(--dock-secondary-opacity);
+  transform: translateY(calc(-8px * var(--dock-progress)));
+}
+/* Follow the visible surface while preserving the tray's 8px overlap and flow slot. */
+.home-feed > .tb-composer-wrap .tb-task-mount-reveal[data-dock-secondary] {
+  transform: translateY(calc(var(--dock-surface-height, var(--dock-expanded-height, 120px)) - var(--dock-expanded-height, 120px)));
+}
+.tb-composer-wrap [data-dock-secondary]:not([inert]) { pointer-events: auto; }
+.tb-composer-wrap [data-dock-secondary][inert],
+.tb-composer-wrap [data-dock-secondary][inert] * { pointer-events: none; }
+.tb-composer-wrap .tb-task-mount-reveal:not(.is-expanded) { opacity: 0; }
+.tb-composer-plus { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--nine-color-border-alpha-subtle) calc(100% * (1 - var(--dock-progress))), transparent); }
+.tb-composer-file-error { position: relative; pointer-events: auto; }
+
+/* One fixed-size backdrop sample; scrolling only changes its transform/opacity. */
+.tb-composer-scroll-glass {
+  --dock-glass-edge: 136px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(var(--dock-glass-base-edge, 136px) + 112px);
+  z-index: 2;
+  pointer-events: none;
+  background: transparent;
+}
+.tb-composer-scroll-glass:not([data-glass-visible='true']) { visibility: hidden; }
+.tb-composer-scroll-glass > span {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --dock-blur: 24px;
+  --dock-mask: linear-gradient(#000 0, #000 calc(var(--dock-glass-base-edge, 136px) - 24px), rgb(0 0 0 / 65%) var(--dock-glass-base-edge, 136px), rgb(0 0 0 / 20%) calc(var(--dock-glass-base-edge, 136px) + 48px), transparent 100%);
+  transform: translate3d(0, calc(var(--dock-glass-edge) - var(--dock-glass-base-edge, 136px)), 0);
+  opacity: var(--dock-glass-opacity, 0);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tb-composer-surface { background: rgba(255, 255, 255, 0.8); -webkit-backdrop-filter: blur(30px) saturate(100%); backdrop-filter: blur(30px) saturate(100%); }
+  .tb-composer-scroll-glass > span { -webkit-backdrop-filter: blur(var(--dock-blur)); backdrop-filter: blur(var(--dock-blur)); -webkit-mask-image: var(--dock-mask); mask-image: var(--dock-mask); }
+}
+:scope[data-theme='dark'] .tb-composer-surface {
+  background:rgba(60,60,60,.6);
+  box-shadow:0 2px 4px -2px rgba(0,0,0,.1),0 0 0 .5px rgba(255,255,255,.12) inset;
+}
+:scope[data-theme='dark'] :is(.tb-composer:focus-within, .tb-composer-wrap[data-editing='true'] .tb-composer) .tb-composer-surface {
+  box-shadow:0 2px 4px -2px rgba(0,0,0,.1),0 0 0 .5px rgba(255,255,255,.2) inset;
+}
+/* The locked homepage needs no live blur sampling while a modal is above it.
+   Keep its tint fade, but avoid feeding masked backdrops into the modal's
+   own blur: this combination can expose rectangular compositor damage bounds. */
+:scope:has(dialog:modal) .tb-composer-scroll-glass > span {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-composer-surface { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .tb-composer-surface { background: var(--nine-color-fill-layer-base); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .tb-composer-scroll-glass > span { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+}

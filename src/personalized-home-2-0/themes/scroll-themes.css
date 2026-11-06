@@ -1,0 +1,42 @@
+@scope (.personalized-home) {
+.scroll-theme-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.scroll-theme-background canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 360ms ease;
+}
+.scroll-theme-background[data-ready='true'] canvas { opacity: 1; }
+.scroll-theme-background[data-pixel] canvas { image-rendering: pixelated; }
+.scroll-theme-background canvas.scroll-theme-overlay { position: absolute; inset: 0; pointer-events: none; }
+
+/* Scroll-driven wallpapers need a guaranteed amount of travel. A spacer at the end
+   of the feed supplies it inside the sticky composer's container (padding would not
+   count), so the docked composer stays put until the story ends. The negative margin
+   cancels the feed's flex gap, making the spacer exactly --scroll-theme-runway tall. */
+.home[data-scroll-theme] .home-feed::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 1px;
+  height: var(--scroll-theme-runway, 0px);
+  margin-top: -24px;
+  pointer-events: none;
+}
+
+.overlay-scroll-theme-preview img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 1; }
+.overlay-scroll-theme-preview[data-pixel] img { image-rendering: pixelated; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-theme-background canvas { transition: none; }
+}
+
+}

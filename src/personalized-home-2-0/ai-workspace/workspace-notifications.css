@@ -1,0 +1,75 @@
+@scope (.personalized-home) {
+/* Library-aligned modal shell; notification rows remain transparent. */
+.aiw-dialog.aiw-notifications-dialog {
+  width:min(600px,calc(var(--home-viewport-width) - 32px)); max-width:calc(var(--home-viewport-width) - 32px); height:550px; max-height:calc(var(--home-viewport-height) - 32px);
+  padding:22px; border:1px solid rgb(255 255 255 / 50%); border-radius:24px; overflow:hidden;
+  isolation:isolate; background:transparent;
+  box-shadow:0 24px 80px rgb(0 0 0 / 18%);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  --aiwn-solid:var(--floating-surface-solid, #fff);
+  --aiwn-secondary:#525862; --aiwn-subtle:#9499a1; --aiwn-link:#0089ff;
+}
+.aiw-notifications-dialog[open] { display:flex; flex-direction:column; gap:16px; }
+.aiw-notifications-dialog::before { content:""; position:absolute; inset:0; z-index:-1; border-radius:inherit; background:var(--aiwn-solid); pointer-events:none; }
+.aiw-notifications-dialog::backdrop { background:rgb(0 0 0 / 18%); backdrop-filter:none; }
+.aiw-notifications-dialog:has(.aiwn-list.is-empty) { height:460px; }
+.aiw-notifications-dialog .aiw-dialog-heading { flex:none; gap:16px; margin:0; height:32px; }
+.aiw-notifications-dialog .aiw-dialog-heading h2 { margin:0; font-size:16px; font-weight:500; line-height:26px; letter-spacing:normal; }
+.aiw-notifications-dialog .aiw-icon-button { width:28px; height:28px; border:0; padding:0; background:transparent; color:var(--aiwn-secondary); }
+.aiw-notifications-dialog .aiw-dialog-heading .aiw-icon-button { width:32px; height:32px; border-radius:50%; }
+.aiw-notifications-dialog .aiw-icon-button:hover { background:var(--hover); }
+.aiwn-toolbar { display:flex; align-items:center; justify-content:space-between; gap:8px; flex:none; }
+.aiwn-tabs { display:flex; gap:2px; min-width:0; }
+.aiwn-tabs button { padding:2px 12px; border:0; border-radius:16px; background:transparent; color:var(--muted); font-size:14px; font-weight:400; line-height:24px; white-space:nowrap; }
+.aiwn-tabs button:hover { background:var(--hover); color:var(--text); }
+.aiwn-tabs button[aria-selected="true"] { background:var(--hover); color:var(--text); font-weight:500; }
+.aiwn-tools { display:flex; align-items:center; gap:8px; flex:none; }
+.aiwn-unread-filter { display:flex; align-items:center; gap:6px; font-size:14px; line-height:24px; white-space:nowrap; cursor:pointer; }
+.aiwn-clear:disabled { opacity:.35; cursor:default; }
+.aiwn-list { flex:1; min-height:0; overflow:auto; overscroll-behavior:contain; padding:0 8px 4px 0; scrollbar-width:thin; }
+.aiwn-card { padding:0 12px 12px; }
+.aiwn-card::after { content:''; display:block; height:.5px; margin-top:12px; background:var(--border); }
+.aiwn-message { display:block; width:100%; padding:0; border:0; background:transparent; text-align:left; border-radius:4px; color:var(--aiwn-secondary); }
+.aiwn-meta { display:flex; align-items:center; flex-wrap:wrap; gap:0 8px; font-size:12px; line-height:20px; color:var(--aiwn-subtle); }
+.aiwn-subject { font-weight:500; overflow-wrap:anywhere; }
+.aiwn-meta time { margin-inline-start:auto; flex-shrink:0; white-space:nowrap; font-weight:400; }
+.aiwn-unread-dot { width:6px; height:6px; flex:none; background:#ff4b55; border-radius:50%; }
+.aiwn-description { display:block; font-size:14px; font-weight:400; line-height:24px; white-space:pre-wrap; overflow-wrap:anywhere; }
+.aiwn-link { display:inline-flex; align-items:center; gap:2px; padding:2px 0; border:0; border-radius:4px; background:transparent; color:var(--aiwn-link); font-size:12px; font-weight:400; line-height:20px; }
+.aiwn-link:hover { text-decoration:underline; }
+.aiwn-end { margin:0; color:var(--aiwn-subtle); font-size:12px; line-height:20px; text-align:center; }
+.aiwn-list.is-empty { display:flex; align-items:center; justify-content:center; }
+.aiwn-empty { display:flex; align-items:center; flex-direction:column; text-align:center; }
+.aiwn-empty-icon { position:relative; display:grid; place-items:center; width:36px; height:36px; margin-bottom:12px; color:var(--aiwn-secondary); }
+.aiwn-empty-icon > span { position:absolute; top:0; right:-1px; background:var(--surface); font-size:12px; font-weight:500; line-height:14px; }
+.aiwn-empty strong { font-size:14px; line-height:24px; font-weight:500; }
+.aiwn-empty p { margin:0; color:var(--aiwn-subtle); font-size:12px; line-height:20px; }
+.aiwn-announcement { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.aiw-notifications-dialog :is(button,input,[tabindex]):focus-visible { outline:2px solid var(--text); outline-offset:2px; }
+.aiwn-list:focus-visible { outline-offset:-2px; border-radius:8px; }
+:scope[data-theme="dark"] .aiw-notifications-dialog {
+  border-color:rgb(255 255 255 / 12%); --aiwn-secondary:#d0d2d7; --aiwn-subtle:#9499a1; --aiwn-link:#62b5ff;
+}
+:scope[data-theme="dark"] .aiw-notifications-dialog::backdrop { background:rgb(0 0 0 / 32%); }
+@media(max-width:550px) {
+  .aiw-dialog.aiw-notifications-dialog { width:calc(var(--home-viewport-width) - 32px); max-width:calc(var(--home-viewport-width) - 32px); max-height:calc(var(--home-viewport-height) - 32px); padding:18px 14px; border-radius:20px; }
+  .aiwn-toolbar { flex-wrap:wrap; }
+  .aiwn-tabs { width:100%; justify-content:space-between; }
+  .aiwn-tabs button { padding-inline:10px; }
+  .aiwn-tools { margin-left:auto; }
+}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .aiw-notifications-dialog::before { background:color-mix(in srgb,var(--aiwn-solid) 72%,transparent); -webkit-backdrop-filter:blur(48px); backdrop-filter:blur(48px); }
+  :scope[data-material="liquid-glass"] .aiw-notifications-dialog::before {
+    background:var(--liquid-fill); background-color:color-mix(in srgb,var(--liquid-solid) calc(var(--liquid-library-undercoat,.64) * 100%),transparent);
+    -webkit-backdrop-filter:blur(16px) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness,1));
+    backdrop-filter:blur(16px) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness,1));
+  }
+}
+:scope[data-material="liquid-glass"] .aiw-notifications-dialog { --aiwn-solid:var(--liquid-solid); border-color:transparent; box-shadow:var(--liquid-shadow); }
+:scope[data-material-opaque="true"] .aiw-notifications-dialog::before { background:var(--aiwn-solid); -webkit-backdrop-filter:none; backdrop-filter:none; }
+@media(prefers-reduced-transparency:reduce) {
+  :scope .aiw-dialog.aiw-notifications-dialog::before { background:var(--aiwn-solid); -webkit-backdrop-filter:none; backdrop-filter:none; }
+}
+
+}

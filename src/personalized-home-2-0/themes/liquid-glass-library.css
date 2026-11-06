@@ -1,0 +1,81 @@
+@scope (.personalized-home) {
+/* Glass belongs to the library shell, shortcut cards and actual previews.
+   Widget gallery frames, toolbar controls, fields, Plus buttons and copy keep
+   their ordinary appearance; the existing AI prism border is untouched. */
+:scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog) {
+  --library-solid: var(--liquid-solid);
+  --library-background: var(--liquid-fill);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: var(--liquid-shadow);
+}
+
+:scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog)::before {
+  background: var(--liquid-solid);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+:scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog) :is(.board-library-shortcut-card, .shortcut-catalog-card) {
+  border-color: transparent;
+  background: var(--liquid-light), var(--liquid-control-fill);
+  box-shadow: var(--liquid-control-shadow);
+}
+
+/* The icon tile itself is styled by the shared material; keep its upload
+   wrapper clear to avoid two stacked glass fills around the same artwork. */
+:scope[data-material='liquid-glass'] .board-library-dialog .shortcut-catalog-custom .board-shortcut-icon-preview {
+  background: transparent;
+  box-shadow: none;
+}
+
+:scope[data-material='liquid-glass'] .board-library-dialog .widget-ai-artwork {
+  --widget-ai-artwork-surface: var(--liquid-control-fill);
+  --preview-stack-shadow: var(--liquid-control-shadow);
+  --preview-stack-hover-shadow: var(--liquid-shadow);
+}
+:scope[data-material='liquid-glass'] .board-library-dialog .widget-ai-artwork-card {
+  background: var(--liquid-light), var(--widget-ai-artwork-surface);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog)::before {
+    background: var(--liquid-fill);
+    /* A quiet undercoat keeps long catalogs readable over the homepage. */
+    background-color: color-mix(in srgb, var(--liquid-solid) calc(var(--liquid-library-undercoat, .64) * 100%), transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness, 1));
+    backdrop-filter: blur(16px) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness, 1));
+  }
+}
+
+/* These local overrides also work when this stylesheet is loaded separately
+   from the shared material fallback. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog) {
+    --liquid-fill: var(--liquid-solid);
+    --liquid-control-fill: var(--liquid-solid);
+    --liquid-hover-fill: var(--segmented);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog) {
+    --liquid-fill: var(--liquid-solid);
+    --liquid-control-fill: var(--liquid-solid);
+    --liquid-hover-fill: var(--segmented);
+  }
+  :scope[data-material='liquid-glass'] .board-library-dialog:not(.page-manager-dialog)::before {
+    background: var(--liquid-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  :scope[data-material='liquid-glass'] .board-library-dialog .shortcut-catalog-glass > span {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  :scope[data-material='liquid-glass'] .board-library-dialog .shortcut-catalog-glass::after {
+    background: linear-gradient(to bottom, var(--liquid-solid) calc(100% - var(--catalog-glass-tail)), transparent);
+  }
+}
+
+}

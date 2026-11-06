@@ -1,0 +1,110 @@
+@scope (.personalized-home) {
+.tb-composer { position: relative; z-index: 1; }
+
+/* MasterGo 54:04776: 676 × 48 under a 700 × 120 composer, overlapping by 8px. */
+.tb-task-mount-reveal {
+  /* Include the overlap inside the clip so it paints behind the composer. */
+  height: 8px;
+  margin-top: calc(-1 * var(--nine-space-xs));
+  margin-inline: var(--nine-space-sm);
+  overflow: hidden;
+  opacity: 0;
+  transition: height 320ms cubic-bezier(.22, 1, .36, 1), opacity var(--nine-motion-duration-fast) var(--nine-motion-easing-standard);
+}
+.tb-task-mount-reveal.is-expanded {
+  height: 48px;
+  opacity: 1;
+  transition: height 320ms cubic-bezier(.22, 1, .36, 1), opacity var(--nine-motion-duration-fast) var(--nine-motion-easing-standard) 40ms;
+}
+.tb-task-mount {
+  --task-mount-solid: var(--nine-color-fill-container-muted);
+  --task-mount-fill: var(--nine-color-fill-layer-strong);
+  --task-mount-brightness: 1;
+  --muted: var(--nine-color-text-tertiary);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nine-space-xs);
+  height: 48px;
+  padding: var(--nine-space-xs) var(--nine-space-xs) 0;
+  border-radius: 0 0 var(--nine-radius-md) var(--nine-radius-md);
+  background: var(--task-mount-fill);
+  -webkit-backdrop-filter: blur(8px) brightness(var(--task-mount-brightness));
+  backdrop-filter: blur(8px) brightness(var(--task-mount-brightness));
+  box-shadow: inset 0 0 0 .5px var(--border, rgb(0 0 0 / 7%));
+  color: var(--nine-color-text-title);
+}
+.tb-task-mount-controls { display: flex; align-items: center; gap: var(--nine-space-sm); min-width: 0; }
+.tb-task-mount-end { display: flex; flex: 0 0 auto; align-items: center; gap: var(--nine-space-xxs); }
+.tb-task-mount-end .tb-local-task-trigger { height: 28px; padding-inline: calc(var(--spacing-base) * 1.5); touch-action: manipulation; }
+.tb-task-mount-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  gap: calc(var(--spacing-base) * 1.5);
+  min-width: 0;
+  height: 32px;
+  padding: 0 calc(var(--spacing-base) * 1.5);
+  border: 0;
+  border-radius: var(--nine-radius-full);
+  color: inherit;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--nine-font-size-13);
+  line-height: var(--nine-font-line-height-13);
+  touch-action: manipulation;
+}
+.tb-task-mount-button > svg { flex-shrink: 0; }
+.tb-task-mount-button > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.tb-task-mount-button > small { flex-shrink: 0; color: var(--nine-color-text-tertiary); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
+.tb-task-project { flex: 0 1 auto; max-width: 200px; }
+.tb-task-runtime {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-base) * 1.5);
+  height: 28px;
+  padding: 0 var(--nine-space-xs);
+  border: 0;
+  border-radius: var(--nine-radius-full);
+  color: var(--nine-color-text-tertiary);
+  background: var(--nine-color-fill-layer-strong);
+  font-family: inherit;
+  font-size: var(--nine-font-size-13);
+  line-height: var(--nine-font-line-height-13);
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+.tb-task-runtime > svg { flex-shrink: 0; }
+.tb-task-mount button:focus-visible { outline: 1px solid var(--nine-color-border-alpha-regular); outline-offset: -1px; }
+.tb-task-mount button.is-open { background: var(--nine-color-fill-layer-strong); color: var(--nine-color-text-title); }
+/* Share backing opacity only: no additional glass rim, shadow or pointer light. */
+@media (hover: hover) {
+  .tb-task-mount button:hover { background: var(--nine-color-fill-layer-strong); color: var(--nine-color-text-title); }
+}
+@container composer-controls (max-width: 430px) {
+  .tb-task-mount { gap: var(--nine-space-xxs); padding-inline: calc(var(--spacing-base) * 1.5); }
+  .tb-task-mount-controls { gap: var(--nine-space-xxs); }
+  .tb-task-mount-button { gap: var(--nine-space-xxs); padding-inline: var(--nine-space-xxs); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
+  .tb-task-project { max-width: 130px; }
+  .tb-task-mount-end .tb-local-task-trigger { gap: var(--nine-space-xxs); padding-inline: var(--nine-space-xxs); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
+  .tb-task-runtime { gap: var(--nine-space-xxs); padding-inline: calc(var(--spacing-base) * 1.5); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-task-mount-reveal, .tb-task-mount-reveal.is-expanded { transition: none; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tb-task-mount { background: var(--task-mount-solid); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .tb-task-mount {
+    background: var(--task-mount-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+}

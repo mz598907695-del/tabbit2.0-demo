@@ -1,0 +1,14 @@
+@scope (.personalized-home) {
+.aiw-secondary-slot { display:flex; flex:1; min-width:0; }
+.aiw-secondary-slot:empty { display:none; }
+.aiw-secondary-navigation { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-width:0; color:var(--text); pointer-events:auto; }
+.aiw-secondary-back { display:flex; align-items:center; gap:8px; min-width:0; max-width:100%; height:32px; padding:0 8px; margin-left:-8px; border-radius:8px; font-size:14px; font-weight:500; line-height:20px; }
+.aiw-secondary-back span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.aiw-secondary-back svg { flex:none; }
+.aiw-secondary-back:hover { background:var(--hover,rgb(127 127 127 / 8%)); }
+.aiw-secondary-actions { display:flex; align-items:center; gap:8px; flex:none; }
+.aiw-secondary-navigation button:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+.aiw-secondary-page { container-type:inline-size; padding-top:24px; min-width:0; }
+.aiw-content-primary[hidden] { display:none; }
+
+}

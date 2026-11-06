@@ -1,0 +1,68 @@
+@scope (.personalized-home) {
+/* Shared Liquid Glass scope and interaction; the material is defined in liquid-glass-macos.css. */
+/* Each surface owns its light, preventing nested previews from inheriting it. */
+:scope[data-material='liquid-glass'] :is(.tb-composer-surface, .promotion-inline-carousel, .promotion-card, .board-widget-card, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-icon, .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
+  --liquid-light: linear-gradient(transparent, transparent);
+}
+:scope[data-material='liquid-glass'] :is(.tb-composer-surface, .promotion-inline-carousel, .promotion-card, .board-widget-card, .page-indicator-capsule) {
+  background: var(--liquid-light), var(--liquid-fill);
+  border-color: transparent;
+  box-shadow: var(--liquid-shadow);
+  -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness, 1));
+  backdrop-filter: blur(var(--liquid-blur)) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness, 1));
+}
+:scope[data-material='liquid-glass'] .tb-composer:focus-within .tb-composer-surface { border-color: transparent; box-shadow: var(--liquid-shadow); }
+:scope[data-material='liquid-glass'] .board-item.is-widget { background: transparent; }
+:scope[data-material='liquid-glass'] .board-item.is-widget::after { border-color: var(--nine-color-border-alpha-subtle); }
+:scope[data-material='liquid-glass'] .board-widget-card :is(.widget-countdown-content, .widget-draw-content, .widget-quote-content) { background: transparent; }
+:scope[data-material='liquid-glass'] :is(.shortcut-icon, .page-indicator-action, .board-empty > :where(button)) {
+  background: var(--liquid-light), var(--liquid-control-fill);
+  box-shadow: var(--liquid-control-shadow);
+  -webkit-backdrop-filter: blur(var(--liquid-control-blur, var(--liquid-blur))) saturate(var(--liquid-saturation)) brightness(var(--liquid-control-brightness, var(--liquid-brightness, 1)));
+  backdrop-filter: blur(var(--liquid-control-blur, var(--liquid-blur))) saturate(var(--liquid-saturation)) brightness(var(--liquid-control-brightness, var(--liquid-brightness, 1)));
+}
+:scope[data-material='liquid-glass'] .promotion-inline-carousel {
+  background: var(--liquid-light), var(--liquid-control-fill);
+  box-shadow: var(--liquid-control-shadow);
+  -webkit-backdrop-filter: blur(var(--liquid-control-blur, var(--liquid-blur))) saturate(var(--liquid-saturation)) brightness(var(--liquid-control-brightness, var(--liquid-brightness, 1)));
+  backdrop-filter: blur(var(--liquid-control-blur, var(--liquid-blur))) saturate(var(--liquid-saturation)) brightness(var(--liquid-control-brightness, var(--liquid-brightness, 1)));
+}
+:scope[data-material='liquid-glass'] :is(.page-indicator-action, .board-empty > :where(button)) { border-color: transparent; }
+:scope[data-material='liquid-glass'] .shortcut-icon::after { border-color: var(--nine-color-border-alpha-subtle); }
+@media (hover: hover) {
+  :scope[data-material='liquid-glass'] .board-item.is-shortcut:not(.is-dragging):hover .shortcut-icon {
+    background: var(--liquid-light), var(--liquid-hover-fill);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0);
+  }
+  :scope[data-material='liquid-glass'] :is(.page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)):hover {
+    background: var(--liquid-light), var(--liquid-hover-fill);
+    box-shadow: var(--liquid-control-shadow);
+  }
+}
+/* Only these otherwise-static surfaces need a containing block for the rim. */
+:scope[data-material='liquid-glass'] :is(.promotion-inline-carousel, .promotion-card, .board-empty > :where(button), .board-library-shortcut-card) { position: relative; }
+
+/* An opaque photograph hides a background/inset highlight. Keep the original
+   image sharp and draw the quiet glass edge above it instead. */
+:scope[data-material='liquid-glass'] :is(.board-widget-card.widget-image, .widget-ai-artwork-landscape) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:scope[data-material='liquid-glass'] :is(.board-widget-card.widget-image, .widget-ai-artwork-landscape)::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 .5px rgb(255 255 255 / 20%), inset 0 .5px 0 rgb(255 255 255 / 10%);
+  pointer-events: none;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :scope[data-material='liquid-glass'][data-theme] { --liquid-fill: linear-gradient(var(--liquid-solid), var(--liquid-solid)); --liquid-control-fill: var(--liquid-fill); --liquid-hover-fill: var(--liquid-fill); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :scope[data-material='liquid-glass'][data-theme] { --liquid-fill: linear-gradient(var(--liquid-solid), var(--liquid-solid)); --liquid-control-fill: var(--liquid-fill); --liquid-hover-fill: var(--liquid-fill); --liquid-blur: 0px; }
+  :scope[data-material='liquid-glass'] :is(.tb-composer-surface, .promotion-inline-carousel, .promotion-card, .board-widget-card, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-icon) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+}

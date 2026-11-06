@@ -1,0 +1,201 @@
+@scope (.personalized-home) {
+.tb-command-dialog.tb-ideas-manager {
+  width: min(480px, calc(calc(var(--home-viewport-width) * 1.0) - 32px));
+}
+.tb-ideas-manager > header {
+  padding: 16px 16px 14px 20px;
+  border-bottom: 1px solid var(--border, rgb(0 0 0 / 8%));
+}
+.tb-ideas-manager-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+}
+.tb-ideas-manager-title > button {
+  margin-left: -8px;
+}
+.tb-ideas-manager h2 {
+  font-size: 16px;
+  line-height: 26px;
+}
+.tb-ideas-manager-:scope {
+  min-height: 0;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.tb-ideas-manager-create {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+  gap: 7px;
+  padding: 10px 12px;
+  border: 1px dashed var(--border, rgb(0 0 0 / 12%));
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text, #202124);
+  font: inherit;
+  cursor: pointer;
+}
+.tb-ideas-manager-create:disabled {
+  color: var(--muted, #8a8e97);
+  cursor: not-allowed;
+}
+.tb-ideas-manager-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tb-ideas-manager-list > li {
+  border-radius: 12px;
+}
+.tb-ideas-manager-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+  padding: 12px 0 12px 8px;
+}
+.tb-ideas-manager-symbol {
+  display: flex;
+  flex: 0 0 28px;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  margin-top: 1px;
+  border-radius: 9px;
+  background: var(--segmented, #f3f3f4);
+  color: var(--muted, #8a8e97);
+}
+.tb-ideas-manager-copy {
+  flex: 1;
+  min-width: 0;
+}
+.tb-ideas-manager-copy > strong {
+  display: block;
+  overflow: hidden;
+  color: var(--text, #202124);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tb-ideas-manager-copy > p {
+  display: -webkit-box;
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: var(--muted, #8a8e97);
+  font-size: 12px;
+  line-height: 19px;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.tb-ideas-manager-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 1px;
+  margin-top: -3px;
+}
+.tb-ideas-manager-actions > button {
+  width: 30px;
+  height: 30px;
+  color: var(--muted, #8a8e97);
+}
+.tb-ideas-manager-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 36px 12px;
+  color: var(--muted, #8a8e97);
+  text-align: center;
+}
+.tb-ideas-manager-empty > strong {
+  margin-top: 3px;
+  color: var(--text, #202124);
+  font-size: 14px;
+  font-weight: 500;
+}
+.tb-ideas-manager-empty > p,
+.tb-ideas-manager-footer > p {
+  margin: 0;
+}
+.tb-ideas-manager .tb-ideas-manager-footer {
+  justify-content: flex-start;
+  padding: 13px 20px 15px;
+  color: var(--muted, #8a8e97);
+  font-size: 12px;
+}
+.tb-ideas-manager .tb-command-fields {
+  padding-top: 2px;
+}
+.tb-ideas-manager-hint {
+  margin: 10px 0 0;
+  color: var(--muted, #8a8e97);
+  font-size: 12px;
+  line-height: 19px;
+}
+.tb-ideas-manager .tb-command-fields > .tb-composer-error {
+  margin-top: 8px;
+}
+.tb-ideas-manager-delete {
+  margin: 0 4px 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--segmented, #f3f3f4);
+}
+.tb-ideas-manager-delete > p {
+  margin: 0 0 10px;
+  overflow-wrap: anywhere;
+}
+.tb-ideas-manager-delete > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.tb-ideas-manager-delete button {
+  min-height: 32px;
+  padding: 5px 12px;
+  background: var(--surface, #fff);
+}
+.tb-ideas-manager .tb-ideas-manager-danger {
+  color: #c34949;
+}
+:scope[data-theme='dark'] .tb-ideas-manager .tb-ideas-manager-danger {
+  color: #f08c8c;
+}
+.tb-ideas-manager-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (hover: hover) {
+  .tb-ideas-manager-create:hover:not(:disabled) {
+    background: var(--hover, rgb(0 0 0 / 4%));
+  }
+  .tb-ideas-manager-actions > button:hover {
+    color: var(--text, #202124);
+  }
+}
+@media (max-width: 420px) {
+  .tb-ideas-manager-:scope {
+    padding: 12px;
+  }
+  .tb-ideas-manager-item {
+    gap: 8px;
+    padding-left: 3px;
+  }
+}
+
+}

@@ -1,0 +1,43 @@
+.delete-space-dialog {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  height: auto;
+  margin: 0;
+  padding: 20px;
+  border: 0;
+  outline: none;
+  border-radius: 20px;
+  background: var(--color-fill-a4);
+  backdrop-filter: blur(30px) saturate(100%);
+  -webkit-backdrop-filter: blur(30px) saturate(100%);
+  box-shadow: 0 0 0 1px var(--nine-color-border-alpha-regular), 0px 4px 12px 0px rgba(0, 0, 0, 0.06), 0px -1px 2px 0px rgba(0, 0, 0, 0.02);
+  color: var(--color-text-1);
+  text-align: center;
+}
+.delete-space-dialog[open] { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+[data-mode="dark"] .delete-space-dialog {
+  background: rgba(27, 27, 27, 0.85);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) inset, 0 4px 12px 0 rgba(0, 0, 0, 0.3), 0 -1px 2px 0 rgba(0, 0, 0, 0.3);
+  outline: 1px solid #000;
+  outline-offset: 0;
+}
+.delete-space-dialog::backdrop { background: rgba(0, 0, 0, .15); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.delete-space-content { display: flex; flex-direction: column; align-items: center; width: 100%; height: auto; gap: 4px; }
+.delete-space-warning { width: 48px; height: 48px; flex: 0 0 auto; object-fit: contain; }
+.delete-space-dialog h2 { margin: 0; font-size: var(--font-size-18); line-height: var(--font-line-height-18); font-weight: 500; color: var(--color-text-1); }
+.delete-space-dialog p { margin: 0; font-size: var(--font-size-14); line-height: var(--font-line-height-14); color: var(--color-text-3); }
+.delete-space-actions { display: flex; gap: 10px; width: 100%; }
+.delete-space-actions button { display: flex; align-items: center; justify-content: center; flex: 1; min-width: 0; height: 36px; padding: 0 12px; border-radius: 10px; font-size: 14px; line-height: 20px; font-weight: 500; }
+.delete-space-cancel { background: rgba(0, 0, 0, .07); color: var(--color-text-1); }
+[data-mode="dark"] .delete-space-cancel { background: rgba(255, 255, 255, 0.1); }
+.delete-space-confirm { background: var(--color-red-4); color: var(--color-text-white); }
+.delete-space-actions button { position: relative; isolation: isolate; cursor: pointer; }
+.delete-space-actions button:disabled { cursor: default; }
+.delete-space-actions button::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: #808080; opacity: 0; pointer-events: none; transition: opacity 100ms ease 100ms; }
+.delete-space-actions button:not(:disabled):hover::before { opacity: .15; }
+[data-mode="dark"] .delete-space-actions button::before { background: #fff; }
+[data-mode="dark"] .delete-space-actions button:not(:disabled):hover::before { opacity: .1; }
+.delete-space-actions button:focus-visible { outline: 2px solid var(--color-text-5); outline-offset: 2px; }

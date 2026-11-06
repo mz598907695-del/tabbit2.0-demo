@@ -1,0 +1,12 @@
+@scope (.personalized-home) {
+.tb-context-menu-content { display: flex; flex: 0 1 auto; flex-direction: column; min-width: 0; min-height: 0; }
+.tb-context-list { display: flex; flex: 0 1 auto; flex-direction: column; gap: 2px; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.tb-context-group { flex: 0 0 auto; }
+.tb-context-menu-content input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.tb-context-menu-content .tb-context-back { color: var(--muted, #858a92); }
+.tb-context-menu-content .tb-context-reference > svg { color: var(--muted, #858a92); }
+.tb-composer-popover.tb-composer-add-menu .tb-context-reference > .tb-context-site-mark { display: grid; flex: 0 0 16px; place-items: center; width: 16px; height: 16px; color: var(--text, #202124); font-size: 18px; font-weight: 700; line-height: 16px; }
+.tb-context-menu-content .tb-context-reference > small { flex: 0 0 auto; color: var(--muted, #858a92); font: inherit; font-size: 12px; white-space: nowrap; }
+.tb-context-menu-content .tb-context-empty { margin: 0; padding: 14px 8px; color: var(--muted, #858a92); font-size: 12px; line-height: 20px; }
+
+}

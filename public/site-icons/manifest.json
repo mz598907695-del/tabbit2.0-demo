@@ -1,0 +1,302 @@
+[
+  {
+    "source": "容器 402058.png",
+    "site": "notion",
+    "hosts": [
+      "notion.so",
+      "notion.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "08fe7801366494f51ecc7cc6936ca977c8fddf11ce1aa49f7e41045cbea52241",
+    "url": "/site-icons/notion.png?v=08fe78013664"
+  },
+  {
+    "source": "容器 402059.png",
+    "site": "youtube",
+    "hosts": [
+      "youtube.com",
+      "youtu.be"
+    ],
+    "demoAssignment": false,
+    "sha256": "19cfc1f642ce2915a38fdc54257447f8a4df0a6cf40d8f017047c5d4e7b815c2",
+    "url": "/site-icons/youtube.png?v=19cfc1f642ce"
+  },
+  {
+    "source": "容器 402060.png",
+    "site": "deepl",
+    "hosts": [
+      "deepl.com"
+    ],
+    "demoAssignment": true,
+    "sha256": "60da0182e9378c5669cc6519e31c58b80278dd648eccb2f9cacc1b89b0b701ba",
+    "url": "/site-icons/deepl.png?v=60da0182e937"
+  },
+  {
+    "source": "容器 402061.png",
+    "site": "perplexity",
+    "hosts": [
+      "perplexity.ai"
+    ],
+    "demoAssignment": true,
+    "sha256": "839a2aa94752e833cd950115d77623f6d3ce76241b91b4f95c855d42677a2198",
+    "url": "/site-icons/perplexity.png?v=839a2aa94752"
+  },
+  {
+    "source": "容器 402062.png",
+    "site": "netflix",
+    "hosts": [
+      "netflix.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "7d7d66f2257bc1c715c7b7cdd3e541c59a4a4a7c250737d6eafa5105c2889e24",
+    "url": "/site-icons/netflix.png?v=7d7d66f2257b"
+  },
+  {
+    "source": "容器 402063.png",
+    "site": "spotify",
+    "hosts": [
+      "spotify.com",
+      "open.spotify.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "e23909ffdd9d457cccd8de04370698f0d0e1f0527d5099787fce84dd534ba23a",
+    "url": "/site-icons/spotify.png?v=e23909ffdd9d"
+  },
+  {
+    "source": "容器 402064.png",
+    "site": "google",
+    "hosts": [
+      "google.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "2477e4a2e4c747e0c6188bcdaf740cee6951b909eaace232154395dd1632ba09",
+    "url": "/site-icons/google.png?v=2477e4a2e4c7"
+  },
+  {
+    "source": "容器 402065.png",
+    "site": "openai",
+    "hosts": [
+      "chatgpt.com",
+      "chat.openai.com",
+      "openai.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "429dcf17d120d176b2ea4db5087990d9561e492d42627602dc507d4c7b0207dd",
+    "url": "/site-icons/openai.png?v=429dcf17d120"
+  },
+  {
+    "source": "容器 402066.png",
+    "site": "claude",
+    "hosts": [
+      "claude.ai",
+      "anthropic.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "668b71d26e8561313998945099e02f6062fab93c332f3acb8f299c36e727b40e",
+    "url": "/site-icons/claude.png?v=668b71d26e85"
+  },
+  {
+    "source": "容器 402067.png",
+    "site": "dribbble",
+    "hosts": [
+      "dribbble.com"
+    ],
+    "demoAssignment": true,
+    "sha256": "218c1a755f415667781a954b290bc20ae9aacdf7efa3016094c055ac8f7f42c4",
+    "url": "/site-icons/dribbble.png?v=218c1a755f41"
+  },
+  {
+    "source": "容器 402068.png",
+    "site": "purposetalent",
+    "hosts": [
+      "purposetalent.xyz"
+    ],
+    "demoAssignment": false,
+    "sha256": "74239aa585af7745546f1f2a5743e2cecc2d4f966ce7f24e57658c57c2038dd9",
+    "url": "/site-icons/purposetalent.png?v=74239aa585af"
+  },
+  {
+    "source": "容器 402069.png",
+    "site": "trickle",
+    "hosts": [
+      "trickle.so"
+    ],
+    "demoAssignment": false,
+    "sha256": "8c5761075fd5eadb9ed17f500c0f829c307f733202125d9d79866e2142802559",
+    "url": "/site-icons/trickle.png?v=8c5761075fd5"
+  },
+  {
+    "source": "容器 402070.png",
+    "site": "zoom",
+    "hosts": [
+      "zoom.us"
+    ],
+    "demoAssignment": true,
+    "sha256": "a0bc4969d0b44fccbfe1988bdea1cf9fb5c113d850e06710d3072ca351186639",
+    "url": "/site-icons/zoom.png?v=a0bc4969d0b4"
+  },
+  {
+    "source": "容器 402071.png",
+    "site": "canva",
+    "hosts": [
+      "canva.com"
+    ],
+    "demoAssignment": true,
+    "sha256": "0b16e4f54b3aedb6c5eb52df75d0a68cfb5ca170c4e037488f579d15bfce7bf6",
+    "url": "/site-icons/canva.png?v=0b16e4f54b3a"
+  },
+  {
+    "source": "容器 402072.png",
+    "site": "figma",
+    "hosts": [
+      "figma.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "4d644ef20c66d48634a8a5fc659430d25a6945d00bb1c54b2d702f5891774445",
+    "url": "/site-icons/figma.png?v=4d644ef20c66"
+  },
+  {
+    "source": "容器 402073.png",
+    "site": "nio",
+    "hosts": [
+      "nio.cn",
+      "nio.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "4cf886fe97f352693fbca4ed9c2961b73daf7307993b834af0bedeca827d84f5",
+    "url": "/site-icons/nio.png?v=4cf886fe97f3"
+  },
+  {
+    "source": "容器 402074.png",
+    "site": "qq-music",
+    "hosts": [
+      "y.qq.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "9e5c4a335fb7501af9003c2e70e0d00adbf14f099c860f8795190db22978ce07",
+    "url": "/site-icons/qq-music.png?v=9e5c4a335fb7"
+  },
+  {
+    "source": "容器 402075.png",
+    "site": "drive",
+    "hosts": [
+      "drive.google.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "e55aae943d6f323767dd97a53db5daa8b4b401930dae78f3202fe93e47bc6ff2",
+    "url": "/site-icons/drive.png?v=e55aae943d6f"
+  },
+  {
+    "source": "容器 402076.png",
+    "site": "x",
+    "hosts": [
+      "x.com",
+      "twitter.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "7e6d115fa75bf4eaa5bf6c51fdb8ab5b2b0b35b1d49cc8e8e31abd6f9ee25e6e",
+    "url": "/site-icons/x.png?v=7e6d115fa75b"
+  },
+  {
+    "source": "容器 402077.png",
+    "site": "threads",
+    "hosts": [
+      "threads.net",
+      "threads.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "a567e51ebd2ec14e9f429e4d9eb161c9e48414b8f967ab09ee4fafb9ad6abe10",
+    "url": "/site-icons/threads.png?v=a567e51ebd2e"
+  },
+  {
+    "source": "容器 402078.png",
+    "site": "dji",
+    "hosts": [
+      "dji.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "c33bb43dc5b5223831e7cb0973b2b67db67b10e8c0394b5cbbc12b3c077c4f75",
+    "url": "/site-icons/dji.png?v=c33bb43dc5b5"
+  },
+  {
+    "source": "容器 402079.png",
+    "site": "douyin",
+    "hosts": [
+      "douyin.com",
+      "tiktok.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "689493f0b951fc1b04c4a539b65fa7a6be8c65e2a350ecae7ddd5cec4d3bed23",
+    "url": "/site-icons/douyin.png?v=689493f0b951"
+  },
+  {
+    "source": "容器 402080.png",
+    "site": "messenger",
+    "hosts": [
+      "messenger.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "9dc18de3ca4adf16e560d07802fcf7b2f06859e9dd4fbda724f6174864a4a769",
+    "url": "/site-icons/messenger.png?v=9dc18de3ca4a"
+  },
+  {
+    "source": "容器 402081.png",
+    "site": "facebook",
+    "hosts": [
+      "facebook.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "e598a13863f34117a9665b282b20d6b5b8ddd9106146c228a240911636c7c018",
+    "url": "/site-icons/facebook.png?v=e598a13863f3"
+  },
+  {
+    "source": "容器 402082.png",
+    "site": "pinterest",
+    "hosts": [
+      "pinterest.com"
+    ],
+    "demoAssignment": true,
+    "sha256": "3bcc59f22e7e4897b7972f60b32b40033c842aafc722caf38b7cfede278955d2",
+    "url": "/site-icons/pinterest.png?v=3bcc59f22e7e"
+  },
+  {
+    "source": "容器 402083.png",
+    "site": "slack",
+    "hosts": [
+      "slack.com"
+    ],
+    "demoAssignment": true,
+    "sha256": "ae67a2cee25ce2e9a744861069d231619e11edad9573921355e80207d7c58ee0",
+    "url": "/site-icons/slack.png?v=ae67a2cee25c"
+  },
+  {
+    "source": "容器 402084.png",
+    "site": "github",
+    "hosts": [
+      "github.com"
+    ],
+    "demoAssignment": true,
+    "sha256": "073f7063d17ea88a4c756b93d3b2063052447827c9f0cb1ab0e13db078fb336f",
+    "url": "/site-icons/github.png?v=073f7063d17e"
+  },
+  {
+    "source": "容器 402085.png",
+    "site": "yang",
+    "hosts": [
+      "yang.design"
+    ],
+    "demoAssignment": false,
+    "sha256": "cee954428390b6ebe3dac1cc9d3a21e118895e7b75b7ef6001e54ba992606de7",
+    "url": "/site-icons/yang.png?v=cee954428390"
+  },
+  {
+    "source": "容器 402086.png",
+    "site": "grok",
+    "hosts": [
+      "grok.com"
+    ],
+    "demoAssignment": false,
+    "sha256": "86cf72d3474b9b084b28b12af0a8b874ba6aea59c146602435daa8fd6ef4390b",
+    "url": "/site-icons/grok.png?v=86cf72d3474b"
+  }
+]

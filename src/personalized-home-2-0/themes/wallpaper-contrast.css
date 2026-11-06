@@ -1,0 +1,77 @@
+@scope (.personalized-home) {
+/* Keep external names as plain text, with no backing, outline or shadow.
+   Preserve inline truncation and the original 11px / 16px label geometry. */
+.home[data-artwork-background] .workspace-board .board-item-label {
+  color: #30363d;
+  text-shadow: none;
+}
+:scope[data-theme='dark'] .home[data-artwork-background] .workspace-board .board-item-label {
+  color: #f3f4f6;
+  text-shadow: none;
+}
+
+/* More transparent material needs stronger ink, not a hidden opacity floor.
+   Only the clearest half of the slider strengthens secondary text. The midpoint
+   and opaque endpoint retain their existing ink, and artwork stays untouched. */
+:scope[data-material='liquid-glass'] {
+  --liquid-secondary-text: color-mix(in srgb, #0b0d10 calc(var(--liquid-clarity, 0) * 100%), #303740);
+  --liquid-mode-track: rgb(255 255 255 / 12%);
+  --liquid-mode-selected: rgb(255 255 255 / 72%);
+  --liquid-mode-text: var(--liquid-secondary-text);
+  --liquid-mode-rim: rgb(0 0 0 / 10%);
+}
+:scope[data-material='liquid-glass'][data-theme='dark'] {
+  --liquid-secondary-text: color-mix(in srgb, #f6f7f9 calc(var(--liquid-clarity, 0) * 100%), #d8dce2);
+  --liquid-mode-track: rgb(0 0 0 / 12%);
+  --liquid-mode-selected: rgb(25 26 28 / 70%);
+  --liquid-mode-text: var(--liquid-secondary-text);
+  --liquid-mode-rim: rgb(255 255 255 / 16%);
+}
+:scope[data-material='liquid-glass'] :is(.tb-composer, .promotion-inline-carousel, .promotion-card, .board-widget-card) {
+  --muted: var(--liquid-secondary-text);
+  --placeholder: var(--liquid-secondary-text);
+}
+/* Internal controls stay plain: no additional glass, blur or pointer light. */
+:scope[data-material='liquid-glass'] .tb-composer-modes {
+  background: var(--liquid-mode-track);
+  box-shadow: inset 0 0 0 .5px var(--liquid-mode-rim);
+}
+:scope[data-material='liquid-glass'] .tb-composer-modes button {
+  color: var(--liquid-mode-text);
+}
+:scope[data-material='liquid-glass'] .tb-composer-modes button[aria-pressed='true'] {
+  background: var(--liquid-mode-selected);
+  color: var(--text);
+  box-shadow: inset 0 0 0 .5px var(--liquid-mode-rim), 0 1px 3px rgb(0 0 0 / 6%);
+}
+:scope[data-theme='dark'][data-material='liquid-glass'] .tb-composer-modes {
+  background:rgba(0,0,0,.35);
+  box-shadow:none;
+}
+:scope[data-theme='dark'][data-material='liquid-glass'] .tb-composer-modes button[aria-pressed='true'] {
+  background:rgba(255,255,255,.12);
+  color:var(--nine-color-text-title);
+  box-shadow:0 4px 12px 0 rgba(0,0,0,.1),0 -1px 2px 0 rgba(0,0,0,.1),0 0 1px .5px rgba(255,255,255,.12) inset;
+}
+
+/* Keep page states distinct while sharing Small's fill with both side actions.
+   Do not impose a capsule-only opacity floor over the selected wallpaper. */
+:scope[data-material='liquid-glass'] .page-indicator-capsule {
+  --page-idle-dot: #b8bdc5;
+}
+:scope[data-material='liquid-glass'][data-theme='dark'] .page-indicator-capsule {
+  --page-idle-dot: #5c6069;
+}
+:scope[data-material='liquid-glass'] .page-indicator-page:not([aria-pressed='true']) .page-indicator-dot {
+  background: var(--page-idle-dot);
+}
+
+/* Local readability overrides must also honor the material's solid fallback. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :scope[data-material='liquid-glass'][data-theme] { --liquid-fill: linear-gradient(var(--liquid-solid), var(--liquid-solid)); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :scope[data-material='liquid-glass'][data-theme] { --liquid-fill: linear-gradient(var(--liquid-solid), var(--liquid-solid)); }
+}
+
+}

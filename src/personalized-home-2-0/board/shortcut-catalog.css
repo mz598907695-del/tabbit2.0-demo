@@ -1,0 +1,64 @@
+@scope (.personalized-home) {
+.shortcut-catalog-chrome { --catalog-glass-tail:64px; position:sticky; top:0; z-index:3; height:32px; margin-bottom:var(--catalog-glass-tail); }
+/* Keep the glass outside the horizontally scrolling pills so neither its fade nor the text is clipped. */
+.shortcut-catalog-glass { position:absolute; top:calc(-1 * var(--library-inset-block)); right:calc(-1 * var(--library-inset-inline)); bottom:calc(-1 * var(--catalog-glass-tail)); left:calc(-1 * var(--library-inset-inline)); pointer-events:none; }
+.shortcut-catalog-glass::after { content:''; position:absolute; inset:0; background:linear-gradient(to bottom, var(--library-solid), color-mix(in srgb, var(--library-solid) 85%, transparent) 65%, transparent); }
+.shortcut-catalog-glass > span { position:absolute; inset:0; }
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
+  .shortcut-catalog-glass > span { -webkit-backdrop-filter:blur(var(--glass-blur)); backdrop-filter:blur(var(--glass-blur)); -webkit-mask-image:var(--glass-mask); mask-image:var(--glass-mask); }
+  .shortcut-catalog-glass > span:nth-child(1) { --glass-blur:8px; --glass-mask:linear-gradient(to bottom,#000 45%,transparent); }
+  .shortcut-catalog-glass > span:nth-child(2) { --glass-blur:24px; --glass-mask:linear-gradient(to bottom,#000 30%,transparent 94%); }
+  .shortcut-catalog-glass > span:nth-child(3) { --glass-blur:48px; --glass-mask:linear-gradient(to bottom,#000 15%,transparent 84%); }
+  .shortcut-catalog-glass::after { background:linear-gradient(to bottom,color-mix(in srgb, var(--library-solid) 68%, transparent),color-mix(in srgb, var(--library-solid) 40%, transparent) 45%,color-mix(in srgb, var(--library-solid) 12%, transparent) 75%,transparent); }
+}
+.shortcut-catalog-navigation { position:relative; z-index:1; display:flex; align-items:stretch; gap:8px; width:max-content; max-width:100%; min-width:0; height:32px; padding:2px 0; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; background:transparent; }
+.shortcut-catalog-navigation::-webkit-scrollbar { display:none; }
+.shortcut-catalog-navigation button { flex:0 0 auto; padding:2px 12px; border:0; border-radius:100px; color:var(--muted); background:transparent; font-size:12px; font-weight:400; line-height:20px; white-space:nowrap; }
+.shortcut-catalog-navigation button[aria-pressed='true'] { color:var(--text); background:var(--segmented); font-weight:500; }
+.shortcut-catalog-navigation button:disabled { opacity:.32; cursor:default; }
+.shortcut-catalog-sections { display:flex; flex-direction:column; gap:26px; }
+.shortcut-catalog-section { min-width:0; }
+.shortcut-catalog-section-title { margin:0 0 12px; color:var(--muted); font-size:12px; line-height:18px; font-weight:500; }
+.shortcut-catalog-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); grid-auto-rows:minmax(80px,auto); gap:12px; }
+.shortcut-catalog-grid .shortcut-catalog-custom { grid-row:span 2; width:auto; min-width:0; margin:0; padding:14px; border-radius:16px; }
+.shortcut-catalog-grid .shortcut-catalog-custom > h3 { margin:0 0 8px; font-size:14px; line-height:20px; }
+.shortcut-catalog-custom .board-shortcut-inline .board-dialog-fields { display:grid; grid-template-columns:50px minmax(0,1fr); gap:8px 14px; overflow:visible; }
+.shortcut-catalog-custom .board-shortcut-artwork { grid-column:1; grid-row:1 / span 2; align-self:center; padding:0; }
+.shortcut-catalog-custom .board-shortcut-icon-preview { width:50px; height:50px; border:0; border-radius:0; background:transparent; }
+.shortcut-catalog-custom .board-shortcut-icon-preview[aria-busy='true'] > .shortcut-icon { opacity:.45; }
+.shortcut-catalog-custom .board-shortcut-icon-edit { width:22px; height:22px; right:-4px; bottom:-4px; }
+.shortcut-catalog-custom .board-shortcut-inline .board-dialog-field { grid-column:2; }
+.shortcut-catalog-custom .board-dialog-field { gap:0; }
+.shortcut-catalog-custom .board-dialog-field > label,
+.shortcut-catalog-custom .board-dialog-label-row { position:absolute; width:1px; height:1px; margin:-1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.shortcut-catalog-custom .board-dialog-field input { min-height:32px; height:32px; padding:6px 10px; border-radius:9px; font-size:12px; }
+.shortcut-catalog-custom .board-shortcut-actions { flex:none; align-items:center; height:40px; padding-top:10px; }
+.shortcut-catalog-custom .board-shortcut-actions .board-dialog-error { flex:1; min-width:0; max-height:30px; overflow:hidden; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; line-height:15px; overflow-wrap:anywhere; }
+.shortcut-catalog-custom .board-dialog-primary { min-height:30px; height:30px; padding:5px 14px; font-size:12px; }
+.shortcut-catalog-card { display:flex; align-items:center; gap:12px; position:relative; min-width:0; padding:12px 34px 12px 12px; border:1px solid var(--border); border-radius:16px; background:var(--library-card); }
+.shortcut-catalog-copy { min-width:0; }
+.shortcut-catalog-copy h3 { margin:0 0 5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; line-height:18px; font-weight:500; color:var(--text); }
+.shortcut-catalog-copy .board-fade-line { font-size:11px; line-height:16px; color:var(--muted); }
+.shortcut-catalog-add { position:absolute; top:8px; right:8px; display:grid; place-items:center; width:26px; height:26px; padding:0; border-radius:50%; color:var(--text); background:var(--segmented); transition:background 140ms; }
+.shortcut-catalog-add:disabled { opacity:.35; cursor:not-allowed; }
+.shortcut-catalog-empty { grid-column:span 2; align-self:center; text-align:center; color:var(--muted); font-size:12px; }
+.shortcut-catalog-frequent-status { display:flex; flex-direction:column; align-items:center; gap:10px; grid-row:span 2; min-width:0; padding:16px; }
+.shortcut-catalog-frequent-status button { padding:5px 12px; border:0; border-radius:100px; color:var(--text); background:var(--segmented); font-size:12px; }
+@media(hover:hover) {
+  .shortcut-catalog-add:hover:not(:disabled) { background:color-mix(in srgb, var(--text) 10%, var(--segmented)); }
+  .shortcut-catalog-navigation button:hover:not(:disabled) { color:var(--text); }
+}
+@container add-library (max-width:800px) { .shortcut-catalog-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .shortcut-catalog-empty { grid-column:auto; } }
+@container add-library (max-width:580px) {
+  .shortcut-catalog-chrome { --catalog-glass-tail:48px; }
+  .shortcut-catalog-grid { grid-template-columns:minmax(0,1fr); grid-auto-rows:auto; gap:12px; }
+  .shortcut-catalog-grid .shortcut-catalog-custom { grid-row:auto; }
+  .shortcut-catalog-frequent-status { grid-row:auto; }
+  .shortcut-catalog-card { min-height:80px; }
+}
+@media(prefers-reduced-transparency:reduce) {
+  .shortcut-catalog-glass > span { -webkit-backdrop-filter:none; backdrop-filter:none; }
+  .shortcut-catalog-glass::after { background:linear-gradient(to bottom,var(--library-solid) calc(100% - var(--catalog-glass-tail)),transparent); }
+}
+
+}

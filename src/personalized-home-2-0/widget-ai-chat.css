@@ -1,0 +1,87 @@
+@scope (.personalized-home) {
+.widget-ai-chat {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  --dock-progress: 0;
+  --dock-secondary-opacity: 1;
+  --surface: #fff;
+  --floating-surface-solid: #fff;
+  --floating-surface-glass: rgb(255 255 255 / 90%);
+  --text: #141414;
+  --muted: #858a92;
+  --border: rgb(0 0 0 / 7%);
+  --hover: rgb(0 0 0 / 3.5%);
+  --segmented: #f3f3f4;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(var(--home-viewport-height) * 1.0);
+  min-height: 0;
+  overflow: hidden;
+  background: #f4f4f4;
+  color: var(--text);
+}
+
+:scope[data-theme='dark'] .widget-ai-chat {
+  --surface: #242528;
+  --floating-surface-solid: #1e1e1f;
+  --floating-surface-glass: rgb(30 30 31 / 90%);
+  --text: #f2f2f3;
+  --muted: #a0a1a8;
+  --border: rgb(255 255 255 / 10%);
+  --hover: rgb(255 255 255 / 6%);
+  --segmented: #303135;
+  background: #191a1c;
+}
+
+.widget-ai-chat-header {
+  display: flex;
+  flex: 0 0 64px;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 24px;
+}
+
+.widget-ai-chat-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.widget-ai-chat-back:hover { background: var(--hover); }
+.widget-ai-chat-back:focus-visible { outline: 1px solid var(--focus-indicator); outline-offset: 2px; }
+.widget-ai-chat-label { color: var(--muted); font-size: 13px; line-height: 20px; }
+
+.widget-ai-chat-content {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: clamp(24px, calc(var(--home-viewport-height) * 0.09), 96px) 24px 48px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.widget-ai-chat-compose { width: min(700px, 100%); margin: 0 auto; }
+.widget-ai-chat-compose h1 {
+  margin: 18px 0 48px;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  letter-spacing: -.3px;
+}
+
+@media (max-width: 650px) {
+  .widget-ai-chat-header { padding-inline: 12px; gap: 12px; }
+  .widget-ai-chat-content { padding: clamp(24px, calc(var(--home-viewport-height) * 0.06), 56px) 16px 32px; }
+  .widget-ai-chat-compose h1 { margin: 16px 0 32px; font-size: 16px; }
+}
+
+}

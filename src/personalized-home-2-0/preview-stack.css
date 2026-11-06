@@ -1,0 +1,32 @@
+@scope (.personalized-home) {
+.preview-stack { isolation: isolate; }
+
+.preview-stack-item {
+  z-index: var(--preview-stack-index, auto);
+  transform: rotate(var(--preview-tilt, 0deg));
+  box-shadow: var(--preview-stack-shadow, 0 1px 3px rgb(0 0 0 / 12%));
+  transition: transform 180ms cubic-bezier(.2, .7, .3, 1), box-shadow 180ms, z-index 0s 180ms;
+}
+
+.preview-stack-trigger:focus-visible .preview-stack-item {
+  transform: translateY(var(--preview-stack-focus-lift, -1px)) rotate(var(--preview-tilt, 0deg));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .preview-stack-item:hover {
+    z-index: 10;
+    transform: translateY(var(--preview-stack-lift, -3px)) rotate(0deg) scale(var(--preview-stack-scale, 1.08));
+    box-shadow: var(--preview-stack-hover-shadow, 0 3px 7px rgb(0 0 0 / 15%));
+    transition-delay: 0s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-stack-item { transition: none; }
+  .preview-stack-item:hover,
+  .preview-stack-trigger:focus-visible .preview-stack-item {
+    transform: rotate(var(--preview-tilt, 0deg));
+  }
+}
+
+}

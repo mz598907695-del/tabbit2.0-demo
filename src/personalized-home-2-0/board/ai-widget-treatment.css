@@ -1,0 +1,38 @@
+@scope (.personalized-home) {
+.ai-treatment-card { position: relative; isolation: isolate; }
+/* Only the 2px decorative ring is masked: composer menus and lifted artwork
+   keep their existing overflow, dimensions and hit areas. */
+.ai-treatment-border {
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  padding: 2px;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: .82;
+  filter: blur(.4px);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+.ai-treatment-border::before {
+  content: '';
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, #5378ff 0deg, #a358ff 65deg, #f66fca 125deg, #ffb36c 185deg, #72ddb5 245deg, #62d5ed 300deg, #5378ff 360deg);
+  filter: blur(16px);
+  animation: ai-prism-orbit 10s linear infinite;
+}
+.ai-treatment-card[data-animating='false'] .ai-treatment-border::before { animation-play-state: paused; }
+
+@keyframes ai-prism-orbit { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ai-treatment-border::before { animation: none; }
+}
+
+}

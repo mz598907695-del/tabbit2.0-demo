@@ -1,0 +1,75 @@
+@scope (.personalized-home) {
+/* Expanded shortcuts retain one material plane: the original shortcut surface. */
+.board-item.is-shortcut.is-expanded-shortcut,
+.board-drop-preview.is-shortcut.is-expanded-shortcut {
+  border-radius: var(--board-card-radius, 24px);
+}
+.board-item.is-expanded-shortcut[data-h='1'] {
+  border-radius: var(--board-card-radius, 24px);
+}
+.board-item.is-expanded-shortcut > .shortcut {
+  height: 100%;
+  border-radius: inherit;
+}
+.board-item.is-expanded-shortcut > .shortcut > .resizable-shortcut {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: inherit;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px;
+  color: var(--text);
+}
+.board-item.is-expanded-shortcut[data-h='1'] > .shortcut > .resizable-shortcut {
+  padding: 10px 12px;
+}
+.resizable-shortcut > .shortcut-icon-artwork {
+  flex: 0 0 auto;
+}
+.resizable-shortcut[data-shortcut-layout='horizontal'] {
+  flex-direction: row;
+}
+.board-item.is-expanded-shortcut > .shortcut > .resizable-shortcut[data-shortcut-layout='horizontal'] {
+  justify-content: flex-start;
+}
+.resizable-shortcut[data-shortcut-layout='vertical'] {
+  flex-direction: column;
+}
+.resizable-shortcut-name {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: inherit;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.resizable-shortcut[data-shortcut-layout='vertical'] > .resizable-shortcut-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.board-item.is-expanded-shortcut[data-w='1'] > .shortcut > .resizable-shortcut {
+  padding: 10px 6px;
+}
+.board-item.is-expanded-shortcut[data-w='1'] .resizable-shortcut-name {
+  font-size: 11px;
+  line-height: 16px;
+}
+/* The inline name is card content, so the shared external-name switch does not
+   remove it. Avoid repeating that name beneath the expanded navigation card. */
+.workspace-board .board-item.is-expanded-shortcut > .board-item-label {
+  display: none;
+}
+
+}

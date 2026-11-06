@@ -1,0 +1,173 @@
+[
+  {
+    "name": "trickle",
+    "file": "trickle.png",
+    "source": "https://trickle.so/favicon.png",
+    "site": "https://trickle.so/",
+    "size": 32,
+    "bytes": 790
+  },
+  {
+    "name": "claude",
+    "file": "claude.ico",
+    "source": "https://claude.ai/favicon.ico",
+    "site": "https://claude.ai/",
+    "size": 48,
+    "bytes": 2445
+  },
+  {
+    "name": "purposetalent",
+    "file": "purposetalent.png",
+    "source": "https://cdn.prod.website-files.com/67079a31e71560a787d9fcc4/670951eecfc1d10ecdf2b5ba_32.png",
+    "site": "https://www.purposetalent.xyz/",
+    "size": 32,
+    "bytes": 1470
+  },
+  {
+    "name": "x",
+    "file": "x.png",
+    "source": "https://x.com/favicon.ico",
+    "site": "https://x.com/",
+    "size": 32,
+    "bytes": 549
+  },
+  {
+    "name": "nio",
+    "file": "nio.ico",
+    "source": "https://www.nio.cn/cdn-static/luban/nextjs/nio-favicon.ico",
+    "site": "https://www.nio.cn",
+    "size": 128,
+    "bytes": 6328,
+    "via": "official favicon"
+  },
+  {
+    "name": "onvo",
+    "file": "onvo.ico",
+    "source": "https://cdn-public.nio.com/www-alps-cn/cdn-static/images/favicon.ico",
+    "site": "https://www.onvo.cn",
+    "size": 64,
+    "bytes": 16446,
+    "via": "official favicon"
+  },
+  {
+    "name": "notion",
+    "file": "notion.ico",
+    "source": "https://www.notion.com/front-static/favicon.ico",
+    "site": "https://www.notion.com/",
+    "size": 64,
+    "bytes": 32038
+  },
+  {
+    "name": "steam",
+    "file": "steam.png",
+    "source": "https://www.google.com/s2/favicons?domain=store.steampowered.com&sz=64",
+    "site": "https://store.steampowered.com",
+    "size": 64,
+    "bytes": 1272,
+    "via": "favicon cache"
+  },
+  {
+    "name": "itch",
+    "file": "itch.ico",
+    "source": "https://itch.io/favicon.ico",
+    "site": "https://itch.io/",
+    "size": 32,
+    "bytes": 5430
+  },
+  {
+    "name": "epic",
+    "file": "epic.png",
+    "source": "https://www.google.com/s2/favicons?domain=store.epicgames.com&sz=64",
+    "site": "https://store.epicgames.com",
+    "size": 48,
+    "bytes": 2548,
+    "via": "favicon cache"
+  },
+  {
+    "name": "keylol",
+    "file": "keylol.png",
+    "source": "https://keylol.com/favicon-32x32.png?v=algn46e3Xp",
+    "site": "https://keylol.com/",
+    "size": 32,
+    "bytes": 1753
+  },
+  {
+    "name": "gamersky",
+    "file": "gamersky.ico",
+    "source": "https://www.gamersky.com/favicon.ico",
+    "site": "https://www.gamersky.com/",
+    "size": 16,
+    "bytes": 1406
+  },
+  {
+    "name": "douban",
+    "file": "douban.png",
+    "source": "https://asset.doubanio.com/cuphead/movie-static/pics/apple-touch-icon.png",
+    "site": "https://movie.douban.com/",
+    "size": 144,
+    "bytes": 5497
+  },
+  {
+    "name": "bilibili",
+    "file": "bilibili.ico",
+    "source": "https://www.bilibili.com/favicon.ico",
+    "site": "https://www.bilibili.com/",
+    "size": 32,
+    "bytes": 4286
+  },
+  {
+    "name": "youtube",
+    "file": "youtube.png",
+    "source": "https://www.youtube.com/s/desktop/e358493a/img/favicon_144x144.png",
+    "site": "https://www.youtube.com/",
+    "size": 144,
+    "bytes": 5020
+  },
+  {
+    "name": "music",
+    "file": "music.ico",
+    "source": "https://s1.music.126.net/style/favicon.ico?v20180823",
+    "site": "https://music.163.com/",
+    "size": 32,
+    "bytes": 4286
+  },
+  {
+    "name": "podcast",
+    "file": "podcast.png",
+    "source": "https://www.xiaoyuzhoufm.com/favicon-32x32.png",
+    "site": "https://www.xiaoyuzhoufm.com/",
+    "size": 32,
+    "bytes": 1859
+  },
+  {
+    "name": "iqiyi",
+    "file": "iqiyi.ico",
+    "source": "https://www.iqiyi.com/favicon.ico",
+    "site": "https://www.iqiyi.com/",
+    "size": 64,
+    "bytes": 32038
+  },
+  {
+    "name": "damai",
+    "file": "damai.ico",
+    "source": "https://img.alicdn.com/tfs/TB1RxAHSmrqK1RjSZK9XXXyypXa-16-16.ico",
+    "site": "https://www.damai.cn/",
+    "size": 16,
+    "bytes": 1150
+  },
+  {
+    "name": "mafengwo",
+    "file": "mafengwo.ico",
+    "source": "https://www.mafengwo.cn/favicon.ico",
+    "site": "https://www.mafengwo.cn/",
+    "size": 16,
+    "bytes": 1150
+  },
+  {
+    "name": "home",
+    "file": "home.ico",
+    "source": "https://www.haohaozhu.com/favicon.ico",
+    "size": 32,
+    "bytes": 1392
+  }
+]
