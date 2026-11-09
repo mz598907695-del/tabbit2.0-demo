@@ -1,17 +1,11 @@
 @font-face {font-family: TabbitVoiceLine;src:url("../assets/iconfont/voice-line.woff2") format("woff2");font-style:normal;font-weight:400;font-display:block;}
 
-.host-palette-icon, .host-navigation-icon {display:inline-flex;align-items:center;justify-content:center;transition:color 180ms ease,transform 180ms ease;}
-.host-palette-icon[data-active="true"] {color:#9364dc;transform:rotate(-8deg);}
-.host-navigation-icon[data-active="true"] {transform:translateY(-1px);}
-@media(prefers-reduced-motion:reduce){.host-palette-icon,.host-navigation-icon{transition:none;transform:none!important;}}
+.host-palette-icon {display:inline-flex;align-items:center;justify-content:center;}
 
 @scope (.personalized-home) {
   :scope {position:relative;display:block;min-width:0;min-height:0;height:100%;isolation:isolate;}
   .widget-ai-chat {position:absolute;}
-  .browser-theme-panel-host .theme-sidebar {width:var(--theme-sidebar-width,320px);height:100%;order:0;}
-  .browser-theme-panel-host .theme-sidebar-content {width:var(--theme-sidebar-width,320px);}
-  .aiws-header :is(.aiws-segments[role="tablist"], .aiws-category-scroll) button,
-  .widget-ai-artwork-temperature,
-  .utility-reset-word,
-  .widget-calendar-grid .widget-calendar-weekday {font-family:var(--home-font-family);}
+  :scope.browser-theme-panel-host .theme-sidebar {width:var(--theme-sidebar-width,320px);height:100%;order:0;}
+  :scope.browser-theme-panel-host .theme-sidebar-content {width:var(--theme-sidebar-width,320px);}
+  .aiws-header :is(.aiws-segments[role="tablist"], .aiws-category-scroll) button, .widget-ai-artwork-temperature, .utility-reset-word, .widget-calendar-grid .widget-calendar-weekday {font-family:var(--home-font-family);}
 }

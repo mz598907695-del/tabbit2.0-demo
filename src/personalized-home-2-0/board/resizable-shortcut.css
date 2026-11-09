@@ -11,7 +11,7 @@
   height: 100%;
   border-radius: inherit;
 }
-.board-item.is-expanded-shortcut > .shortcut > .resizable-shortcut {
+.board-item.is-expanded-shortcut > .shortcut > .resizable-shortcut > .board-card-content {
   display: flex;
   width: 100%;
   height: 100%;
@@ -24,19 +24,19 @@
   padding: 14px;
   color: var(--text);
 }
-.board-item.is-expanded-shortcut[data-h='1'] > .shortcut > .resizable-shortcut {
+.board-item.is-expanded-shortcut[data-h='1'] > .shortcut > .resizable-shortcut > .board-card-content {
   padding: 10px 12px;
 }
-.resizable-shortcut > .shortcut-icon-artwork {
+.resizable-shortcut > .board-card-content > .shortcut-icon-artwork {
   flex: 0 0 auto;
 }
-.resizable-shortcut[data-shortcut-layout='horizontal'] {
+.resizable-shortcut[data-shortcut-layout='horizontal'] > .board-card-content {
   flex-direction: row;
 }
-.board-item.is-expanded-shortcut > .shortcut > .resizable-shortcut[data-shortcut-layout='horizontal'] {
+.board-item.is-expanded-shortcut > .shortcut > .resizable-shortcut[data-shortcut-layout='horizontal'] > .board-card-content {
   justify-content: flex-start;
 }
-.resizable-shortcut[data-shortcut-layout='vertical'] {
+.resizable-shortcut[data-shortcut-layout='vertical'] > .board-card-content {
   flex-direction: column;
 }
 .resizable-shortcut-name {
@@ -51,7 +51,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.resizable-shortcut[data-shortcut-layout='vertical'] > .resizable-shortcut-name {
+.resizable-shortcut[data-shortcut-layout='vertical'] > .board-card-content > .resizable-shortcut-name {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -59,7 +59,7 @@
   overflow-wrap: anywhere;
   text-align: center;
 }
-.board-item.is-expanded-shortcut[data-w='1'] > .shortcut > .resizable-shortcut {
+.board-item.is-expanded-shortcut[data-w='1'] > .shortcut > .resizable-shortcut > .board-card-content {
   padding: 10px 6px;
 }
 .board-item.is-expanded-shortcut[data-w='1'] .resizable-shortcut-name {

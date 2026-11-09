@@ -1,7 +1,5 @@
 @scope (.personalized-home) {
-.tb-mount-menu-note { margin: 6px 7px 3px; color: var(--muted, #858a92); font-size: 11px; line-height: 18px; }
 .tb-project-picker { min-width: 0; }
-.tb-project-section-heading { justify-content: space-between; gap: 8px; }
 .tb-project-count { font-variant-numeric: tabular-nums; font-size: 11px; }
 .tb-project-recents { padding-block: 2px; }
 .tb-mount-project-options { display: flex; flex-direction: column; gap: 2px; max-height: 192px; overflow-y: auto; overscroll-behavior: contain; }

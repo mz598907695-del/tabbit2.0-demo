@@ -1,5 +1,4 @@
 import { useVisibilityMotion } from './useVisibilityMotion';
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { TextCursorInput, Plus, Controls, Trash2, X } from "./icons";
 import { BoardConfirm } from "./board/BoardDialogs";

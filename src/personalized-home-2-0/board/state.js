@@ -1,6 +1,5 @@
 import { createCuratedSecondDesktop, refreshProvidedSecondPageIcons, CURATED_SECOND_DESKTOP_VERSION } from './curated-desktop.js';
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { compactBoardItems, firstVacancy, layoutItems, reflowBoardItems } from './layout.js';
 import { isWidgetSize, MAX_WIDGET_WIDTH } from './widget-size.js';
 import { isShortcutSize, isLegacyShortcutSize, normalizeShortcutSize } from './shortcut-size.js';
@@ -316,12 +315,12 @@ export function useBoardState(seeds, brands) {
   // The marker belongs to the initialized history, not the module version:
   // Fast Refresh can retain a history that has not received the sample set yet.
   useEffect(()=>{try{localStorage.setItem(BOARD_STORAGE,JSON.stringify({version:LAYOUT_VERSION,desktopOrderVersion:history.desktopOrderVersion,firstDesktopShortcutsVersion:history.firstDesktopShortcutsVersion,thirdDesktopEmptyVersion:history.thirdDesktopEmptyVersion,curatedSecondDesktopVersion:history.curatedSecondDesktopVersion,commonScrollDemoVersion:history.commonScrollDemoVersion,pages:history.present.map(page=>({...page,layoutVersion:LAYOUT_VERSION}))}));}catch{}},[history.present,history.commonScrollDemoVersion,history.desktopOrderVersion,history.firstDesktopShortcutsVersion,history.thirdDesktopEmptyVersion,history.curatedSecondDesktopVersion]);
-  const setPages=update=>setHistory(current=>boardHistoryReducer(current,{type:'pages',update}));
-  const setIndex=update=>setHistory(current=>boardHistoryReducer(current,{type:'index',update}));
-  const reorderPage=(id,index)=>setPages(pages=>reorderPages(pages,id,index));
-  const initializeLayoutOrder=(pageId,order,measuredLayout)=>setHistory(current=>boardHistoryReducer(current,{type:'initialize-layout-order',pageId,order,measuredLayout}));
-  const undo=()=>setHistory(current=>boardHistoryReducer(current,{type:'undo'}));
-  const redo=()=>setHistory(current=>boardHistoryReducer(current,{type:'redo'}));
+  const setPages=useCallback(update=>setHistory(current=>boardHistoryReducer(current,{type:'pages',update})),[]);
+  const setIndex=useCallback(update=>setHistory(current=>boardHistoryReducer(current,{type:'index',update})),[]);
+  const reorderPage=useCallback((id,index)=>setPages(pages=>reorderPages(pages,id,index)),[setPages]);
+  const initializeLayoutOrder=useCallback((pageId,order,measuredLayout)=>setHistory(current=>boardHistoryReducer(current,{type:'initialize-layout-order',pageId,order,measuredLayout})),[]);
+  const undo=useCallback(()=>setHistory(current=>boardHistoryReducer(current,{type:'undo'})),[]);
+  const redo=useCallback(()=>setHistory(current=>boardHistoryReducer(current,{type:'redo'})),[]);
   return {pages:history.present,setPages,index:selectedIndex,setIndex,reorderPage,initializeLayoutOrder,undo,redo,canUndo:!!history.past.length,canRedo:!!history.future.length};
 }
 export const sizePresets = [

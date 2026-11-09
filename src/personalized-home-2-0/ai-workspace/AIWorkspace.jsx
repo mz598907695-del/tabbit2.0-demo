@@ -1,5 +1,4 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Home, Search, X, ArrowUpRight, MessageSquare, Folder, Lightbulb, CalendarClock, LayoutGrid, Star, Share2, Bell, Gauge, Check, ArrowRight } from '../icons';
 import WorkspaceNavigation from './WorkspaceNavigation';
 import WorkspaceContent from './WorkspaceContent';
@@ -17,6 +16,7 @@ import { WorkspaceSettingsContext } from './WorkspaceSchemeSettings';
 import WorkspaceNotifications from './WorkspaceNotifications';
 import { updateWorkspaceChat, deleteWorkspaceChats } from './workspace-chat-actions';
 import { WorkspaceNavigationSlot } from './workspace-secondary-context';
+import { WallpaperTransitionBackground } from '../HomeBackground';
 
 
 const destinations = [
@@ -34,7 +34,7 @@ function readVariant() {
   try { stored = localStorage.getItem('personalized-home-2-0-ai-workspace-variant'); } catch { /* session-only fallback */ }
   return resolveWorkspaceVariant(fromUrl, stored);
 }
-export default function AIWorkspace({ children, onActivityChange, onNewChat, disabled = false }) {
+export default function AIWorkspace({ children, wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNewChat, disabled = false }) {
   const [open, setOpen] = useState(false);
   const [variant, setVariant] = useState(readVariant);
   const [page, setPage] = useState(() => new URLSearchParams(window.location.search).get('preview') === 'ai-sidebar' && variant === 8 ? 'overview' : 'home');
@@ -234,8 +234,22 @@ export default function AIWorkspace({ children, onActivityChange, onNewChat, dis
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
   }
-  const searchResults = [...destinations.map(([id, label, Icon, description]) => ({ id, label, Icon, description })), ...Object.keys(workspaceData).filter(id => id !== 'assets' && Array.isArray(workspaceData[id])).flatMap(id => getWorkspaceItems(workspaceData, id).map(item=>({id,label:item.title,description:TYPE_LABELS[item.type] || item.type,filter:`detail:${item.id}`,Icon:destinations.find(d=>d[0]===id)?.[2] || Folder})))].filter(item => `${item.label}${item.description}`.toLowerCase().includes(query.toLowerCase()));
-  return <WorkspaceSettingsContext.Provider value={{ variant, onVariant: changeVariant, onCompare: () => setModal('compare') }}><div ref={shellRef} className={`aiw-shell ${open ? 'is-open' : ''} ${sidebarOverlay ? 'is-sidebar-overlay' : ''} ${activeContent ? 'has-content' : ''}`} data-variant={variant} inert={disabled} aria-hidden={disabled || undefined} style={{ visibility: disabled ? 'hidden' : undefined }}>
+  const searchResults = useMemo(() => {
+    if (modal !== 'search') return [];
+    const needle = query.toLowerCase();
+    const entries = destinations.map(([id, label, Icon, description]) => ({ id, label, Icon, description }));
+    for (const id of Object.keys(workspaceData)) {
+      if (id === 'assets' || !Array.isArray(workspaceData[id])) continue;
+      const Icon = destinations.find(destination => destination[0] === id)?.[2] || Folder;
+      for (const item of getWorkspaceItems(workspaceData, id)) {
+        entries.push({ id, label:item.title, description:TYPE_LABELS[item.type] || item.type, filter:`detail:${item.id}`, Icon });
+      }
+    }
+    return entries.filter(item => `${item.label}${item.description}`.toLowerCase().includes(needle));
+  }, [modal, query, workspaceData]);
+  return <WorkspaceSettingsContext.Provider value={{ variant, onVariant: changeVariant, onCompare: () => setModal('compare') }}><div ref={shellRef} className={`aiw-shell ${open ? 'is-open' : ''} ${sidebarOverlay ? 'is-sidebar-overlay' : ''} ${activeContent ? 'has-content' : ''} ${(wallpaper || wallpaperTransition) && !activeContent ? 'has-home-wallpaper' : ''}`} data-variant={variant} inert={disabled} aria-hidden={disabled || undefined} style={{ visibility: disabled ? 'hidden' : undefined }}>
+    {/* One media plane spans the homepage and internal sidebar. */}
+    {!activeContent && <WallpaperTransitionBackground wallpaper={wallpaper} blurred={wallpaperBlur} transition={wallpaperTransition}/>}
     <div className="aiw-nav-host" ref={navHostRef} inert={!open || disabled} aria-hidden={!open || undefined} role={navigationOverlay && open ? 'dialog' : undefined} aria-modal={navigationOverlay && open || undefined} aria-label="AI 导航" onKeyDown={navKeyDown}><WorkspaceNavigation onUpdateChat={updateChat} onDeleteChats={deleteChats} active={open && !disabled && !modal} variant={variant} page={page === 'conversation' ? 'chats' : page} activeConversationId={page === 'conversation' ? conversationId : undefined} data={workspaceData} activeFilter={activeFilter} onNavigate={navigate} onClose={closeSidebar} onSearch={openSearch} onNewChat={newChat} /></div>
     {open && !navigationOverlay && variant === 1 && <SidebarResizeHandle key={SIDEBAR_WIDTH_DEFAULT}/>}
     {navigationOverlay && open && <button className="aiw-nav-backdrop" aria-label="关闭导航抽屉" tabIndex={-1} onClick={closeSidebar}/>} 

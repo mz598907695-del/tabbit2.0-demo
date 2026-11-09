@@ -3,9 +3,11 @@ import { ChevronLeft, ChevronRight, Flag, Newspaper, Quote, RefreshCw, Sparkles 
 import { calendarCells, daysUntil, DRAW_RESULTS, DAILY_QUOTES, DEMO_NEWS, safeIndex } from './widget-data';
 import { CodexUsageCard, WorkdayCountdownCard } from './UtilityWidgetCards';
 import { normalizeCodexUsageConfig, normalizeWorkdayConfig } from './utility-widget-data';
+import BoardCard from './BoardCard';
 import './widget-cards.css';
 
 const ASSETS = '/personalized-home-2-0/asset/widgets/';
+const weekdayFormatter = new Intl.DateTimeFormat('zh-CN', { weekday: 'long' });
 const JOKES = [
   '代码是程序员思维的镜子',
   '为什么程序员喜欢黑暗？因为光会吸引 bug。',
@@ -26,7 +28,6 @@ export const widgetCatalog = [
   { kind: 'workday-countdown', title: '下班倒计时', category: 'life', description: '美好的一天从下班开始。设置上班时间与工作时长，翻页时钟实时倒数。', defaultConfig: normalizeWorkdayConfig({}), defaultSize: { w: 4, h: 2 } },
 ];
 
-export const WIDGET_CATALOG = widgetCatalog;
 
 function ReminderCard({ config, onChange }) {
   const sourceLines = typeof config.text === 'string' ? config.text.split('\n') : Array.isArray(config.lines) ? config.lines : [];
@@ -135,25 +136,36 @@ function WeatherCard({ config }) {
   </div>;
 }
 
-function useToday() {
+function useToday(active) {
   const [today, setToday] = useState(() => new Date());
   useEffect(() => {
-    const update = () => setToday(new Date());
-    const timer = window.setInterval(update, 60_000);
-    document.addEventListener('visibilitychange', update);
-    return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', update); };
-  }, []);
+    if (!active) return;
+    const update = () => {
+      const next = new Date();
+      setToday(previous => previous.getFullYear() === next.getFullYear() && previous.getMonth() === next.getMonth() && previous.getDate() === next.getDate() ? previous : next);
+    };
+    let timer;
+    const sync = () => {
+      window.clearInterval(timer);
+      if (document.hidden) return;
+      update();
+      timer = window.setInterval(update, 60_000);
+    };
+    sync();
+    document.addEventListener('visibilitychange', sync);
+    return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', sync); };
+  }, [active]);
   return today;
 }
 
-function CalendarCard({ config, onChange }) {
-  const today = useToday();
+function CalendarCard({ config, onChange, active }) {
+  const today = useToday(active);
   const offset = Math.max(-1200, Math.min(1200, Number(config.monthOffset) || 0));
   const date = new Date(today.getFullYear(), today.getMonth() + offset, 1);
   const year = date.getFullYear();
   const month = date.getMonth();
   const sameMonth = year === today.getFullYear() && month === today.getMonth();
-  const weekday = new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(today);
+  const weekday = weekdayFormatter.format(today);
   const cells = calendarCells(year, month);
   const weeks = cells.slice(35).some(Boolean) ? 6 : 5;
   return <div className="widget-content widget-calendar-content">
@@ -173,8 +185,8 @@ function CalendarCard({ config, onChange }) {
   </div>;
 }
 
-function CountdownCard({ config }) {
-  const today = useToday();
+function CountdownCard({ config, active }) {
+  const today = useToday(active);
   const days = daysUntil(config.targetDate, today);
   return <div className="widget-content widget-countdown-content">
     <div className="widget-card-eyebrow"><Flag size={14} /><span>{days === null ? '设置日期' : days < 0 ? '已经过去' : days === 0 ? '就是今天' : '还有'}</span></div>
@@ -236,7 +248,7 @@ export function WidgetCard({ kind, item = {}, size, onChange, inert = false, pre
   if (actualKind === 'weather' && item.config?.temperature === undefined && item.config?.temp !== undefined) {
     config.temperature = item.config.temp;
   }
-  return <div
+  return <BoardCard
     className={`board-widget-card widget-${actualKind}`}
     inert={inert}
     data-widget-kind={actualKind}
@@ -251,15 +263,14 @@ export function WidgetCard({ kind, item = {}, size, onChange, inert = false, pre
       {config.caption && <span className="widget-image-caption" aria-hidden="true">{config.caption}</span>}
     </>}
     {actualKind === 'weather' && <WeatherCard config={config} />}
-    {actualKind === 'calendar' && <CalendarCard config={config} onChange={onChange} />}
-    {actualKind === 'countdown' && <CountdownCard config={config} />}
+    {actualKind === 'calendar' && <CalendarCard config={config} onChange={onChange} active={active && !preview} />}
+    {actualKind === 'countdown' && <CountdownCard config={config} active={active && !preview} />}
     {actualKind === 'draw' && <DrawCard config={config} onChange={onChange} />}
     {actualKind === 'quote' && <QuoteCard config={config} onChange={onChange} />}
     {actualKind === 'news' && <NewsCard config={config} onChange={onChange} />}
     {actualKind === 'codex-usage' && <CodexUsageCard config={config} onChange={onChange} preview={preview} />}
     {actualKind === 'workday-countdown' && <WorkdayCountdownCard config={config} onChange={onChange} preview={preview} active={active} />}
-  </div>;
+  </BoardCard>;
 }
 
-export const WidgetCards = WidgetCard;
 export default WidgetCard;

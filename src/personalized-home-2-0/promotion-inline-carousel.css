@@ -7,10 +7,7 @@
   gap: 0;
   width: min(760px, 100%);
   padding: 0;
-  border: var(--home-card-outline);
   border-radius: var(--home-card-radius);
-  background: var(--home-card-surface);
-  box-shadow: var(--home-card-resting-shadow);
   color: var(--text, #141414);
 }
 
@@ -21,22 +18,6 @@
   align-self: stretch;
   width: max-content;
   padding: var(--nine-space-xs) 0 var(--nine-space-xs) var(--nine-space-xs);
-}
-
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .promotion-inline-carousel {
-    background: var(--home-card-surface);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .promotion-inline-carousel {
-    background: var(--home-card-surface);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
 }
 
 .promotion-inline-stack {

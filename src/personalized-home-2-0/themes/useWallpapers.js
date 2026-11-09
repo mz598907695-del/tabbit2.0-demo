@@ -1,6 +1,6 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { deleteWallpaper, getWallpaperErrorMessage, readWallpapers, saveWallpaper } from './wallpapers.js';
+import { deleteWallpaper, getWallpaperErrorMessage, readWallpapers, refreshWallpaperVideoPoster, saveWallpaper } from './wallpapers.js';
+import { officialWallpaperIds } from './officialWallpapers';
 
 export function useWallpapers() {
   const [wallpapers, setWallpapers] = useState([]);
@@ -16,13 +16,33 @@ export function useWallpapers() {
   const deletingRef = useRef(null);
   const urls = useRef(new Map());
 
-  const toDisplayItem = useCallback((record) => {
-    let url = urls.current.get(record.id);
-    if (!url) {
-      url = URL.createObjectURL(record.blob);
-      urls.current.set(record.id, url);
+  const releaseURLs = useCallback(() => {
+    for (const item of urls.current.values()) {
+      URL.revokeObjectURL(item.url);
+      if (item.posterUrl) URL.revokeObjectURL(item.posterUrl);
     }
-    return { id: record.id, name: record.name, mimeType: record.blob.type, url };
+    urls.current.clear();
+  }, []);
+
+  const toDisplayItem = useCallback(record => {
+    let media = urls.current.get(record.id);
+    if (!media) {
+      const url = URL.createObjectURL(record.blob);
+      try {
+        media = { url, posterUrl:record.poster ? URL.createObjectURL(record.poster) : undefined, posterBlob:record.poster };
+        urls.current.set(record.id, media);
+      } catch (error) {
+        URL.revokeObjectURL(url);
+        throw error;
+      }
+    }
+    if (media.posterBlob !== record.poster) {
+      const posterUrl = record.poster ? URL.createObjectURL(record.poster) : undefined;
+      if (media.posterUrl) URL.revokeObjectURL(media.posterUrl);
+      media.posterUrl = posterUrl;
+      media.posterBlob = record.poster;
+    }
+    return { id:record.id, name:record.name, mimeType:record.blob.type, url:media.url, posterUrl:media.posterUrl };
   }, []);
 
   useEffect(() => {
@@ -31,17 +51,30 @@ export function useWallpapers() {
     readyRef.current = false;
     setReady(false);
     setLoading(true);
-    readWallpapers().then(records => {
+    readWallpapers({ excludeIds: officialWallpaperIds }).then(records => {
       if (!mounted.current || lifecycle.current !== generation) return;
+      // Promoted images resolve from bundled official assets; only new uploads
+      // belong to 我的. Keep the original device records as migration backups.
       const items = records.map(toDisplayItem);
       setWallpapers(items);
       readyRef.current = true;
       setReady(true);
       setError('');
+      // Keep the video URL/clock stable while repairing covers in the background.
+      void (async () => {
+        for (const record of records) {
+          if (!mounted.current || lifecycle.current !== generation) return;
+          try {
+            const refreshed = await refreshWallpaperVideoPoster(record);
+            if (!refreshed || refreshed === record || !mounted.current || lifecycle.current !== generation || !urls.current.has(record.id)) continue;
+            const item = toDisplayItem(refreshed);
+            setWallpapers(previous => previous.some(entry => entry.id === item.id) ? previous.map(entry => entry.id === item.id ? item : entry) : previous);
+          } catch { /* Keep a usable wallpaper; retry its cover on the next load. */ }
+        }
+      })();
     }).catch(cause => {
       if (!mounted.current || lifecycle.current !== generation) return;
-      for (const url of urls.current.values()) URL.revokeObjectURL(url);
-      urls.current.clear();
+      releaseURLs();
       setError(getWallpaperErrorMessage(cause));
     }).finally(() => {
       if (mounted.current && lifecycle.current === generation) setLoading(false);
@@ -49,10 +82,9 @@ export function useWallpapers() {
     return () => {
       mounted.current = false;
       readyRef.current = false;
-      for (const url of urls.current.values()) URL.revokeObjectURL(url);
-      urls.current.clear();
+      releaseURLs();
     };
-  }, [toDisplayItem]);
+  }, [toDisplayItem, releaseURLs]);
 
   const upload = useCallback(async (file) => {
     if (!file || !mounted.current || uploadingRef.current) return null;
@@ -95,8 +127,8 @@ export function useWallpapers() {
       await deleteWallpaper(id);
       if (!mounted.current || lifecycle.current !== generation) return false;
       setWallpapers(previous => previous.filter(item => item.id !== id));
-      const url = urls.current.get(id);
-      if (url) URL.revokeObjectURL(url);
+      const media = urls.current.get(id);
+      if (media) { URL.revokeObjectURL(media.url); if (media.posterUrl) URL.revokeObjectURL(media.posterUrl); }
       urls.current.delete(id);
       return true;
     } catch (cause) {

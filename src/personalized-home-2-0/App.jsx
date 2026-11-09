@@ -4,16 +4,19 @@ import AIWorkspace from './ai-workspace/AIWorkspace';
 import { getHomeRoot } from "./home-host";
 import HomeBackground from './HomeBackground';
 import HomeContent from './HomeContent';
+import { ComposerWeatherContext } from './ComposerWeather';
 import HomeControls from './HomeControls';
 import { brands, initialShortcutPages, promotions } from './home-data';
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import WidgetAIChat from "./WidgetAIChat";
-import { ThemePanel, DemoDialog } from "./Overlays";
+import { ThemePanel } from "./ThemePanel";
+import { DemoDialog } from "./DemoDialog";
 import PageContextMenu from "./PageContextMenu";
 import PageManagerDialog from "./board/PageManagerDialog";
 import ThemeSidebarResizeHandle from './ThemeSidebarResizeHandle';
 import { resolvePreferences } from "./preferences";
 import { spaceColors } from "../spaceColors";
+import { normalizeAppIcon } from "./appIcons";
 import { useBoardState, transferBoardItem } from "./board/state";
 import { getIllustratedTheme } from "./themes/catalog";
 import { getThemeBackground, getThemeSelectionAppearance } from "./themes/appearance";
@@ -25,7 +28,12 @@ import { useLiquidGlassLens } from "./themes/useLiquidGlassLens";
 import { usePageSwipe } from "./usePageSwipe";
 import { isOceanTheme, OCEAN_THEME_ID } from './themes/ocean/catalog.js';
 import { baseGlassSettings, GLASS_THEME_EVENT, GLASS_SPACE_THEME_EVENT } from '../demoDefaults';
-import { readWindowAppearance, watchExistingTokenMode, WINDOW_APPEARANCE_KEY } from '../windowAppearance';
+import { readWindowAppearance, resolveWindowAppearance, watchExistingTokenMode, WINDOW_APPEARANCE_KEY } from '../windowAppearance';
+import { useSpaceWallpaperTransition } from './themes/useSpaceWallpaperTransition';
+import { useSpaceAppearanceTransition } from './themes/useSpaceAppearanceTransition';
+import { useWindowWallpaperLayout } from './themes/useWindowWallpaperLayout';
+import { getAutomaticThemeAppearance } from './themes/imageAppearance';
+import { COLOR_WINDOW_APPEARANCE_KEY, resolveThemeSource } from '../themeSelection';
 
 function readPreferences() {
   const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -44,26 +52,38 @@ export function App() {
   const [widgetAIEntryId, setWidgetAIEntryId] = useState('initial');
   const [widgetAIEntries, setWidgetAIEntries] = useState(() => [{ id: 'initial', draft: null }]);
   const [preferences, setPreferences] = useState(readPreferences);
+  const [spaceId, setSpaceId] = useState(null);
+  const spaceIdRef = useRef(null);
   const [spaceColor, setSpaceColor] = useState(baseGlassSettings.color);
   const controlColorPreset = spaceColors.find((item, index) => index > 0 && item.tintColor.toLowerCase() === spaceColor.toLowerCase());
-  const controlAccent = controlColorPreset?.color || 'var(--nine-color-action-primary)';
+  const controlAccent = preferences.themeSource === 'gallery' ? 'var(--nine-color-action-primary)' : controlColorPreset?.color || 'var(--nine-color-action-primary)';
+  const composerFrameColor = preferences.themeSource === 'color' && spaceColor.toLowerCase() !== baseGlassSettings.color.toLowerCase()
+    ? controlColorPreset?.color || spaceColor : null;
   const [frameTint,setFrameTint] = useState(50);
   const [frameClear,setFrameClear] = useState(false);
   const [selectedAppIcon, setSelectedAppIcon] = useState(() => {
     const saved = Number.parseInt(localStorage.getItem('tabbit-app-icon-v1') || '0', 10);
-    return Number.isInteger(saved) && saved >= 0 && saved < 10 ? saved : 0;
+    return normalizeAppIcon(saved);
   });
   const [windowAppearance, setWindowAppearance] = useState(() => {
     return readWindowAppearance();
   });
-  useEffect(() => {
-    localStorage.setItem(WINDOW_APPEARANCE_KEY, windowAppearance);
-    return watchExistingTokenMode(windowAppearance, resolved => {
-      void invoke('set_window_appearance', { appearance:windowAppearance, resolved }).catch(error => {
+  const effectiveAppearance = preferences.themeSource === 'gallery' ? preferences.appearance : windowAppearance;
+  const [appearanceTheme, setAppearanceTheme] = useState(() => resolveWindowAppearance(effectiveAppearance));
+  useLayoutEffect(() => {
+    // Commit the image and its analyzed appearance together, before paint.
+    localStorage.setItem(WINDOW_APPEARANCE_KEY, effectiveAppearance);
+    return watchExistingTokenMode(effectiveAppearance, resolved => {
+      setAppearanceTheme(resolved);
+      void invoke('set_window_appearance', { appearance:effectiveAppearance, resolved }).catch(error => {
         console.warn('Native window appearance update unavailable:', error);
       });
     });
-  }, [windowAppearance]);
+  }, [effectiveAppearance, preferences.theme]);
+  useSpaceAppearanceTransition(spaceId, appearanceTheme);
+  useEffect(() => {
+    if (preferences.themeSource === 'color') localStorage.setItem(COLOR_WINDOW_APPEARANCE_KEY, windowAppearance);
+  }, [windowAppearance, preferences.themeSource]);
   useEffect(() => {
     localStorage.setItem('tabbit-app-icon-v1', String(selectedAppIcon));
     void invoke('set_app_icon', { index:selectedAppIcon + 1 }).catch(error => {
@@ -72,8 +92,23 @@ export function App() {
   }, [selectedAppIcon]);
   useEffect(() => {
     const syncSpaceTheme = event => {
+      if (typeof event.detail?.spaceId === 'string') {
+        if (spaceIdRef.current !== event.detail.spaceId) themeSelectionEpoch.current += 1;
+        spaceIdRef.current = event.detail.spaceId;
+        setSpaceId(event.detail.spaceId);
+      }
       const theme = event.detail?.theme;
-      if (typeof theme === 'string') setPreferences(current => current.theme === theme ? current : ({ ...current, theme, appearance:getThemeSelectionAppearance(theme,current.appearance) }));
+      if (typeof theme === 'string') {
+        const themeSource = resolveThemeSource(theme, event.detail.themeSource);
+        setPreferences(current => current.theme === theme && current.themeSource === themeSource ? current : ({ ...current, theme, themeSource, appearance:getThemeSelectionAppearance(theme,current.appearance) }));
+        // Stored space appearance can predate the current image/threshold.
+        // Gallery appearance is owned by image analysis and must not be reset
+        // by a later settings sync for the same theme.
+        if (themeSource === 'color') {
+          const mode = localStorage.getItem(COLOR_WINDOW_APPEARANCE_KEY) || 'system';
+          if (['system', 'light', 'dark'].includes(mode)) setWindowAppearance(mode);
+        }
+      }
       if (typeof event.detail?.color === 'string') setSpaceColor(event.detail.color);
       if (typeof event.detail?.tint === 'number') setFrameTint(event.detail.tint);
       if (typeof event.detail?.clear === 'boolean') setFrameClear(event.detail.clear);
@@ -85,6 +120,8 @@ export function App() {
   const wallpaperLibrary = useWallpapers();
   const selectedWallpaper = getExampleWallpaper(preferences.theme)
     || wallpaperLibrary.wallpapers.find((item) => item.id === preferences.theme);
+  const wallpaperTransition = useSpaceWallpaperTransition(preferences.theme, selectedWallpaper,
+    wallpaperLibrary.wallpapers, document.documentElement.dataset.mode, preferences.wallpaperBlur, spaceId);
   const [composerOpen, setComposerOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const [themePanelPresent, setThemePanelPresent] = useState(false);
@@ -103,7 +140,6 @@ export function App() {
   const [boardEditing, setBoardEditing] = useState(false);
   const [pageActionsOpen, setPageActionsOpen] = useState(false);
   const [pageManagerOpen, setPageManagerOpen] = useState(false);
-  const [appearanceTheme, setAppearanceTheme] = useState(() => document.documentElement.dataset.mode === "dark" ? "dark" : "light");
   const [submitted, setSubmitted] = useState({
     query: "",
     mode: "对话",
@@ -120,6 +156,8 @@ export function App() {
     setShortcutPageIndex(next);
   }
   const homeRef = useRef(null);
+  // Wallpaper follows the whole new-tab shell, independent of the AI sidebar.
+  useWindowWallpaperLayout(homeRef);
   const [themePortalHost, setThemePortalHost] = useState(null);
   useLayoutEffect(() => { setThemePortalHost(homeRef.current?.closest(".browser-content-row") || null); }, []);
   const oceanRef = useRef(null);
@@ -127,7 +165,6 @@ export function App() {
   const pageContextRef = useRef(null);
   const themeRef = useRef(null);
   const themeTriggerRef = useRef(null);
-  const paletteIconRef = useRef(null);
   const themeSelectionEpoch = useRef(0);
   const previousWidgetAIRef = useRef(widgetAI);
   const pageSwipeBlocked = !preferences.shortcuts || widgetAI || aiWorkspaceBusy || composerOpen || Boolean(dialog)
@@ -141,11 +178,18 @@ export function App() {
   const illustratedTheme = getIllustratedTheme(preferences.theme);
   const oceanActive = isOceanTheme(preferences.theme);
   const darkAppearance = appearanceTheme === "dark";
-  const currentShortcuts = shortcutPages[shortcutPage].items.map((entry, index) => {
-    if (!Array.isArray(entry)) return entry;
-    const [key, label] = entry;
-    return { ...brands[key], key, label, id: `${key}-${index}` };
-  });
+  useEffect(() => {
+    if (preferences.themeSource !== 'gallery' || (isWallpaperTheme(preferences.theme) && !selectedWallpaper)) return;
+    const epoch = themeSelectionEpoch.current;
+    let cancelled = false;
+    getAutomaticThemeAppearance(preferences.theme, wallpaperLibrary.wallpapers).then(mode => {
+      if (cancelled || themeSelectionEpoch.current !== epoch) return;
+      setPreferences(current => current.appearance === mode ? current : { ...current, appearance:mode });
+      if (spaceId !== null) localStorage.setItem(`tabbit-glass-theme-appearance:${spaceId}`, mode);
+    });
+    return () => { cancelled = true; };
+  }, [preferences.theme, preferences.themeSource, selectedWallpaper?.url, wallpaperLibrary.wallpapers, spaceId]);
+
 
   useEffect(() => {
     if (previousWidgetAIRef.current === widgetAI) return;
@@ -245,16 +289,6 @@ export function App() {
     setShortcutPage(retainedIndex >= 0 ? retainedIndex : Math.min(targetIndex, nextPages.length - 1));
   }
 
-  useEffect(() => {
-    const root = document.documentElement;
-    const syncMode = () => setAppearanceTheme(root.dataset.mode === "dark" ? "dark" : "light");
-    const observer = new MutationObserver(syncMode);
-    observer.observe(root, {attributes: true, attributeFilter: ["data-mode"]});
-    syncMode();
-    return () => observer.disconnect();
-  }, []);
-
-
   useLayoutEffect(() => {
     getHomeRoot().dataset.theme = appearanceTheme;
     if (preferences.liquidGlass) {
@@ -268,8 +302,11 @@ export function App() {
   }, [appearanceTheme, preferences.liquidGlass, preferences.liquidGlassOpacity]);
 
   useLayoutEffect(() => {
-    getHomeRoot().style.setProperty('--accent', controlAccent);
-  }, [controlAccent]);
+    const root = getHomeRoot();
+    root.style.setProperty('--accent', controlAccent);
+    if (composerFrameColor) root.style.setProperty('--composer-frame-fill', `color-mix(in srgb, ${composerFrameColor} 15%, transparent)`);
+    else root.style.removeProperty('--composer-frame-fill');
+  }, [controlAccent, composerFrameColor]);
 
   useLayoutEffect(() => {
     document.documentElement.dataset.largeTabRadius = String(preferences.largeTabRadius);
@@ -289,9 +326,11 @@ export function App() {
   useEffect(() => {
     // Wait for IndexedDB before treating an uploaded theme as missing.
     if (!wallpaperLibrary.ready || !isWallpaperTheme(preferences.theme) || selectedWallpaper) return;
-    setPreferences((current) => current.theme === preferences.theme
-      ? { ...current, theme: darkAppearance ? "dark" : "light" }
-      : current);
+    const theme = darkAppearance ? 'dark' : 'light';
+    themeSelectionEpoch.current += 1;
+    setPreferences(current => current.theme === preferences.theme ? { ...current, theme, themeSource:'color' } : current);
+    setWindowAppearance(localStorage.getItem(COLOR_WINDOW_APPEARANCE_KEY) || 'system');
+    window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT, { detail:{ theme, themeSource:'color', ...baseGlassSettings, preset:true, reset:true } }));
   }, [wallpaperLibrary.ready, preferences.theme, selectedWallpaper, darkAppearance]);
   useEffect(() => {
     function onKey(event) {
@@ -356,23 +395,35 @@ export function App() {
     if (key === 'shortcuts') setModuleVisible(value);
     else updatePreference(key, value);
   }
-  function selectTheme(theme) {
-    themeSelectionEpoch.current += 1;
-    setPreferences((current) => ({ ...current, theme, appearance: getThemeSelectionAppearance(theme, current.appearance) }));
-    const color = theme === 'light' ? baseGlassSettings.color : getThemeBackground(theme, preferences.appearance);
-    setSpaceColor(color);
-    window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT, { detail:{ theme, color } }));
+  async function selectTheme(theme, wallpapers = wallpaperLibrary.wallpapers) {
+    const epoch = ++themeSelectionEpoch.current;
+    const appearance = await getAutomaticThemeAppearance(theme, wallpapers);
+    if (themeSelectionEpoch.current !== epoch) return;
+    setPreferences(current => ({ ...current, theme, themeSource:'gallery', appearance }));
+    setSpaceColor(baseGlassSettings.color);
+    setFrameTint(baseGlassSettings.tint);
+    setFrameClear(false);
+    window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT, { detail:{ theme, themeSource:'gallery', appearance, ...baseGlassSettings, preset:true, reset:true } }));
   }
   function selectSpaceColor(color, preset) {
+    themeSelectionEpoch.current += 1;
+    const mode = localStorage.getItem(COLOR_WINDOW_APPEARANCE_KEY) || 'system';
+    const dark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+    const theme = dark ? 'dark' : 'light';
+    const swatch = spaceColors.find(item => item.tintColor.toLowerCase() === color.toLowerCase());
+    setPreferences(current => ({ ...current, theme, themeSource:'color', appearance:mode }));
+    setWindowAppearance(mode);
     setSpaceColor(color);
-    window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT, { detail:{ theme:preferences.theme, color, ...preset } }));
+    window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT, { detail:{ theme, themeSource:'color', color, ...preset, tint:swatch ? dark ? swatch.darkTint : swatch.tint : preset?.tint } }));
   }
   function updateFrameTint(tint, detail = {}) {
+    if (preferences.themeSource === 'gallery') return;
     setFrameTint(tint);
     if (typeof detail.clear === 'boolean') setFrameClear(detail.clear);
     window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT,{detail:{tint, ...detail}}));
   }
   function updateFrameClear(clear) {
+    if (preferences.themeSource === 'gallery') return;
     setFrameClear(clear);
     window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT,{detail:{clear}}));
   }
@@ -381,7 +432,7 @@ export function App() {
     const epoch = themeSelectionEpoch.current;
     const item = await wallpaperLibrary.upload(file);
     // A later explicit theme choice wins over an in-flight upload.
-    if (item && themeSelectionEpoch.current === epoch) selectTheme(item.id);
+    if (item && themeSelectionEpoch.current === epoch) await selectTheme(item.id, [item, ...wallpaperLibrary.wallpapers]);
   }
   function usePrompt(text) {
     (widgetAI ? aiComposerRef : composerRef).current?.setPrompt(text);
@@ -417,10 +468,11 @@ export function App() {
           <ThemePanel
             openThemesRequest={themeGalleryRequest}
             theme={preferences.theme}
+            themeSource={preferences.themeSource}
             onTheme={selectTheme}
-            appearance={windowAppearance}
+            appearance={effectiveAppearance}
             resolvedAppearance={appearanceTheme}
-            onAppearance={setWindowAppearance}
+            onAppearance={value => { if (preferences.themeSource === 'color') setWindowAppearance(value); }}
             spaceColor={spaceColor}
             onSpaceColor={selectSpaceColor}
             frameTint={frameTint}
@@ -429,32 +481,16 @@ export function App() {
             onFrameTint={updateFrameTint}
             wallpaperLibrary={wallpaperLibrary}
             onUploadWallpaper={uploadWallpaper}
-            liquidGlass={preferences.liquidGlass}
-            onLiquidGlass={(value) => updatePreference("liquidGlass", value)}
-            liquidGlassOpacity={preferences.liquidGlassOpacity}
-            onLiquidGlassOpacity={(value) => updatePreference("liquidGlassOpacity", value)}
-            wallpaperBlur={preferences.wallpaperBlur}
-            onWallpaperBlur={(value) => updatePreference("wallpaperBlur", value)}
-            shortcutShape={preferences.shortcutShape}
-            onShortcutShape={(value) => updatePreference("shortcutShape", value)}
-            shortcutSize={preferences.shortcutSize}
-            onShortcutSize={(value) => updatePreference("shortcutSize", value)}
-            pageWidth={preferences.pageWidth}
-            onPageWidth={(value) => updatePreference("pageWidth", value)}
             largeTabRadius={preferences.largeTabRadius}
             onLargeTabRadius={(value) => updatePreference("largeTabRadius", value)}
             selectedAppIcon={selectedAppIcon}
             onAppIcon={setSelectedAppIcon}
+            onDefaultBrowserUnlock={() => promotionAction(promotions.find(item => item.kind === 'default-browser'))}
             onClose={closeThemePanel}
             showShortcuts={preferences.shortcuts}
             onShortcuts={setModuleVisible}
-            showShortcutLabels={preferences.shortcutLabels !== false}
-            onShortcutLabels={(value) => updatePreference("shortcutLabels", value)}
             showPromotion={preferences.promotion}
             onPromotion={(value) => updatePreference("promotion", value)}
-            promotionStyle={preferences.promotionStyle}
-            onPromotionStyle={(value) => updatePreference("promotionStyle", value)}
-            onAddContent={() => boardRef.current?.openLibrary()}
             pageManagement={{ pages: shortcutPages, onOpen: openPageManager }}
           />
           )}
@@ -463,8 +499,8 @@ export function App() {
   );
 
   return (
-    <>
-    <AIWorkspace disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNewChat={prompt => {
+    <ComposerWeatherContext.Provider value={selectedWallpaper?.weather || null}>
+    <AIWorkspace wallpaper={selectedWallpaper} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNewChat={prompt => {
       setWidgetAI(false); aiComposerRef.current?.closeOverlays();
       setDialog(null); setThemeOpen(false); setPageManagerOpen(false); boardRef.current?.dismissOverlays(); setBoardEditing(false);
       composerRef.current?.startNew(prompt);
@@ -473,7 +509,7 @@ export function App() {
     <main
       ref={homeRef}
       data-page-swipe-enabled={!pageSwipeBlocked && shortcutPages.length > 1 || undefined}
-      className={`home ${oceanActive ? 'has-ocean-theme' : ''} ${illustratedTheme ? "has-illustrated-theme" : ""} ${preferences.shortcuts && currentShortcuts.length > 9 ? "has-multiple-shortcut-rows" : ""} ${preferences.promotion && preferences.promotionStyle === "inline" ? "has-inline-promotion" : ""} ${preferences.promotion && preferences.promotionStyle === "card" ? "has-corner-promotion" : ""}`}
+      className={`home${oceanActive ? " has-ocean-theme" : ""}`}
       aria-label="个性化首页 2.0"
       data-background-theme={preferences.theme}
       data-shortcuts-visible={preferences.shortcuts ? "true" : "false"}
@@ -486,7 +522,6 @@ export function App() {
         illustratedTheme={illustratedTheme}
         active={!widgetAI}
         paused={Boolean(widgetAI || composerOpen || dialog || shortcutEditing || boardEditing || pageActionsOpen || pageManagerOpen || pageContextOpen)}
-        wallpaper={selectedWallpaper}
         ocean={oceanActive ? {
           ref: oceanRef, homeRef, pageKey: shortcutPages[shortcutPage].id,
           onPhaseChange: setOceanPhase,
@@ -499,6 +534,7 @@ export function App() {
         onToggleShortcuts={() => setModuleVisible(!preferences.shortcuts)}
         appIconIndex={selectedAppIcon}
         spaceColor={spaceColor}
+        wallpaper={selectedWallpaper}
         ocean={oceanActive ? {phase: oceanPhase, onCast: () => oceanRef.current?.cast()} : null}
         composerProps={{
           ref: composerRef, onSubmit: submit, onVoice: () => setDialog('voice'),
@@ -531,7 +567,7 @@ export function App() {
       />
       <HomeControls
         promotionProps={preferences.promotion && preferences.promotionStyle === 'card' ? promotionProps : null}
-        themeButtonProps={{ref: themeTriggerRef, paletteIconRef, expanded: themeOpen, onClick: toggleThemePanel}}
+        themeButtonProps={{ref: themeTriggerRef, expanded: themeOpen, onClick: toggleThemePanel}}
         pageProps={!widgetAI ? {
           visible: preferences.shortcuts,
           pages: shortcutPages, selectedIndex: shortcutPage,
@@ -565,7 +601,7 @@ export function App() {
         {themeSidebar}
       </div>, themePortalHost
     )}
-    <PageContextMenu ref={pageContextRef} enabled={!widgetAI && !aiWorkspaceBusy} canEdit={currentShortcuts.length > 0}
+    <PageContextMenu ref={pageContextRef} enabled={!widgetAI && !aiWorkspaceBusy} canEdit={shortcutPages[shortcutPage].items.length > 0}
       preferences={preferences} onPreferenceChange={updatePageMenuPreference}
       onAdd={openPageLibrary} onEdit={editCurrentPage} onPageSettings={openPageManager}
       onThemeSettings={openThemeGallery} onOpenChange={setPageContextOpen} />
@@ -591,6 +627,6 @@ export function App() {
           onUsePrompt={usePrompt}
         />
       )}
-    </>
+    </ComposerWeatherContext.Provider>
   );
 }

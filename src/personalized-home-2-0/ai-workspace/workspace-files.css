@@ -31,10 +31,6 @@
 .aiwf-card-copy { display:flex; flex-direction:column; align-items:stretch; gap:0; padding:6px 6px 0; min-width:0; }
 .aiwf-card-title { font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:500; color:var(--nine-color-text-title); overflow-wrap:anywhere; }
 .aiwf-card-description { font-size:var(--nine-font-size-12); line-height:var(--nine-font-line-height-12); font-weight:400; color:var(--nine-color-text-tertiary); }
-.aiwf-type-icon { display:grid; place-items:center; width:32px; height:32px; flex:none; border:.5px solid var(--border); border-radius:6px; background:var(--aiw-content-soft); color:var(--muted); }
-.aiwf-identity-text { display:flex; flex:1; flex-direction:column; min-width:0; }
-.aiwf-identity-title { font-size:14px; line-height:24px; font-weight:400; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-.aiwf-identity-meta { display:block; min-height:20px; color:var(--muted); font-size:12px; line-height:20px; font-weight:400; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .aiwf-file-actions { display:flex; align-items:center; gap:4px; }
 .aiw-content .aiwf-file-actions .aiwf-icon-button { width:28px; height:28px; color:var(--text); }
 .aiwf-card>.aiwf-file-actions { position:absolute; right:12px; top:12px; gap:2px; padding:2px; border:.5px solid #fff; border-radius:18px; background:var(--nine-color-fill-floating); backdrop-filter:blur(30px) saturate(100%); -webkit-backdrop-filter:blur(30px) saturate(100%); box-shadow:none; opacity:0; pointer-events:none; }
@@ -105,8 +101,6 @@
 .aiwf-share-form { padding-top:20px; gap:12px; }
 .aiwf-share-form h3 { font-size:14px; font-weight:500; overflow-wrap:anywhere; }
 .aiwf-share-form .aiw-form-note { margin:0!important; }
-
-.aiwf-mobile-meta,.aiwf-mobile-info { display:none; }
 @container workspace-results (max-width:640px) {
   .aiwf-table-scroll { overflow:visible; }
   .aiwf-table { display:block; min-width:0; }
@@ -118,9 +112,6 @@
   .aiwf-table tbody tr:last-child { border-bottom:0; }
   .aiwf-table td { display:block; height:auto; padding:12px 0; border:0; min-width:0; }
   .aiwf-table td:nth-child(2),.aiwf-table td:nth-child(3) { display:none; }
-  .aiwf-table .aiwf-identity-meta { display:none; }
-  .aiwf-table .aiwf-mobile-info { display:block; font-size:12px; line-height:20px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--muted); }
-  .aiwf-table .aiwf-mobile-meta { display:block; font-size:11px; line-height:18px; color:var(--muted); }
 }
 
 

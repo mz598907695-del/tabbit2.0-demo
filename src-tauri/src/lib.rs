@@ -1,3 +1,5 @@
+mod shockwave;
+
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
 
@@ -283,7 +285,7 @@ fn install_trackpad_phases(window: tauri::WebviewWindow) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![update_glass, set_window_appearance, page_switch_haptic, record_swipe_trace, set_app_icon])
+        .invoke_handler(tauri::generate_handler![update_glass, set_window_appearance, page_switch_haptic, record_swipe_trace, set_app_icon, shockwave::capture_shockwave_content])
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             use tauri::menu::{Menu, MenuItem, MenuItemKind};

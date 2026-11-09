@@ -1,4 +1,5 @@
 import { LEGACY_LIQUID_GLASS_THEME, resolveThemePreferences } from './themes/appearance.js';
+import { resolveThemeSource } from '../themeSelection';
 
 const accentColors = ['#ff7900', '#3478f6', '#8b5cf6', '#e85c8a', '#16a085', '#e05252'];
 
@@ -9,6 +10,7 @@ export function resolvePreferences(saved = {}, systemDark = false) {
     ? saved.catpawGlassOpacity : saved.liquidGlassOpacity;
   return {
     ...resolveThemePreferences(saved, systemDark),
+    themeSource:resolveThemeSource(saved.theme || 'light', saved.themeSource),
     liquidGlass: typeof saved.liquidGlass === 'boolean' ? saved.liquidGlass : saved.theme === LEGACY_LIQUID_GLASS_THEME,
     wallpaperBlur: saved.wallpaperBlur === true,
     largeTabRadius: saved.largeTabRadius !== false,

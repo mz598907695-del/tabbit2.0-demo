@@ -1,0 +1,49 @@
+@scope (.personalized-home) {
+.home-layout .illustrated-theme-background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+.uploaded-wallpaper-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.uploaded-wallpaper-background :is(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+}
+.window-aligned-wallpaper-canvas {
+  position: absolute;
+  max-width: none;
+  max-height: none;
+}
+.window-aligned-wallpaper-canvas.is-blurred {
+  filter: blur(8px);
+}
+.wallpaper-background-layers { position:absolute; inset:0; z-index:0; overflow:hidden; border-radius:inherit; pointer-events:none; }
+.space-wallpaper-scene { position:absolute; inset:0; }
+.space-wallpaper-scene.is-incoming { opacity:var(--space-wallpaper-progress,0); }
+.space-wallpaper-scene.is-outgoing { opacity:calc(1 - var(--space-wallpaper-progress,0)); }
+.home-layout > .home[data-wallpaper-blur="true"] {
+  /* Overscan must not create a focus-scrollable outer viewport. Content owns scrolling. */
+  overflow: clip;
+}
+.home[data-wallpaper-blur="true"] > :is(.illustrated-theme-background, .monochrome-theme-background, .scroll-theme-background) {
+  /* Overscan by three blur radii so the clipped homepage has no faded edges.
+     Filter only the background; never flatten the foreground glass or text. */
+  inset: -24px;
+  width: calc(100% + 48px);
+  height: calc(100% + 48px);
+  border-radius: 0;
+  filter: blur(8px);
+}
+}

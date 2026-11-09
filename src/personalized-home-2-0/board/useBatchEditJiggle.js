@@ -52,7 +52,8 @@ export default function useBatchEditJiggle(rootRef, enabled, paused = false) {
 
     function collectItems() {
       dirty = false;
-      const present = new Set(root.querySelectorAll('[data-board-item]'));
+      // Gesture snapshots copy the data attributes too; only live tiles edit.
+      const present = new Set(root.querySelectorAll(':scope > .board-grid > [data-board-item]'));
       for (const [node, item] of items) {
         if (present.has(node)) continue;
         visibility.unobserve(node);
@@ -122,6 +123,10 @@ export default function useBatchEditJiggle(rootRef, enabled, paused = false) {
     function wake() {
       if (disposed) return;
       if (preference.matches || document.hidden) { reset(); return; }
+      // Outside edit mode, preview mounts and widget text updates need no
+      // discovery pass, visibility observers or animation frame. Let an
+      // already-running exit finish settling before going dormant.
+      if (!optionsRef.current.enabled && !previousTime && !frame) return;
       if (!frame) frame = requestAnimationFrame(tick);
     }
 

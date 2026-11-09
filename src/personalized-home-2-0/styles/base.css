@@ -1,0 +1,98 @@
+@scope (.personalized-home) {
+:scope {
+  --home-font-family:var(--app-font-family);
+  font-family: var(--home-font-family);
+  color: var(--text);
+  background: transparent;
+  margin: 0;
+  min-width: 320px;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --bg: var(--nine-color-bg-page);
+  --default-home-background: transparent;
+  --surface: var(--nine-color-fill-layer-base);
+  --tile-surface: color-mix(in srgb, var(--surface) 70%, transparent);
+  --home-card-surface: var(--tile-surface);
+  --home-card-outline: var(--nine-border-thin) solid var(--nine-color-border-alpha-subtle);
+  --home-card-radius: var(--nine-radius-md);
+  --home-card-resting-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  /* 新鲸语 5106:51739 / 5106:49602: 悬浮容器, 90% fill + 30px background blur. */
+  --floating-surface-solid: var(--nine-color-fill-layer-base);
+  --floating-surface-glass: var(--nine-color-fill-floating);
+  --floating-surface-blur: 30px;
+  --text: var(--nine-color-text-title);
+  --muted: var(--nine-color-text-tertiary);
+  --border: var(--nine-color-border-alpha-subtle);
+  --tile-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0);
+  --hover: var(--nine-color-fill-layer-strong);
+  --segmented: var(--nine-color-fill-layer-muted);
+  --accent: var(--nine-color-action-primary);
+  --focus-ring: var(--nine-color-text-tertiary);
+  --focus-indicator: var(--nine-color-border-alpha-regular);
+  --placeholder: var(--nine-color-text-disabled);
+  --shadow: var(--nine-shadow-level-1);
+}
+* {
+  box-sizing: border-box;
+}
+button,
+textarea,
+input {
+  font: inherit;
+}
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+  color: inherit;
+  border: 0;
+  background: none;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 1px solid var(--focus-indicator);
+  outline-offset: -1px;
+}
+button,
+a {
+  touch-action: manipulation;
+}
+p,
+h2 {
+  margin: 0;
+}
+svg {
+  flex-shrink: 0;
+  stroke-width: 1.75;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+:scope :is(input:not([type="range"]):not([type="checkbox"]):not([type="radio"]), textarea):focus-visible {
+  outline: none;
+  border-color: var(--focus-indicator);
+}
+:scope :is(input, textarea)[aria-invalid="true"]:focus-visible { border-color: #c84646; }
+:scope[data-theme="dark"] :is(input, textarea)[aria-invalid="true"]:focus-visible { border-color: #f38e8e; }
+}

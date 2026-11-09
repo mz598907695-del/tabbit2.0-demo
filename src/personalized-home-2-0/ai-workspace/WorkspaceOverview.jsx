@@ -1,4 +1,3 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { useId, useState } from 'react';
 import {
   ArrowRight, ArrowUpRight, Bell, CalendarClock, CheckCheck, ChevronRight,
@@ -72,7 +71,7 @@ export default function WorkspaceOverview({ data, onNavigate, onNewChat }) {
         </div>
         <div className="aiw-overview-panel">
           <div className="aiw-overview-filters" role="group" aria-label="最近工作类型">
-            {[{ page: 'all', label: '全部', icon: FolderOpen }, ...WORK_TYPES].map(({ page, label, icon: Icon }) => <button
+            {[{ page: 'all', label: '全部', icon: FolderOpen }, ...WORK_TYPES].map(({ page, label }) => <button
               key={page} aria-pressed={filter === page} onClick={() => setFilter(page)}
             >{label}</button>)}
           </div>

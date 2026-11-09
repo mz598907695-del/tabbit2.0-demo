@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>视频空间衔接验证</title>
+<body style="font:14px/1.6 system-ui;padding:24px">
+<button id="run">检查视频衔接与播放器共享</button>
+<output id="result">等待检查</output>
+<pre id="details"></pre>
+<script type="module">
+import { checkThemeTransitions, checkSharedWallpaper } from './theme-transitions.jsx';
+document.querySelector('#run').onclick=async()=>{
+  const result=document.querySelector('#result');
+  result.textContent='检查中…'; delete result.dataset.passed;
+  try {
+    const transitions=await checkThemeTransitions();
+    const playback=await checkSharedWallpaper();
+    result.textContent='全部通过'; result.dataset.passed='true';
+    document.querySelector('#details').textContent=JSON.stringify({transitions,playback},null,2);
+  } catch(error) { result.textContent=String(error); result.dataset.passed='false'; }
+};
+</script>
+</body>
+</html>

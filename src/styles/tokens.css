@@ -324,7 +324,7 @@
   --color-bg-3: rgba(18, 19, 20, 1);
   --color-bg-4: rgba(42, 42, 43, 1);
   --color-bg-overlay: rgba(0, 0, 0, 0.3);
-  --color-bg-global-mask: linear-gradient(rgba(34, 34, 34, 0.85), rgba(25, 25, 25, 0.2));
+  --color-bg-global-mask: linear-gradient(rgba(34, 34, 34, 0.6), rgba(25, 25, 25, 0.2));
 
   /* ========== 容器颜色 - 实色 ========== */
   /* 深色模式覆盖值，详细说明见 Light 模式。 */

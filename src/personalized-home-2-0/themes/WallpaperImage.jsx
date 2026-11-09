@@ -78,7 +78,7 @@ function MeasuredWallpaperImage({ src, alt, loading, mimeType, style, onLoad, on
       left: rect?.left ?? 0, top: rect?.top ?? 0,
       width: rect?.width ?? '100%', height: rect?.height ?? '100%',
       maxWidth: 'none', maxHeight: 'none',
-      objectFit: rect ? 'fill' : 'cover', objectPosition: 'center',
+      objectFit: rect ? 'fill' : 'cover', objectPosition: 'center bottom',
     }}
     onLoad={event => { inspectImage(event.currentTarget); onLoad?.(event); }}
     onError={event => { boundsRef.current = null; setRect(null); onError?.(event); }}

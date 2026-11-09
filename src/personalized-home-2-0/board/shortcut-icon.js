@@ -41,7 +41,7 @@ export function getShortcutIconCandidates(item = {}, appearanceTheme = 'light') 
   const hostname = shortcutHostname(item.url);
   const matches = !item.iconHostname || item.iconHostname === hostname;
   const storedImage = matches ? (appearanceTheme === 'dark' ? item.darkImage || item.image : item.image) : undefined;
-  const candidates = [processedSiteIconFor(hostname), processedSiteIconFor(item.key), sanitizeShortcutCustomIcon(item.customIcon), storedImage, localIcons.get(hostname)];
+  const candidates = [processedSiteIconFor(hostname, appearanceTheme), processedSiteIconFor(item.key, appearanceTheme), sanitizeShortcutCustomIcon(item.customIcon), storedImage, localIcons.get(hostname)];
   if (canLookUpOnline(hostname)) {
     // Ask for the highest useful resolution; providers return the best available source.
     // Only the hostname is sent, never paths, query strings or credentials.

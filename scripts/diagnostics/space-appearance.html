@@ -1,0 +1,129 @@
+<!doctype html>
+<html data-mode="light" lang="zh-CN">
+<meta charset="utf-8">
+<title>空间亮暗过渡验证</title>
+<body>
+<div style="position:fixed;z-index:1000;top:8px;left:8px;display:flex;gap:8px;color:#fff;background:#333;padding:8px;border-radius:8px">
+  <button id="run">运行过渡检查</button>
+  <button id="forward">浅→深 50%</button>
+  <button id="reverse">深→浅 50%</button>
+  <button id="cancel">取消手势</button>
+  <output id="result">等待检查</output>
+</div>
+<div class="mode-vertical" style="height:100%;padding:68px 30px 24px;background:linear-gradient(110deg,#8aaab2,#4f637a)">
+  <div class="container-fill"></div>
+  <div class="vertical-browser" style="height:100%">
+    <div class="content-container is-new-tab" style="position:relative;height:100%;overflow:visible">
+      <section class="personalized-home new-tab-page" data-theme="light" data-material="liquid-glass" style="--home-viewport-height:650px">
+        <div class="home-layout"><main class="home" data-artwork-background="true">
+          <div class="home-scroll"><section class="home-content" style="padding:80px 30px">
+            <button class="brand-toggle"><span class="brand-mark brand-mark-default"></span></button>
+            <div class="home-feed">
+              <div class="tb-composer-wrap"><form class="tb-composer"><div class="tb-composer-surface"></div><span class="sample-text">文字与材质随手势过渡</span></form></div>
+              <div class="workspace-board" style="display:flex;gap:24px;margin-top:24px">
+                <div class="board-card" style="width:180px;height:100px"><span>卡片材质</span></div>
+                <span class="board-item-label">快捷方式文字</span>
+              </div>
+            </div>
+          </section></div>
+        </main></div>
+      </section>
+    </div>
+  </div>
+</div>
+<script type="module">
+import '/src/styles/tokens.css';
+import '/src/styles/semantic.css';
+import '/src/App.css';
+import '/src/personalized-home-2-0/styles.css';
+import '/src/personalized-home-2-0/composer.css';
+import '/src/personalized-home-2-0/composer-scroll.css';
+import '/src/personalized-home-2-0/themes/liquid-glass.css';
+import '/src/personalized-home-2-0/themes/liquid-glass-macos.css';
+import '/src/personalized-home-2-0/themes/wallpaper-contrast.css';
+import '/src/personalized-home-2-0/styles/home-surfaces.css';
+import { createSpaceAppearanceTransition } from '/src/personalized-home-2-0/themes/spaceAppearanceTransition.js';
+
+const root=document.documentElement, home=document.querySelector('.personalized-home'), result=document.querySelector('#result');
+const saved=new Map();
+const storage={getItem:key=>saved.get(key)??null};
+let current={spaceId:'0',mode:'light'}, controller=null;
+const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+const assert=(value,message)=>{if(!value)throw Error(message);};
+const emit=detail=>window.dispatchEvent(new CustomEvent('tabbit-space-gesture-progress',{detail}));
+function reset(mode) {
+  controller?.destroy();
+  current={spaceId:'0',mode}; root.dataset.mode=mode; home.dataset.theme=mode;
+  saved.set('tabbit-glass-theme:1','wallpaper-destination');
+  saved.set('tabbit-glass-theme-source:1','gallery');
+  saved.set('tabbit-glass-theme-appearance:1',mode==='light'?'dark':'light');
+  controller=createSpaceAppearanceTransition({getCurrent:()=>current,storage});
+}
+function measure() {
+  const text=getComputedStyle(document.querySelector('.sample-text')).color;
+  const canvas=document.createElement('canvas'); canvas.width=canvas.height=1;
+  const ctx=canvas.getContext('2d'); ctx.fillStyle=text; ctx.fillRect(0,0,1,1);
+  return {red:ctx.getImageData(0,0,1,1).data[0],text,
+    fill:getComputedStyle(document.querySelector('.tb-composer-surface'),'::before').backgroundImage,
+    blur:getComputedStyle(document.querySelector('.board-card'),'::before').backdropFilter,
+    brightness:getComputedStyle(document.querySelector('.board-card'),'::before').filter,
+    rim:getComputedStyle(document.querySelector('.tb-composer-surface'),'::after').boxShadow};
+}
+async function settle() {
+  const start=performance.now();
+  while(root.hasAttribute('data-space-appearance-preview')) {
+    assert(performance.now()-start<2500,'过渡没有结束'); await nextFrame();
+  }
+}
+async function checkDirection(mode) {
+  reset(mode); await nextFrame();
+  const initial=measure(), values=[];
+  const start=performance.now();
+  for(const progress of [0,.25,.5,.75,1]) {
+    emit({fromSpaceId:'0',toSpaceId:'1',progress}); await nextFrame();
+    values.push(measure());
+    assert(root.dataset.mode===mode,'手势预览写入了真实亮暗模式');
+  }
+  assert(Math.abs(values[0].red-initial.red)<=1,'手势开始有颜色跳变');
+  assert(Math.abs(values[2].red-128)<=2,'中点文字没有连续混色');
+  assert(values[2].fill.includes('linear-gradient'),'材质在手势中点丢失');
+  assert(values[2].blur.includes('blur('),'卡片模糊在手势中丢失');
+  assert(values[2].brightness.includes('1.25'),'材质提亮没有跟随进度');
+  emit(null); await settle();
+  assert(Math.abs(measure().red-initial.red)<=1,'取消后颜色没有恢复');
+  assert(!document.querySelector('style[data-space-appearance]'),'取消后残留临时样式');
+  return {mode,red:values.map(v=>v.red),midpoint:values[2],elapsed:Math.round(performance.now()-start)};
+}
+document.querySelector('#run').onclick=async()=>{
+  result.textContent='检查中…';
+  try {
+    const checks=[await checkDirection('light'),await checkDirection('dark')];
+    reset('light'); emit({fromSpaceId:'0',toSpaceId:'1',progress:.4}); await nextFrame();
+    emit({fromSpaceId:'0',toSpaceId:'1',progress:1,duration:80});
+    await new Promise(resolve=>setTimeout(resolve,90));
+    current={spaceId:'1',mode:'dark'}; root.dataset.mode='dark'; home.dataset.theme='dark'; controller.handoff(); await settle();
+    assert(measure().red===255,'提交后没有衔接目标亮暗模式');
+    saved.set('tabbit-glass-theme-appearance:1','dark'); current={spaceId:'0',mode:'dark'};
+    emit({fromSpaceId:'0',toSpaceId:'1',progress:.5}); await nextFrame();
+    assert(!root.hasAttribute('data-space-appearance-preview'),'同模式空间启动了多余过渡');
+    reset('light'); emit({fromSpaceId:'0',toSpaceId:'1',progress:.7}); await nextFrame();
+    emit({fromSpaceId:'0',toSpaceId:'1',progress:1,duration:200});
+    emit({fromSpaceId:'0',toSpaceId:'1',progress:.25}); await nextFrame();
+    emit(null); await settle();
+    assert(measure().red===0,'接续手势打断松手动画后无法取消');
+    reset('light'); emit({fromSpaceId:'0',toSpaceId:'1',progress:.5}); await nextFrame();
+    saved.set('tabbit-glass-theme:2','light'); saved.set('tabbit-color-window-appearance-v1','light');
+    emit({fromSpaceId:'0',toSpaceId:'2',progress:.2}); await nextFrame();
+    assert(!root.hasAttribute('data-space-appearance-preview'),'改变目标空间后残留上一次亮暗预览');
+    result.textContent='全部通过'; result.dataset.passed='true';
+    document.querySelector('#details').textContent=JSON.stringify(checks,null,2);
+  } catch(error) {result.textContent=String(error);result.dataset.passed='false';}
+};
+document.querySelector('#forward').onclick=()=>{reset('light');emit({fromSpaceId:'0',toSpaceId:'1',progress:.5});};
+document.querySelector('#reverse').onclick=()=>{reset('dark');emit({fromSpaceId:'0',toSpaceId:'1',progress:.5});};
+document.querySelector('#cancel').onclick=()=>emit(null);
+reset('light');
+</script>
+<pre id="details" style="position:fixed;bottom:0;left:0;max-height:160px;overflow:auto;background:#fff;color:#222;z-index:1000;font-size:10px"></pre>
+</body>
+</html>

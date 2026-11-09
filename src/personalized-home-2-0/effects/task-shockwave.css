@@ -1,0 +1,9 @@
+.task-shockwave-overlay {
+  position: fixed;
+  z-index: 1000;
+  display: block;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+  contain: strict;
+}

@@ -9,15 +9,6 @@
   flex: 0 0 auto;
   pointer-events: none;
 }
-.tb-composer-wrap .tb-composer,
-.tb-composer-wrap .tb-composer:focus-within {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  pointer-events: none;
-}
 .tb-composer-surface {
   position: absolute;
   top: -.5px;
@@ -70,14 +61,14 @@
   opacity: var(--dock-secondary-opacity);
   transform: translateY(calc(-8px * var(--dock-progress)));
 }
-/* Follow the visible surface while preserving the tray's 8px overlap and flow slot. */
-.home-feed > .tb-composer-wrap .tb-task-mount-reveal[data-dock-secondary] {
+/* Keep the attached extension aligned with the visible input while docking. */
+.home-feed > .tb-composer-wrap .tb-composer-expansion[data-dock-secondary] {
   transform: translateY(calc(var(--dock-surface-height, var(--dock-expanded-height, 120px)) - var(--dock-expanded-height, 120px)));
 }
 .tb-composer-wrap [data-dock-secondary]:not([inert]) { pointer-events: auto; }
 .tb-composer-wrap [data-dock-secondary][inert],
 .tb-composer-wrap [data-dock-secondary][inert] * { pointer-events: none; }
-.tb-composer-wrap .tb-task-mount-reveal:not(.is-expanded) { opacity: 0; }
+.tb-composer-wrap .tb-composer-expansion:not(.is-expanded) { pointer-events: none; }
 .tb-composer-plus { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--nine-color-border-alpha-subtle) calc(100% * (1 - var(--dock-progress))), transparent); }
 .tb-composer-file-error { position: relative; pointer-events: auto; }
 
@@ -111,7 +102,8 @@
   background:rgba(60,60,60,.6);
   box-shadow:0 2px 4px -2px rgba(0,0,0,.1),0 0 0 .5px rgba(255,255,255,.12) inset;
 }
-:scope[data-theme='dark'] :is(.tb-composer:focus-within, .tb-composer-wrap[data-editing='true'] .tb-composer) .tb-composer-surface {
+:scope[data-theme='dark'] .tb-composer:focus-within .tb-composer-surface,
+:scope[data-theme='dark'] .tb-composer-wrap[data-editing='true'] .tb-composer-surface {
   box-shadow:0 2px 4px -2px rgba(0,0,0,.1),0 0 0 .5px rgba(255,255,255,.2) inset;
 }
 /* The locked homepage needs no live blur sampling while a modal is above it.

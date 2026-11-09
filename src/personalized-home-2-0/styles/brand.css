@@ -1,0 +1,54 @@
+@scope (.personalized-home) {
+.brand-toggle {
+  display: block;
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  line-height: 0;
+  cursor: pointer;
+  transition: transform 120ms ease;
+}
+.brand-toggle:active { transform: scale(.96); }
+.brand-toggle:focus-visible { outline: 1px solid var(--focus-indicator); outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .brand-toggle { transition: none; }
+  .brand-toggle:active { transform: none; }
+}
+.brand-mark {
+  display: block;
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+}
+.brand-wind-motion { display: block; width: 60px; height: 60px; transform-origin: center; }
+.brand-mark-default,
+.brand-mark-tinted {
+  -webkit-mask: url('/personalized-home-2-0/asset/icons/tabbit-solid.svg') center / contain no-repeat;
+  mask: url('/personalized-home-2-0/asset/icons/tabbit-solid.svg') center / contain no-repeat;
+}
+.brand-mark-default { background: rgb(0 0 0 / 30%); mix-blend-mode:multiply; }
+.brand-mark-tinted {
+  background: color-mix(in srgb, var(--brand-mark-color) 50%, transparent);
+}
+:scope[data-theme="dark"] .brand-mark-tinted {
+  background: color-mix(in srgb, var(--brand-mark-color) 80%, transparent);
+}
+.brand-mark-app-icon { object-fit:contain; }
+:scope[data-theme="dark"] .brand-mark-default {
+  background: rgb(0 0 0 / 12%);
+  mix-blend-mode: normal;
+  filter: invert(1) brightness(5);
+  opacity: 0.65;
+}
+.home-layout .brand-mark {
+  opacity: calc(1 - var(--logo-scroll-progress, 0));
+  transform: rotate(calc(90deg * var(--logo-scroll-progress, 0)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-layout .brand-mark { transform: none; }
+}
+}

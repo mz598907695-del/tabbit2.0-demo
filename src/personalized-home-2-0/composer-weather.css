@@ -1,0 +1,100 @@
+@scope (.personalized-home) {
+.tb-composer-weather {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  height: var(--dock-surface-height, 100%);
+  border-radius: inherit;
+  pointer-events: none;
+  user-select: none;
+  animation: composer-weather-enter 600ms ease-out both;
+}
+.tb-composer-weather.is-rain { overflow: hidden; }
+.tb-composer-weather.is-snow { overflow: visible; }
+/* Baseline sits on the input's top edge; inset clears both rounded corners. */
+.tb-composer-snow-ledge {
+  position: absolute;
+  top: -4px;
+  inset-inline: calc(var(--nine-radius-xl) + 2px);
+  height: 6px;
+}
+.tb-composer-snow-patch {
+  position: absolute;
+  top: 0;
+  height: 6px;
+  overflow: visible;
+  transform-origin: 50% 4px;
+  filter: drop-shadow(0 .5px .5px rgb(30 47 66 / 16%));
+  animation: composer-snow-accumulate var(--snow-duration) ease-out var(--snow-delay) both;
+}
+.tb-composer-snow-body { fill: #e7eef3; }
+.tb-composer-snow-light { fill: none; stroke: rgb(255 255 255 / 85%); stroke-width: .7; stroke-linecap: round; }
+.tb-composer-snow-grain {
+  position: absolute;
+  top: 4px;
+  width: 1.5px;
+  height: 1.5px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 80%);
+  animation: composer-snow-land 2.6s ease-in var(--snow-delay) 3 both;
+}
+@keyframes composer-snow-accumulate {
+  0% { transform: scaleY(0); opacity: 0; }
+  20% { transform: scaleY(.22); opacity: .55; }
+  50% { transform: scaleY(.55); opacity: .85; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+@keyframes composer-snow-land {
+  0% { transform: translate(-5px, -18px); opacity: 0; }
+  20% { opacity: .6; }
+  82% { transform: translate(0, -1px); opacity: .7; }
+  100% { transform: translate(0, 0); opacity: 0; }
+}
+.tb-composer-rain-track {
+  position: absolute;
+  top: -14px;
+  width: 12px;
+  height: calc(100% + 28px);
+  animation: composer-raindrop-slide var(--rain-duration) linear var(--rain-delay) infinite both;
+}
+.tb-composer-raindrop, .tb-composer-rain-bead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--rain-size);
+  height: calc(var(--rain-size) * 1.3);
+  border-radius: 48% 52% 47% 53% / 58% 60% 40% 42%;
+  background: radial-gradient(ellipse at 30% 23%, rgb(255 255 255 / 75%) 0 6%, transparent 24%),
+    radial-gradient(ellipse at 64% 78%, rgb(231 245 255 / 30%), transparent 65%),
+    linear-gradient(145deg, rgb(225 241 255 / 16%), rgb(13 30 48 / 12%) 55%, rgb(255 255 255 / 18%));
+  box-shadow: inset .5px .5px .5px rgb(255 255 255 / 42%), inset -.5px -1px .5px rgb(12 25 40 / 24%), 0 1px 1px rgb(8 25 40 / 18%);
+}
+.tb-composer-rain-bead { height: var(--rain-size); border-radius: 50%; opacity: .55; }
+.tb-composer-raindrop::before {
+  content: '';
+  position: absolute;
+  bottom: 80%;
+  left: 40%;
+  width: 1.5px;
+  height: calc(var(--rain-size) * 1.6);
+  border-radius: 50%;
+  background: linear-gradient(transparent, rgb(233 247 255 / 12%));
+}
+@keyframes composer-weather-enter { from { opacity: 0; } to { opacity: 1; } }
+@keyframes composer-raindrop-slide {
+  0%, 5% { transform: translate(0, 0); opacity: 0; }
+  14% { transform: translate(.5px, 12%); opacity: .8; }
+  30% { transform: translate(.5px, 14%); opacity: .8; }
+  47% { transform: translate(-.5px, 36%); opacity: .8; }
+  61% { transform: translate(-.5px, 38%); opacity: .8; }
+  83% { transform: translate(.5px, 76%); opacity: .75; }
+  96%, 100% { transform: translate(0, 100%); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tb-composer-weather { animation: none; }
+  .tb-composer-rain-track { animation: none; top: 20%; height: auto; }
+  .tb-composer-rain-track:nth-child(even) { top: 60%; }
+  .tb-composer-snow-patch { animation: none; }
+  .tb-composer-snow-grain { display: none; }
+}
+}

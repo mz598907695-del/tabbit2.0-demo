@@ -6,7 +6,7 @@ import WorkspaceActionButton from './WorkspaceActionButton';
 
 const status = item => <span className={`aiwt-status ${item.type === 'active' ? 'is-active' : ''}`}>{item.type === 'active' ? '生效中' : '已暂停'}</span>;
 
-export default function WorkspaceTasks({ items, query, onOpen, onUpdate, onCreate }) {
+export default function WorkspaceTasks({ items, query, onOpen, onUpdate }) {
   if (!items.length) return <div className="aiwt-empty"><span className="aiwt-empty-icon" aria-hidden="true"/><div className="aiwt-empty-copy"><h2>{query ? '没有找到相关任务' : '暂无定时任务'}</h2><p>{query ? '换个关键词，或者切换分类试试。' : '创建一个任务，安排下一次行动。'}</p></div></div>;
   return <div className="aiwt-results">
     {query && <p className="aiw-results-label" role="status">找到 {items.length} 项相关任务</p>}

@@ -5,8 +5,20 @@
 .tb-context-menu-content input::-webkit-search-cancel-button { -webkit-appearance: none; }
 .tb-context-menu-content .tb-context-back { color: var(--muted, #858a92); }
 .tb-context-menu-content .tb-context-reference > svg { color: var(--muted, #858a92); }
-.tb-composer-popover.tb-composer-add-menu .tb-context-reference > .tb-context-site-mark { display: grid; flex: 0 0 16px; place-items: center; width: 16px; height: 16px; color: var(--text, #202124); font-size: 18px; font-weight: 700; line-height: 16px; }
+.tb-composer-add-menu .tb-context-menu-content .tb-context-reference > .tb-context-site-mark { display: grid; flex: 0 0 16px; place-items: center; width: 16px; height: 16px; color: var(--text, #202124); font-size: 18px; font-weight: 700; line-height: 16px; }
 .tb-context-menu-content .tb-context-reference > small { flex: 0 0 auto; color: var(--muted, #858a92); font: inherit; font-size: 12px; white-space: nowrap; }
 .tb-context-menu-content .tb-context-empty { margin: 0; padding: 14px 8px; color: var(--muted, #858a92); font-size: 12px; line-height: 20px; }
 
+.tb-context-browser { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.tb-context-actions-title { padding: 4px 8px 0; font-weight: 500; }
+.tb-context-actions-copy { margin: 4px 8px 12px; color: var(--nine-color-text-tertiary); font-size: 12px; line-height: 20px; }
+.tb-composer-inline-add .tb-context-menu-content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.tb-composer-inline-add .tb-context-menu-content:not([data-view='main']) { grid-template-columns: minmax(0, 1fr); }
+.tb-composer-inline-add .tb-dropdown-footer { padding-left: 12px; border-left: .5px solid var(--nine-color-border-alpha-regular); }
+.tb-composer-inline-add .tb-dropdown-footer::before { display: none; }
+@container composer-controls (max-width: 480px) {
+  .tb-composer-inline-add .tb-context-menu-content { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .tb-composer-inline-add .tb-dropdown-footer { padding: 8px 0 0; border-left: 0; border-top: .5px solid var(--nine-color-border-alpha-regular); }
+  .tb-composer-inline-add .tb-context-actions-copy { margin-bottom: 6px; }
+}
 }

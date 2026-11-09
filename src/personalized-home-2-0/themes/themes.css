@@ -1,4 +1,14 @@
 @scope (.personalized-home) {
+/* Used by saved Suzhou and dandelion backgrounds. */
+@font-face {
+  font-family: 'LXGW WenKai Lite';
+  src: url('/personalized-home-2-0/asset/fonts/lxgw-wenkai-lite-regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+
 .illustrated-theme-background {
   position: fixed;
   inset: 0;

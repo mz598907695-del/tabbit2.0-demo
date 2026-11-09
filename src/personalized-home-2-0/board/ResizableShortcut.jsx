@@ -1,4 +1,5 @@
 import ShortcutIcon, { ShortcutIconTile } from './ShortcutIcon';
+import BoardCard from './BoardCard';
 import './resizable-shortcut.css';
 
 /** One surface owns both the artwork and text, including its glass material. */
@@ -7,10 +8,10 @@ export default function ResizableShortcut({ item = {}, appearanceTheme = 'light'
   if (!expanded) return <ShortcutIconTile item={item} appearanceTheme={appearanceTheme} iconSize={iconSize} shape={shape} />;
 
   const horizontal = item.w > item.h;
-  return <span className="shortcut-icon resizable-shortcut"
+  return <BoardCard as="span" className="shortcut-icon resizable-shortcut"
     data-shortcut-shape={shape} data-brand={item.key}
     data-shortcut-layout={horizontal ? 'horizontal' : 'vertical'}>
     <ShortcutIcon item={item} appearanceTheme={appearanceTheme} iconSize={iconSize === 'small' ? 'small' : 'medium'} />
     <span className="resizable-shortcut-name" title={item.label}>{item.label}</span>
-  </span>;
+  </BoardCard>;
 }

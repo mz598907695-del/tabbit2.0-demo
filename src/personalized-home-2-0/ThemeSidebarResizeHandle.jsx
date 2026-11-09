@@ -23,7 +23,7 @@ export default function ThemeSidebarResizeHandle() {
 
   function apply(value) {
     const next = Math.round(Math.max(MIN_WIDTH, Math.min(widthLimit(available.current), Number(value) || DEFAULT_WIDTH)));
-    host.current?.style.setProperty('--theme-sidebar-width', `${next}px`);
+    if (host.current && host.current.style.getPropertyValue('--theme-sidebar-width') !== `${next}px`) host.current.style.setProperty('--theme-sidebar-width', `${next}px`);
     current.current = next;
     setWidth(next);
     return next;

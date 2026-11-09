@@ -14,7 +14,7 @@ export default function VerticalSidebarResizeHandle({ collapsed }: { collapsed:b
     if (!shell) return DEFAULT_WIDTH;
     const max = Math.max(200, Math.min(420, shell.clientWidth - 480));
     const next = Math.max(200, Math.min(max, value));
-    shell.style.setProperty('--vertical-sidebar-width', `${next}px`);
+    if (shell.style.getPropertyValue('--vertical-sidebar-width') !== `${next}px`) shell.style.setProperty('--vertical-sidebar-width', `${next}px`);
     setMaximum(max); setWidth(next);
     return next;
   }

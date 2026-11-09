@@ -1,5 +1,4 @@
 import { getHomeRoot } from "../home-host";
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, Grid2X2, Pencil, Plus, Search, X } from "../icons";

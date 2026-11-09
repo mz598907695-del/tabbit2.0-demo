@@ -25,6 +25,7 @@
  box-shadow:0 0 0 .5px rgba(0,0,0,.1),0 4px 12px rgba(0,0,0,.06),0 -1px 2px rgba(0,0,0,.02);
 }
 .aiw-shell .aiw-dialog::backdrop { background:rgba(0,0,0,.15); backdrop-filter:blur(4px); }
+.theme-button,
 .aiw-shell .aiw-launcher { color:var(--nine-color-text-title); }
 .session-nav-icon { display:inline-flex; align-items:center; justify-content:center; }
 .session-nav-icon svg { width:18px; height:18px; }
@@ -48,14 +49,15 @@
 .aiw-shell > .aiw-stage { grid-column:2; grid-row:1; }
 .aiw-shell > .aiw-nav-host {
  width:var(--aiw-nav-width);
- opacity:0;
+ /* Keep the backdrop root stable while the navigation slides. Fading this
+    ancestor prevents its child blur from sampling the wallpaper until opacity 1. */
+ opacity:1;
  visibility:hidden;
  transform:translateX(calc(-100% - 12px));
- transition:transform var(--aiw-sidebar-motion) cubic-bezier(.2,0,0,1),opacity var(--aiw-sidebar-motion) ease,visibility 0s linear var(--aiw-sidebar-motion);
- will-change:transform,opacity;
+ transition:transform var(--aiw-sidebar-motion) cubic-bezier(.2,0,0,1),visibility 0s linear var(--aiw-sidebar-motion);
+ will-change:transform;
 }
 .aiw-shell.is-open > .aiw-nav-host {
- opacity:1;
  visibility:visible;
  transform:translateX(0);
  transition-delay:0s;
@@ -75,7 +77,6 @@
  height:100%;
  padding:8px 0 8px 8px;
  overflow:visible;
- opacity:1;
  background:transparent;
  box-shadow:none;
  backdrop-filter:none;
@@ -99,10 +100,36 @@
 }
 .aiw-shell.is-sidebar-resizing { transition:none; }
 
+/* The new-session wallpaper spans both columns in window coordinates. */
+.aiw-shell.has-home-wallpaper > .aiw-nav-host { position:relative; z-index:24; will-change:transform; }
+.aiw-shell.has-home-wallpaper > .aiw-stage { z-index:1; }
+.aiw-shell.has-home-wallpaper > .aiw-nav-host > .aiw-navigation {
+ background:var(--nine-color-fill-layer-muted);
+ backdrop-filter:blur(30px);
+ -webkit-backdrop-filter:blur(30px);
+}
+.aiw-shell.has-home-wallpaper.is-sidebar-overlay > .aiw-nav-host { position:absolute; }
+/* The home entry buttons and sidebar share one translucent material. */
+.aiw-shell .aiw-nav-host > .aiw-navigation.aiwn-variant-1,
+.theme-button,
+.aiw-shell:not(.has-content) .aiw-launcher {
+ background:rgba(255,255,255,.15);
+ backdrop-filter:blur(8px);
+ -webkit-backdrop-filter:blur(8px);
+}
+:scope[data-theme='dark'] .aiw-shell .aiw-nav-host > .aiw-navigation.aiwn-variant-1,
+:where(:scope[data-theme='dark']) .theme-button,
+:where(:scope[data-theme='dark']) .aiw-shell:not(.has-content) .aiw-launcher {
+ background:rgba(0,0,0,.15);
+}
+@media(max-width:650px) {
+ .aiw-shell.has-home-wallpaper > .aiw-nav-host { position:absolute; }
+}
+
 .aiw-shell .aiw-launcher {
  opacity:1;
  visibility:visible;
- transition:opacity 160ms ease var(--aiw-sidebar-motion),visibility 0s linear var(--aiw-sidebar-motion);
+ transition:opacity 160ms ease var(--aiw-sidebar-motion),visibility 0s linear var(--aiw-sidebar-motion),scale 280ms var(--nine-motion-easing-standard);
 }
 .aiw-shell.is-open .aiw-launcher {
  position:absolute;

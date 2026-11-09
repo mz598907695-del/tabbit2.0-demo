@@ -1,7 +1,6 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "./icons";
-import { createPromotionClock } from "./PromotionCarousel";
+import { createPromotionClock } from "./promotion-clock";
 import "./promotion-inline-carousel.css";
 
 const initialSlide = (count) => count > 1 ? 1 : 0;
@@ -250,7 +249,6 @@ export function PromotionInlineCarousel({ items = [], onAction, onClose, paused 
     const clock = createPromotionClock({
       count: items.length,
       onIndexChange: (index) => transitionRef.current?.(index),
-      onProgress() {},
     });
     clockRef.current = clock;
     instantNextRef.current = true;

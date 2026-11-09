@@ -45,26 +45,18 @@
 }
 
 /* Compact controls retain their existing geometry and one 6px sample. */
-:scope[data-material='liquid-glass'][data-theme] :is(.shortcut-icon, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)) {
+:scope[data-material='liquid-glass'][data-theme] :is(.page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)) {
   --liquid-blur: 6px;
   --liquid-control-blur: 6px;
 }
 
 /* A single static reflection, with no pointer tracking or animation loop. */
-:scope[data-material='liquid-glass'][data-theme] :is(.tb-composer-surface, .promotion-inline-carousel, .promotion-card, .board-widget-card, .shortcut-icon, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
+:scope[data-material='liquid-glass'][data-theme] :is(.tb-composer-surface, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
   --liquid-light: var(--glass-light);
   --liquid-rim: inset 0 0 0 .5px rgb(var(--glass-edge) / var(--glass-edge-alpha)), inset 0 .5px .5px rgb(var(--glass-edge) / var(--glass-top-alpha));
   --liquid-shadow: var(--liquid-rim), 0 5px 18px rgb(var(--glass-shadow) / .09), 0 1px 3px rgb(var(--glass-shadow) / .045);
   --liquid-control-shadow: var(--liquid-small-shadow);
   --liquid-hover-fill: var(--liquid-card-fill);
-}
-:scope[data-material='liquid-glass'][data-theme] :is(.board-widget-card, .shortcut-icon) {
-  --liquid-shadow: var(--liquid-rim), 0 2px 8px rgb(var(--glass-shadow) / .045);
-  --liquid-control-shadow: var(--liquid-rim), 0 2px 6px rgb(var(--glass-shadow) / .035);
-}
-:scope[data-material='liquid-glass'][data-theme] .tb-task-mount {
-  --task-mount-fill: var(--liquid-card-fill);
-  --task-mount-brightness: 1;
 }
 
 /* Refraction is restricted to this one small, stationary surface. Scale the

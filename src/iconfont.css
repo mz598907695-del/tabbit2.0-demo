@@ -18,6 +18,7 @@
 
 .icon-jiantou-v-xiangxia::before { content: "\e00e"; }
 .icon-jiantou-v-xiangyou::before { content: "\e011"; }
+.icon-jiantou_fenxiang_shangchuan::before { content: "\e041"; }
 .icon-jiahao::before { content: "\e033"; }
 .icon-zhinanzhen::before { content: "\e503"; }
 .icon-ren::before { content: "\e036"; }

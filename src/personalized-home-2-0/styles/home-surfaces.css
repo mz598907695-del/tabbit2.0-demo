@@ -1,0 +1,152 @@
+@scope (.personalized-home) {
+/* Shared home/conversation input material, plus homepage cards.
+   BoardCard geometry and all card effects live here; component CSS only lays out content. */
+:scope {
+  --home-content-surface-fill: rgba(255, 255, 255, 0.8);
+  --home-content-surface-outline: inset 0 0 0 .5px rgba(0, 0, 0, 0.15);
+  --home-content-surface-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --home-content-surface-backdrop: var(--nine-backdrop-blur-30) saturate(100%);
+}
+/* BoardCard is the only shortcut/widget shell, including library previews.
+   Content clips inside; the outer rim stays outside size containment. */
+.board-card {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-shrink: 0;
+  overflow: visible;
+  border-radius: var(--board-card-radius, 24px);
+  --home-surface-elevation: var(--home-card-resting-shadow);
+  --home-surface-backdrop: var(--nine-backdrop-blur-30);
+  --home-surface-edge: none;
+}
+.board-card[data-card-size='icon'] { width: 50px; height: 50px; }
+.board-card[data-card-shape='circle'] { border-radius: 50%; }
+.board-card[data-card-shape='square'] { border-radius: var(--home-card-radius); }
+.board-card-content {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+:scope[data-theme='light'][data-material='liquid-glass'] .board-card {
+  --home-surface-backdrop: blur(16px) saturate(var(--liquid-saturation));
+}
+/* All dark homepage surfaces share the gradient, top light and bottom edge. */
+:scope[data-theme='dark'] :is(.board-card, :is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card) {
+  --home-surface-brightness: 1.5;
+  --home-surface-dither: url('/personalized-home-2-0/asset/material-dither.png');
+  --home-content-surface-fill: linear-gradient(#33333366, #3333334d);
+  --home-surface-backdrop: blur(30px) saturate(100%);
+  --home-surface-elevation: none;
+  --home-card-outline: 0;
+  --home-card-resting-shadow: none;
+  --tile-hover-shadow: none;
+}
+/* Paint the light outline above the separate background plane. An inset
+   shadow on the parent is underneath its positioned background child. */
+:scope[data-theme='light'] :is(:is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card) {
+  --home-surface-edge: var(--home-content-surface-outline);
+}
+:scope[data-theme='dark'] :is(:is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card, .board-card) {
+  --widget-edge-light: rgba(255, 255, 255, 0.3);
+  --home-surface-edge: inset 0 .5px 0 var(--widget-edge-light), inset 0 -.5px 0 rgba(255, 255, 255, 0.06);
+}
+:scope[data-theme] .board-card,
+:scope[data-theme] :is(:is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card) {
+  box-sizing: border-box;
+  border: 0;
+  box-shadow: var(--home-surface-elevation, var(--home-content-surface-shadow));
+  isolation: isolate;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+:scope[data-theme] .corner-promotion .promotion-card { position: relative; }
+/* Brighten only the material plane. Filtering the card itself also clips
+   highlights in its photos, site icons, weather artwork and activity images. */
+:scope[data-theme] .board-card::before,
+:scope[data-theme] :is(:is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  /* Static 2/255-alpha grain breaks up blurred gradient bands. Keep it on
+     the material plane so text/artwork stay clear; no animated SVG filter. */
+  background: var(--home-surface-dither, none) 0 0 / 64px 64px repeat, var(--home-content-surface-fill);
+  -webkit-backdrop-filter: var(--home-surface-backdrop, var(--home-content-surface-backdrop));
+  backdrop-filter: var(--home-surface-backdrop, var(--home-content-surface-backdrop));
+  filter: brightness(var(--home-surface-brightness, 1));
+  pointer-events: none;
+}
+/* One rim above the artwork, outside the inner content clip. */
+:scope[data-theme] .board-card::after,
+:scope[data-theme] :is(:is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  border-radius: inherit;
+  box-shadow: var(--home-surface-edge);
+  pointer-events: none;
+}
+:scope[data-theme] .board-card {
+  scale: var(--home-card-hover-scale, 1);
+  transition: scale 280ms var(--nine-motion-easing-standard), box-shadow 300ms var(--nine-motion-easing-standard);
+}
+:scope[data-theme] .board-card::after {
+  border: var(--home-card-outline);
+  z-index: 3;
+  background-color: transparent;
+}
+:scope[data-theme] .home .workspace-board .board-item:not(.is-dragging):is(:focus-visible, :focus-within) .board-card {
+  box-shadow: var(--tile-hover-shadow);
+}
+@media (hover: hover) {
+  :scope[data-theme] .home .workspace-board .board-item:not(.is-dragging):hover .board-card {
+    box-shadow: var(--home-surface-elevation);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* Scale the material and artwork together; labels, layout and gesture
+     translation stay still. Editing and page transitions keep neutral scale. */
+  :scope[data-theme] .home .workspace-board:not(.is-editing):not([data-page-swiping]) > .board-grid > .board-item:not(.is-dragging):not(.is-resizing):hover {
+    --home-card-hover-scale: 1.06;
+  }
+}
+:scope[data-theme] .home .workspace-board .board-item.is-dragging .board-card { box-shadow: none; }
+
+/* Light input retains its active shadow; dark input keeps the shared recipe. */
+:scope[data-theme='light'] :is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer:focus-within .tb-composer-surface,
+:scope[data-theme='light'] :is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap[data-editing='true'] .tb-composer-surface {
+  --home-content-surface-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.04);
+}
+
+:scope[data-theme='light'][data-material='liquid-glass'][data-material-opaque='true'] .board-card {
+  --home-surface-backdrop: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  :scope[data-theme] .board-card::before {
+    background: var(--nine-color-fill-container-base);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :scope[data-theme] .board-card,
+  :scope[data-theme] .board-card::after,
+  .home .workspace-board .board-item-label-text { transition: none; }
+}
+}

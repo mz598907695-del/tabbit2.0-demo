@@ -33,6 +33,8 @@
 }
 /* Internal controls stay plain: no additional glass, blur or pointer light. */
 :scope[data-material='liquid-glass'] .tb-composer-modes {
+  --composer-mode-fill: var(--liquid-mode-selected);
+  --composer-mode-shadow: inset 0 0 0 .5px var(--liquid-mode-rim), 0 1px 3px rgb(0 0 0 / 6%);
   background: var(--liquid-mode-track);
   box-shadow: inset 0 0 0 .5px var(--liquid-mode-rim);
 }
@@ -40,18 +42,16 @@
   color: var(--liquid-mode-text);
 }
 :scope[data-material='liquid-glass'] .tb-composer-modes button[aria-pressed='true'] {
-  background: var(--liquid-mode-selected);
   color: var(--text);
-  box-shadow: inset 0 0 0 .5px var(--liquid-mode-rim), 0 1px 3px rgb(0 0 0 / 6%);
 }
 :scope[data-theme='dark'][data-material='liquid-glass'] .tb-composer-modes {
-  background:rgba(0,0,0,.35);
+  --composer-mode-fill: rgba(255,255,255,.12);
+  --composer-mode-shadow: 0 4px 12px 0 rgba(0,0,0,.1),0 -1px 2px 0 rgba(0,0,0,.1),0 0 1px .5px rgba(255,255,255,.12) inset;
+  background:rgba(0,0,0,.2);
   box-shadow:none;
 }
 :scope[data-theme='dark'][data-material='liquid-glass'] .tb-composer-modes button[aria-pressed='true'] {
-  background:rgba(255,255,255,.12);
   color:var(--nine-color-text-title);
-  box-shadow:0 4px 12px 0 rgba(0,0,0,.1),0 -1px 2px 0 rgba(0,0,0,.1),0 0 1px .5px rgba(255,255,255,.12) inset;
 }
 
 /* Keep page states distinct while sharing Small's fill with both side actions.

@@ -31,7 +31,7 @@ function ReferenceRow({ item, onSelect }) {
   </button>;
 }
 
-export default function ComposerAddMenu({ onReferences, onFiles, onFolder }) {
+export default function ComposerAddMenu({ onReferences, onFiles, onFolder, active = true }) {
   const [view, setView] = useState('main');
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
@@ -43,8 +43,8 @@ export default function ComposerAddMenu({ onReferences, onFiles, onFolder }) {
   const bookmarks = BOOKMARKS.filter(matches);
 
   useEffect(() => {
-    inputRef.current?.focus({ preventScroll: true });
-  }, [view]);
+    if (active) inputRef.current?.focus({ preventScroll: true });
+  }, [view, active]);
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = 0;
@@ -86,7 +86,8 @@ export default function ComposerAddMenu({ onReferences, onFiles, onFolder }) {
   const visibleTabs = view === 'main' && !search ? tabs.slice(0, 4) : tabs;
   const empty = (!showTabs || !tabs.length) && (!showBookmarks || !bookmarks.length);
 
-  return <div className="tb-context-menu-content" ref={rootRef} onKeyDown={keydown}>
+  return <div className="tb-context-menu-content" data-view={view} ref={rootRef} onKeyDown={keydown}>
+    <div className="tb-context-browser">
     {view !== 'main' && <button type="button" className="tb-composer-menu-row tb-context-back" data-composer-menu-item aria-label="返回添加菜单" onClick={() => changeView('main')}><ChevronLeft size={16} aria-hidden="true" /><span>{view === 'tabs' ? '所有标签页' : '收藏'}</span></button>}
     <div className="tb-dropdown-search">
       <Search size={16} aria-hidden="true" />
@@ -106,7 +107,10 @@ export default function ComposerAddMenu({ onReferences, onFiles, onFolder }) {
       </div>}
       {empty && <p className="tb-context-empty" role="status">没有找到相关{view === 'bookmarks' ? '收藏' : view === 'tabs' ? '标签页' : '内容'}</p>}
     </div>
+    </div>
     {view === 'main' && <footer className="tb-dropdown-footer">
+      <div className="tb-context-actions-title">添加到对话</div>
+      <p className="tb-context-actions-copy">从电脑添加图片、文档或文件夹，也可以引用收藏。</p>
       {!search && <button type="button" className="tb-composer-menu-row" data-composer-menu-item onClick={() => changeView('bookmarks')}><Star size={16} aria-hidden="true" /><span>收藏</span><ChevronRight size={15} aria-hidden="true" /></button>}
       <button type="button" className="tb-composer-menu-row" data-composer-menu-item onClick={onFiles}><FilePlus2 size={16} aria-hidden="true" /><span>上传本地文件</span></button>
       <button type="button" className="tb-composer-menu-row" data-composer-menu-item onClick={onFolder}><Folder size={16} aria-hidden="true" /><span>选择本地文件夹</span></button>

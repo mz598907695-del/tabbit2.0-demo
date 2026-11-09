@@ -32,7 +32,7 @@ export function hasWallpaperAlphaPadding(bounds) {
   return Boolean(bounds && (bounds.left > 0 || bounds.top > 0 || bounds.right < 1 || bounds.bottom < 1));
 }
 
-/** Scale the original image uniformly so its visible bounds cover the viewport. */
+/** Cover the viewport with visible image bounds, centered horizontally and bottom-aligned. */
 export function getWallpaperCoverRect(imageWidth, imageHeight, bounds, viewportWidth, viewportHeight) {
   if (![imageWidth, imageHeight, viewportWidth, viewportHeight].every(value => Number.isFinite(value) && value > 0)
     || !bounds || ![bounds.left, bounds.top, bounds.right, bounds.bottom].every(Number.isFinite)
@@ -45,6 +45,6 @@ export function getWallpaperCoverRect(imageWidth, imageHeight, bounds, viewportW
     width: imageWidth * scale,
     height: imageHeight * scale,
     left: (viewportWidth - contentWidth * scale) / 2 - bounds.left * imageWidth * scale,
-    top: (viewportHeight - contentHeight * scale) / 2 - bounds.top * imageHeight * scale,
+    top: viewportHeight - bounds.bottom * imageHeight * scale,
   };
 }

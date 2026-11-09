@@ -6,21 +6,37 @@ export default function SidebarScrollArea({ scrollRef, onKeyDown, children }) {
   useLayoutEffect(() => {
     const scroll = scrollRef.current;
     const thumb = thumbRef.current;
+    const observed = new Set();
     const update = () => {
-      const height = scroll.clientHeight;
+      // Read scroll geometry before touching the thumb's paint properties.
+      const height = scroll.clientHeight, scrollHeight = scroll.scrollHeight, top = scroll.scrollTop;
       const track = Math.max(0, height - 4);
-      const size = Math.min(track, Math.max(24, track * height / scroll.scrollHeight));
-      thumb.hidden = scroll.scrollHeight <= height + 1;
-      thumb.style.height = `${size}px`;
-      thumb.style.transform = `translateY(${(track - size) * scroll.scrollTop / Math.max(1, scroll.scrollHeight - height)}px)`;
+      const size = Math.min(track, Math.max(24, track * height / Math.max(1, scrollHeight)));
+      const hidden = scrollHeight <= height + 1;
+      const thumbHeight = `${size}px`;
+      const transform = `translateY(${(track - size) * top / Math.max(1, scrollHeight - height)}px)`;
+      if (thumb.hidden !== hidden) thumb.hidden = hidden;
+      if (thumb.style.height !== thumbHeight) thumb.style.height = thumbHeight;
+      if (thumb.style.transform !== transform) thumb.style.transform = transform;
     };
     const observer = new ResizeObserver(update);
     observer.observe(scroll);
-    for (const child of scroll.children) observer.observe(child);
-    const mutations = new MutationObserver(() => {
-      for (const child of scroll.children) observer.observe(child);
+    const syncChildren = () => {
+      const children = new Set(scroll.children);
+      for (const child of observed) {
+        if (children.has(child)) continue;
+        observer.unobserve(child);
+        observed.delete(child);
+      }
+      for (const child of children) {
+        if (observed.has(child)) continue;
+        observer.observe(child);
+        observed.add(child);
+      }
       update();
-    });
+    };
+    syncChildren();
+    const mutations = new MutationObserver(syncChildren);
     mutations.observe(scroll, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
     scroll.addEventListener('scroll', update, { passive: true });
     update();

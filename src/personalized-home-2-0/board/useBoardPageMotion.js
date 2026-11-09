@@ -7,9 +7,8 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
   const latest = useRef({ enabled, pages });
   latest.current = { enabled, pages };
   const cancelAnimations = useCallback(() => {
-    // Detach the outgoing page before cancel() restores its underlying full
-    // opacity/position. WebKit can otherwise briefly composite that old page.
-    outgoingRef.current?.replaceChildren();
+    // Detach before cancel() restores the old page's underlying position.
+    if (outgoingRef.current?.hasChildNodes()) outgoingRef.current.replaceChildren();
     running.current.forEach(animation => { animation.onfinish = null; animation.cancel(); });
     running.current = [];
     if (!tracking.current) gridRef.current?.parentElement?.removeAttribute('data-page-swiping');
@@ -18,9 +17,7 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
     tracking.current = null;
     if (previewRef.current) previewRef.current.style.visibility = 'hidden';
     gridRef.current?.style.removeProperty('transform');
-    gridRef.current?.style.removeProperty('opacity');
     previewRef.current?.style.removeProperty('transform');
-    previewRef.current?.style.removeProperty('opacity');
     gridRef.current?.parentElement?.removeAttribute('data-page-swiping');
     setPreviewPage(null);
   }, [gridRef]);
@@ -51,6 +48,7 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
     const entry = pending.current;
     pending.current = null;
     const grid = gridRef.current, host = outgoingRef.current;
+    if (!enabled) clearTracking();
     if (entry && grid && host && enabled) {
       host.replaceChildren(entry.snapshot);
       grid.parentElement?.setAttribute('data-page-swiping', 'true');
@@ -58,19 +56,19 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
       const progress = Math.min(1, entry.offset / Math.max(1, width));
       const options = { duration: Math.round(150 + 100 * (1 - progress)), easing: 'cubic-bezier(.2, .75, .2, 1)', fill: 'both' };
       const outgoing = entry.snapshot.animate([
-        { opacity: 1 - progress, transform: `translateX(${-direction * entry.offset}px)` },
-        { opacity: 0, transform: `translateX(${-direction * width}px)` },
+        { transform: `translateX(${-direction * entry.offset}px)` },
+        { transform: `translateX(${-direction * width}px)` },
       ], options);
       const incoming = grid.animate([
-        { opacity: progress, transform: `translateX(${direction * (width - entry.offset)}px)` },
-        { opacity: 1, transform: 'translateX(0)' },
+        { transform: `translateX(${direction * (width - entry.offset)}px)` },
+        { transform: 'translateX(0)' },
       ], options);
       running.current = [outgoing, incoming];
       incoming.onfinish = cancelAnimations;
     }
     grid?.style.removeProperty('visibility');
     return cancelAnimations;
-  }, [pageId, enabled, gridRef, cancelAnimations]);
+  }, [pageId, enabled, gridRef, cancelAnimations, clearTracking]);
   useLayoutEffect(() => {
     const peer = previewRef.current;
     const target = tracking.current && latest.current.pages[tracking.current.to];
@@ -86,10 +84,10 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
         const old = tracking.current;
         if (!old) return;
         cancelAnimations();
-        const progress = Math.min(1, old.distance / Math.max(1, grid.clientWidth));
+        const progress = Math.min(1, old.distance / Math.max(1, old.width));
         const options = { duration: Math.round(150 + 100 * progress), easing: 'cubic-bezier(.2, .75, .2, 1)', fill: 'both' };
-        const returning = grid.animate([{ opacity: grid.style.opacity, transform: grid.style.transform }, { opacity: 1, transform: 'translateX(0)' }], options);
-        const retreating = peer.animate([{ opacity: peer.style.opacity, transform: peer.style.transform }, { opacity: 0, transform: `translateX(${old.direction * grid.clientWidth}px)` }], options);
+        const returning = grid.animate([{ transform: grid.style.transform }, { transform: 'translateX(0)' }], options);
+        const retreating = peer.animate([{ transform: peer.style.transform }, { transform: `translateX(${old.direction * old.width}px)` }], options);
         running.current = [returning, retreating];
         returning.onfinish = () => { cancelAnimations(); clearTracking(); };
         return;
@@ -100,16 +98,17 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
       const samePreview = tracking.current && tracking.current.to === detail.to && tracking.current.from === detail.from;
       if (!samePreview) peer.style.visibility = 'hidden';
       const direction = detail.to > detail.from ? 1 : -1;
-      const distance = Math.min(grid.clientWidth, detail.distance ?? detail.progress * grid.clientWidth / 2);
-      tracking.current = { ...detail, direction, distance };
-      const fraction = distance / Math.max(1, grid.clientWidth);
+      const width = samePreview ? tracking.current.width : grid.clientWidth;
+      const distance = Math.min(width, detail.distance ?? detail.progress * width);
+      tracking.current = { ...detail, direction, distance, width };
+      // Opacity/filter on this ancestor creates a backdrop root. Its glass
+      // descendants then lose the wallpaper sample until the animation ends.
+      // Keep both pages fully opaque and slide them continuously instead.
       grid.style.transform = `translateX(${-direction * distance}px)`;
-      grid.style.opacity = String(1 - fraction);
-      peer.style.transform = `translateX(${direction * (grid.clientWidth - distance)}px)`;
-      peer.style.opacity = String(fraction);
+      peer.style.transform = `translateX(${direction * (width - distance)}px)`;
       if (samePreview) peer.style.visibility = 'visible';
       grid.parentElement?.setAttribute('data-page-swiping', 'true');
-      setPreviewPage(current => current?.id === page.id ? current : page);
+      if (!samePreview) setPreviewPage(page);
     }
     const scroll=gridRef.current?.closest('.home-scroll'),feed=gridRef.current?.closest('.home-feed');
     const releaseScrollFloor=()=>{ if(scroll?.scrollTop<=0)feed?.style.removeProperty('min-height'); };

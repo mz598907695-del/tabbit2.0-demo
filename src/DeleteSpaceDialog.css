@@ -21,7 +21,7 @@
 [data-mode="dark"] .delete-space-dialog {
   background: rgba(27, 27, 27, 0.85);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) inset, 0 4px 12px 0 rgba(0, 0, 0, 0.3), 0 -1px 2px 0 rgba(0, 0, 0, 0.3);
-  outline: 1px solid #000;
+  outline: 1px solid rgba(0, 0, 0, 0.5);
   outline-offset: 0;
 }
 .delete-space-dialog::backdrop { background: rgba(0, 0, 0, .15); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }

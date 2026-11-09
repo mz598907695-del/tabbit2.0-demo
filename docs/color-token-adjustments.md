@@ -1,5 +1,28 @@
 # 颜色 Token 调整台账
 
+## homepage-shared-tile-surface
+
+- 语义：首页快捷方式与小组件的统一容器表面（图片小组件也使用同一外框）；深色活动卡片复用同一套材质
+- 填充：亮色与首页对话输入框共用 `--home-content-surface-fill`，值为 `rgba(255, 255, 255, 0.8)`；深色在看板内局部覆盖为 `linear-gradient(#33333366, #3333334d)`
+- 描边：亮色使用 `--home-card-outline` → `.5px solid --nine-color-border-alpha-subtle`；深色关闭额外描边，快捷方式、小组件和活动卡片统一使用 `--widget-edge-light`（20% 白色）绘制顶部 0.5px 内高光，位于图片之上
+- 默认阴影：亮色为 `0 2px 4px -2px rgba(0, 0, 0, 0.04)`；深色为 `none`
+- Hover 阴影：亮色沿用 `--tile-hover-shadow`；深色与默认态相同
+- 背景模糊：深色固定 `blur(30px) saturate(100%)`；亮色普通模式 30px，玻璃模式 16px
+- 尺寸与形状：保留各自圆角与布局
+- 下拉淡化：保留淡化反馈；使用现有页面背景 token 的独立覆盖层（70%）及文字 30%，不再降低整个看板 opacity；面板退场结束后恢复，避免背景模糊重新合成闪烁
+- 应用范围：`.home .workspace-board` 中 `.shortcut-icon`、`.board-widget-card`；深色模式下还包括 `.promotion-inline-carousel`、`.corner-promotion .promotion-card`
+- 实现文件：`src/personalized-home-2-0/styles/home-surfaces.css`
+
+## composer-dropdown-controls
+
+- 应用范围：对话输入框“加号 / 妙招”搜索框及模型菜单开关
+- 搜索框默认描边：复用 `--nine-color-border-alpha-regular`，`1px` 内描边
+- 搜索框激活描边：亮色黑色 `40%`；深色白色 `40%`，保留 `1px` 内描边
+- 模型开关关闭轨道：`--nine-color-fill-layer-strong`，与自定义面板开关一致
+- 模型开关开启轨道：现有 `--accent`，跟随空间主题标准色，默认蓝色
+- 开启态圆点：`--nine-color-action-primary-on`（固定白色）；深色关闭圆点：`--nine-color-text-title`（白色）；亮色关闭圆点保留基础容器填充
+- 实现文件：`src/personalized-home-2-0/composer.css`
+
 ## dark-page-scrollbar
 
 - 语义：深色页面原生滚动条
@@ -193,7 +216,7 @@
 - 状态：已确认
 - 深色填充：`rgba(27, 27, 27, 0.85)`
 - 深色特效：`0 0 0 0.5px rgba(255, 255, 255, 0.2) inset, 0 4px 12px 0 rgba(0, 0, 0, 0.3), 0 -1px 2px 0 rgba(0, 0, 0, 0.3)`
-- 深色外描边：`1px solid #000000`
+- 深色外描边：`1px solid rgba(0, 0, 0, 0.5)`
 - 应用基类：`.dropdown-panel`、`.dropdown-surface`
 - 应用范围：空间菜单、标签列表、空间图标选择、AI 筛选/历史菜单、编辑器添加/妙招/模型/任务菜单
 - 排除：嵌入式透明菜单保持无背景、无阴影、无外描边；右键菜单属于独立组件族
@@ -265,7 +288,7 @@
 - 亮色模式：继续使用现有 `--nine-color-fill-floating` 与 `--nine-color-border-alpha-regular`，其余效果保持原样
 - 深色填充：与下拉面板一致，`rgba(27, 27, 27, 0.85)`；最终整理时合并同色填充
 - 深色特效：`0 0 0 1px rgba(255, 255, 255, 0.2) inset, 0 4px 12px 0 rgba(0, 0, 0, 0.3), 0 -1px 2px 0 rgba(0, 0, 0, 0.3)`；阴影与下拉面板一致，弹窗内描边按后续要求为 `1px`
-- 深色外描边：`1px solid #000000`，与下拉面板一致
+- 深色外描边：`1px solid rgba(0, 0, 0, 0.5)`，与下拉面板一致
 - 遮罩与圆角：保持弹窗自身样式，不随下拉面板修改
 - 应用位置：空间创建、编辑、删除弹窗共用基类 `.delete-space-dialog`
 - 实现文件：`src/DeleteSpaceDialog.css`
@@ -377,3 +400,31 @@
 - 正式入口：继续使用主题设置侧边栏“主框架效果”控制材质和染色浓度
 - token 处理：不新增或修改颜色 token
 - 实现文件：`src/GlassControls.tsx`
+
+## home-content-surface
+
+- 应用：首页对话输入框的基础材质；活动卡片在浅色模式复用，深色模式使用 `homepage-shared-tile-surface` 的渐变与顶部高光。
+- 浅色填充 token 同时复用于首页快捷方式和小组件；深色看板卡片使用 `homepage-shared-tile-surface` 中的局部覆盖。
+- `--home-content-surface-fill`：亮色 `rgba(255, 255, 255, 0.8)`；深色 `rgba(46, 46, 46, 0.5)`。
+- `--home-content-surface-outline`：0.5px 内描边；亮色黑色 15%，深色白色 12%。
+- `--home-content-surface-shadow`：亮色 `0 2px 4px -2px rgba(0, 0, 0, 0.04)`；深色 `0 2px 4px -2px rgba(0, 0, 0, 0)`。
+- `--home-content-surface-backdrop`：复用 `--nine-backdrop-blur-30`（30px），饱和度 100%。
+- 输入框激活态沿用同名 token 的局部覆盖，保留已有激活反馈。
+- 仅深色模式下，首页输入框背景层、活动卡片、快捷方式和小组件使用 `filter: brightness(1.2)`，提亮 20%。
+- 快捷方式图标随亮暗模式选择资源；深色优先使用现有白色版本（Notion、DeepL、Perplexity、OpenAI、Dribbble、Trickle、蔚来、大疆、Pinterest），保留图标自身镂空与细节。
+- 实现文件：`src/personalized-home-2-0/themes/liquid-glass-performance.css`。
+
+## composer-frame-fill
+
+- 应用：任务、添加参考、妙招与模型选择共用的输入框外层底托。
+- 默认和图片外观：复用 `--nine-color-fill-layer-strong`，浅色 `rgba(17,25,37,.05)`，深色 `rgba(255,255,255,.07)`。
+- 彩色外观：局部 `--composer-frame-fill` 为 `color-mix(in srgb, 当前色板颜色 15%, transparent)`，亮暗模式均为 15%。命中预设时使用色板颜色 `spaceColors.color`，自定义颜色保留实际值。
+- 回到默认或图片外观时移除局部覆盖，保持全局 token 不变。
+- 外层描边：0.5px，沿用 `--nine-color-border-alpha-subtle` 的 RGB 色值，将透明度设为 5%；浅色为 `rgba(17,25,37,.05)`，深色为 `rgba(255,255,255,.05)`。
+- 实现：`src/personalized-home-2-0/App.jsx`、`composer-expansion.css`。
+
+## 深色材质色带处理
+
+- 首页/对话页输入框、小组件、快捷方式、活动卡片继续使用现有深色渐变、30px 模糊和 1.5 倍背景提亮。
+- 共用背景层叠加透明度 2/255 的静态微噪点贴图，以减轻模糊渐变的色阶断层；不调整颜色 token，不影响前景图片、图标或文字。
+- 实现：`src/personalized-home-2-0/styles/home-surfaces.css`、`public/personalized-home-2-0/asset/material-dither.png`。

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Check, ChevronLeft, ChevronRight, ListFilter, Plus, Search } from '../icons';
 import { UserRound } from 'lucide-react';
 import DropdownPanel from '../../DropdownPanel';
@@ -17,7 +17,7 @@ function authorAvatar(name) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-export default function WorkspaceSkills({ active = true, items, ui, setUI, onCreate, onOpen, onUpdate, onUse }) {
+export default function WorkspaceSkills({ active = true, items, ui, setUI, onCreate, onOpen, onUpdate }) {
   const scope = ui.skillScope || 'discover';
   const [searchOpen,setSearchOpen] = useState(false);
   const [filterOpen,setFilterOpen] = useState(false);

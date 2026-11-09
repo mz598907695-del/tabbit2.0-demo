@@ -14,27 +14,6 @@ export function WorkspaceFilesHeader({ ui, setUI, onCreate, onRefresh }) {
   return <WorkspacePageHeader page="files" title="AI 输出物" action="创建输出物" onAction={onCreate} tabs={PAGE_TABS.files} ui={ui} setUI={setUI} hasViews onRefresh={onRefresh}/>;
 }
 
-function FileTypeIcon({ type }) {
-  const Icon = TYPE_ICONS[type] || Paperclip;
-  return <span className="aiwf-type-icon" aria-hidden="true"><Icon size={18} strokeWidth={1.6}/></span>;
-}
-
-function outputMetadata(item) {
-  const fields = item.type === 'web'
-    ? [item.domain, item.date]
-    : item.type === 'card' || item.type === 'board'
-      ? [item.tag !== TYPE_LABELS[item.type] ? item.tag : '', item.date]
-      : [item.format, item.dimensions || item.size];
-  return fields.filter(value => typeof value === 'string' && value.trim()).join(' · ');
-}
-
-function FileIdentity({ item, metadata = true }) {
-  const date = formatWorkspaceOutputDate(item);
-  const details = metadata ? outputMetadata({ ...item, date }) : '';
-  const compactDetails = metadata ? outputMetadata({ ...item, date: '' }) : '';
-  return <><FileTypeIcon type={item.type}/><span className="aiwf-identity-text"><span className="aiwf-identity-title" title={item.title}>{item.title}</span>{metadata && <small className="aiwf-identity-meta" title={details || undefined}>{details || '\u00a0'}</small>}{compactDetails && <small className="aiwf-mobile-info" title={compactDetails}>{compactDetails}</small>}{metadata && <small className="aiwf-mobile-meta">{[TYPE_LABELS[item.type], date].filter(Boolean).join(' · ')}</small>}</span></>;
-}
-
 function FileThumbnail({ item }) {
   const [failed, setFailed] = useState(false);
   const Icon = TYPE_ICONS[item.type] || Paperclip;
@@ -50,15 +29,19 @@ function FileThumbnail({ item }) {
 function FileActions({ item, chats, onNavigate, onNotice, onShare }) {
   const tooltipId = useId();
   const [tooltip, setTooltip] = useState(null);
+  const [tooltipPending, setTooltipPending] = useState(false);
   const tooltipTimer = useRef(null);
-  function hideTooltip() { window.clearTimeout(tooltipTimer.current); setTooltip(null); }
+  function hideTooltip() { window.clearTimeout(tooltipTimer.current); setTooltipPending(false); setTooltip(null); }
+  const tooltipActive = tooltipPending || Boolean(tooltip);
   useEffect(() => {
-    const hide = () => { window.clearTimeout(tooltipTimer.current); setTooltip(null); };
+    if (!tooltipActive) return;
+    const hide = hideTooltip;
     document.addEventListener('scroll', hide, true);
     window.addEventListener('blur', hide);
     window.addEventListener('resize', hide);
     return () => { window.clearTimeout(tooltipTimer.current); document.removeEventListener('scroll', hide, true); window.removeEventListener('blur', hide); window.removeEventListener('resize', hide); };
-  }, []);
+  }, [tooltipActive]);
+  useEffect(() => () => window.clearTimeout(tooltipTimer.current), []);
   function tooltipProps(key, label) {
     return {
       'aria-describedby': tooltip?.key === key ? tooltipId : undefined,
@@ -66,7 +49,9 @@ function FileActions({ item, chats, onNavigate, onNotice, onShare }) {
         if (event.pointerType === 'touch') return;
         const anchor = event.currentTarget;
         hideTooltip();
+        setTooltipPending(true);
         tooltipTimer.current = window.setTimeout(() => {
+          setTooltipPending(false);
           if (!anchor.isConnected) return;
           const rect = anchor.getBoundingClientRect();
           setTooltip({ key, label, x:Math.max(70, Math.min(innerWidth - 70, rect.left + rect.width / 2)), y:rect.top - 6 });
@@ -93,7 +78,7 @@ function FileActions({ item, chats, onNavigate, onNotice, onShare }) {
   </div>;
 }
 
-export function WorkspaceFiles({ items, ui, setUI, onOpen, onCreate, selectedId, chats, onNavigate, onNotice, onShare }) {
+export function WorkspaceFiles({ items, ui, onOpen, selectedId, chats, onNavigate, onNotice, onShare }) {
   const masonryRef = useRef(null);
   useLayoutEffect(() => {
     const grid = masonryRef.current;

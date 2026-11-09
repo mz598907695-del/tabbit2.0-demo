@@ -1,0 +1,56 @@
+@scope (.personalized-home) {
+.shortcut {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 12px;
+}
+.shortcut-icon img {
+  display: block;
+  object-fit: contain;
+  width: 24px;
+  height: 24px;
+}
+.shortcut-icon > .board-card-content > .shortcut-icon-artwork {
+  --shortcut-artwork-square-radius: 4px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.shortcut-icon > .board-card-content > .shortcut-icon-artwork:is([data-size="medium"], [data-size="large"]) {
+  --shortcut-artwork-square-radius: calc(16px - var(--shortcut-artwork-inset));
+}
+.shortcut-icon[data-shortcut-shape="square"] > .board-card-content > .shortcut-icon-artwork {
+  border-radius: var(--shortcut-artwork-square-radius);
+}
+.shortcut-icon > .board-card-content > .shortcut-icon-artwork > img {
+  border-radius: inherit;
+}
+.shortcut-label {
+  width: 66px;
+  height: 24px;
+  flex-shrink: 0;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  line-height: 24px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+
+}
+.shortcut:hover .shortcut-label {
+  color: var(--text);
+}
+:scope[data-theme="dark"] .shortcut-icon:is([data-brand="dji"], [data-brand="openai"]) img {
+  filter: brightness(0) invert(0.95);
+}
+:scope[data-theme="dark"] .shortcut-label {
+  color: #b4b6be;
+}
+:scope[data-theme="dark"] .shortcut:is(:hover, :focus-visible) .shortcut-label {
+  color: var(--text);
+}
+}

@@ -1,14 +1,15 @@
 import './curated-desktop.css';
+import { createFrameBatch } from './frame-batch';
 import BoardPagePreview from './BoardPagePreview';
 import { useBoardPageMotion } from './useBoardPageMotion';
 import { useVisibilityMotion } from '../useVisibilityMotion';
 import { getHomeRoot } from "../home-host";
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { createPortal } from 'react-dom';
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Plus, Minus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, PanelTop, MoveDiagonal2, Check, Undo2, Redo2 } from "../icons";
+import { Plus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, PanelTop, Check, Undo2, Redo2 } from "../icons";
 import WidgetCard, { widgetCatalog } from './WidgetCards';
-import ResizableShortcut from './ResizableShortcut';
+import BoardItem from './BoardItem';
+import { boardItemName as itemName } from './BoardItemContent';
 import ContextSubmenu from '../ContextSubmenu';
 import { BoardLibrary, BoardItemDialog, BoardConfirm } from './BoardDialogs';
 import { movePackedBoardItem, resizeItem, resizePackedBoardItem, getBoardRows } from './layout';
@@ -20,7 +21,6 @@ import { addBoardItemToPage, updateBoardMeasurement, boardReadingOrder, gridProf
 import './workspace-board.css';
 import '../context-menu.css';
 
-const itemName=item=>item?.type==='widget'?item.title:item?.label;
 const normalizeItemSize=(item,size,options)=>item.type==='shortcut'
   ? normalizeShortcutSize(size) : normalizeWidgetSize(size,options);
 
@@ -35,7 +35,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
   const [notice,setNotice]=useState('');
   const [error,setError]=useState('');
   const [drag,setDrag]=useState(null);
-  const suppressedClickRef=useRef(null), dragHandlersRef=useRef(null), holdTimerRef=useRef(null);
+  const suppressedClickRef=useRef(null), dragHandlersRef=useRef(null), holdTimerRef=useRef(null), dragPaintRef=useRef(null);
   const [measurement,setMeasurement]=useState({width:700,columns:9,ready:false});
   const gridRef=useRef(null), rootRef=useRef(null), dragRef=useRef(null), busyRef=useRef(onEditingChange), menuRef=useRef(null), menuTriggerRef=useRef(null);
   const boardPresent = useVisibilityMotion(rootRef, visible, -20);
@@ -104,8 +104,8 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     const grid=gridRef.current;
     if(!grid)return;
     const observe=entries=>{
-      // Layout must not react to the page transition's visual scale. ResizeObserver
-      // reports the untransformed content box, including when only height changes.
+      // Read layout width, independent of gesture translation. Height-only changes
+      // return the existing measurement object and do not project the board again.
       const width=entries?.[0]?.contentRect.width ?? grid.clientWidth;
       setMeasurement(previous=>updateBoardMeasurement(previous,width,showLabels));
     };
@@ -166,7 +166,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     document.addEventListener('scroll',scroll,true);
     window.addEventListener('blur',blur);
     document.addEventListener('visibilitychange',hidden);
-    return()=>{clearTimeout(holdTimerRef.current);document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',finish);document.removeEventListener('pointercancel',cancel);document.removeEventListener('scroll',scroll,true);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);const current=dragRef.current;if(current?.captureTarget?.hasPointerCapture(current.pointerId))current.captureTarget.releasePointerCapture(current.pointerId);dragRef.current=null;};
+    return()=>{dragPaintRef.current?.cancel();clearTimeout(holdTimerRef.current);document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',finish);document.removeEventListener('pointercancel',cancel);document.removeEventListener('scroll',scroll,true);window.removeEventListener('blur',blur);document.removeEventListener('visibilitychange',hidden);const current=dragRef.current;if(current?.captureTarget?.hasPointerCapture(current.pointerId))current.captureTarget.releasePointerCapture(current.pointerId);dragRef.current=null;};
   },[]);
   const persist=(items,positions,description)=>{
     let next={...page,items};
@@ -285,9 +285,14 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
       next=resizeItem(current.originalPlaced,current.id,size.w,size.h,columns,'free');
     }
     const minRows=Math.max(current.minRows,getBoardRows(next));
-    const updated={...current,placed:next,size,previewCell,moved:true,dx,dy,minRows,clientX:event.clientX,clientY:event.clientY};dragRef.current=updated;setDrag(updated);
+    const updated={...current,placed:next,size,previewCell,moved:true,dx,dy,minRows,clientX:event.clientX,clientY:event.clientY};dragRef.current=updated;
+    // Preserve per-event packing, thresholds and edge auto-scroll. Only the
+    // React preview waits for paint, avoiding a full card-tree render per sample.
+    dragPaintRef.current ||= createFrameBatch(setDrag);
+    dragPaintRef.current.schedule(updated);
   };
   const cancelDrag=(pointerEnded=false)=>{
+    dragPaintRef.current?.cancel();
     clearTimeout(holdTimerRef.current);
     const current=dragRef.current;
     if(current?.captureTarget?.hasPointerCapture(current.pointerId))current.captureTarget.releasePointerCapture(current.pointerId);
@@ -358,22 +363,24 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
   return <div ref={rootRef} hidden={!boardPresent} inert={!visible} aria-hidden={!visible || undefined} data-strategy={strategy} className={`workspace-board ${editing?'is-editing':''} ${showLabels?'':'labels-hidden'}`}>
     <div ref={pageMotion.outgoingRef} className="board-page-outgoing" aria-hidden="true" inert />
     <div ref={pageMotion.previewRef} className="board-page-preview" aria-hidden="true" inert>
-      {pageMotion.previewPage && <BoardPagePreview page={pageMotion.previewPage} columns={columns} width={width} columnWidth={columnWidth} profile={profile} sourceColumns={sourceColumns} appearanceTheme={appearanceTheme} shortcutSize={shortcutSize} shortcutShape={shortcutShape} />}
+      {pageMotion.previewPage && <BoardPagePreview page={pageMotion.previewPage} columns={columns} width={width} columnWidth={columnWidth} profile={profile} sourceColumns={sourceColumns} showLabels={showLabels} appearanceTheme={appearanceTheme} shortcutSize={shortcutSize} shortcutShape={shortcutShape} />}
     </div>
     <div ref={gridRef} className={`board-grid${activeDrag?.moved?' is-dragging':''}`} role="region" aria-label={`${page.name}快捷方式与小组件`} tabIndex={0} style={{height:rows*profile.pitch, '--board-column':`${columnWidth}px`,'--board-pitch':`${profile.pitch}px`,'--board-gap':`${profile.gap}px`,'--board-offset':`${alignmentOffset}px`}} onContextMenu={openPageMenu} onKeyDown={e=>{if(e.key==='ContextMenu'||(e.shiftKey&&e.key==='F10')){const item=page.items.find(i=>i.id===e.target.closest('[data-board-item]')?.dataset.boardItem);const box=e.target.getBoundingClientRect();const event={preventDefault:()=>e.preventDefault(),stopPropagation:()=>e.stopPropagation(),target:e.target,currentTarget:e.target,clientX:box.x+8,clientY:box.bottom};if(item)openMenu(event,item);else openPageMenu(event);}}}>
       {activeDrag?.moved&&activeDrag.kind==='move'&&(()=>{const target=display.find(item=>item.id===activeDrag.id);return <div className={`board-drop-preview ${target.type==='shortcut'?'is-shortcut':'is-widget'} ${target.type==='shortcut'&&(target.w>1||target.h>1)?'is-expanded-shortcut':''}`} aria-hidden="true" style={{width:target.w*columnWidth-profile.gap,height:target.h*profile.pitch-profile.gap,transform:`translate(${alignmentOffset+target.x*columnWidth}px,${target.y*profile.pitch}px)`}}/>;})()}
       {display.map(item=>{
-        const isWidget=item.type==='widget';
-        const expandedShortcut=!isWidget&&(item.w>1||item.h>1);
         const dragged=activeDrag?.id===item.id&&activeDrag.kind==='move'&&activeDrag.moved;
         const x=dragged?activeDrag.alignmentOffset+activeDrag.original.x*columnWidth+activeDrag.dx:alignmentOffset+item.x*columnWidth;
         const y=dragged?activeDrag.original.y*profile.pitch+activeDrag.dy:item.y*profile.pitch;
-        return <article key={item.id} data-design-item={item.id} data-board-item={item.id} data-item-type={item.type} data-x={item.x} data-y={item.y} data-w={item.w} data-h={item.h} className={`board-item ${isWidget?'is-widget':'is-shortcut'} ${expandedShortcut?'is-expanded-shortcut':''} ${editing&&selected===item.id?'is-selected':''} ${activeDrag?.id===item.id?'is-dragging':''} ${activeDrag?.id===item.id&&activeDrag.kind==='resize'?'is-resizing':''}`} style={{width:item.w*columnWidth-profile.gap,height:item.h*profile.pitch-profile.gap,translate:`${x}px ${y}px`}} tabIndex={isWidget?0:undefined} aria-label={isWidget?(editing?`选择${itemName(item)}，方向键移动`:`${itemName(item)}，右键管理`):undefined} onFocus={e=>{if(editing&&isWidget&&e.target===e.currentTarget)setSelected(item.id);}} onKeyDown={e=>{if(editing&&isWidget&&e.target===e.currentTarget)keyboardMove(e,item);}} onPointerDown={e=>startDrag(e,item,'move',true)} onClickCapture={e=>suppressDraggedClick(e,item)} onContextMenu={e=>{cancelDrag();openMenu(e,item);}}>
-          {isWidget?<WidgetCard kind={item.kind} item={item} size={item.size} inert={editing} active={active&&visible} onChange={patch=>updateConfig(item.id,patch)}/>:<a className="shortcut" href={item.url} target="_blank" rel="noreferrer" title={item.label} aria-label={editing?`选择${itemName(item)}，方向键移动`:`打开 ${item.service || item.label}`} draggable={false} onFocus={()=>{if(editing)setSelected(item.id);}} onKeyDown={e=>{if(editing)keyboardMove(e,item);}} onClick={e=>{if(editing){e.preventDefault();setSelected(item.id);}}}><ResizableShortcut item={item} appearanceTheme={appearanceTheme} iconSize={shortcutSize} shape={shortcutShape}/></a>}
-          <span className="board-item-label shortcut-label" aria-hidden={!showLabels||expandedShortcut} title={itemName(item)}><span className="board-item-label-text">{itemName(item)}</span></span>
-          {editing&&<button type="button" className="board-remove-button" aria-label={`删除${itemName(item)}`} title={`删除${itemName(item)}`} onClick={e=>{e.stopPropagation();removeFromTile(item);}}><Minus size={14} aria-hidden="true"/></button>}
-          {isWidget&&<button type="button" className="board-resize-handle" aria-label={`调整${itemName(item)}大小`} title="按住拖拽调整大小，方向键微调" onPointerDown={e=>startDrag(e,item,'resize')} onClick={()=>setSelected(item.id)} onKeyDown={e=>{if(['ArrowRight','ArrowUp','ArrowDown','ArrowLeft'].includes(e.key)){e.preventDefault();const horizontal=['ArrowRight','ArrowLeft'].includes(e.key);const axis=horizontal?'w':'h';const delta=['ArrowRight','ArrowDown'].includes(e.key)?1:-1;resize(item,{w:item.w,h:item.h,[axis]:item[axis]+delta},axis);}}}><span className="board-resize-visual" aria-hidden="true"><MoveDiagonal2 size={14}/></span></button>}
-        </article>;
+        return <BoardItem key={item.id} item={item}
+          style={{width:item.w*columnWidth-profile.gap,height:item.h*profile.pitch-profile.gap,translate:`${x}px ${y}px`}}
+          editing={editing} selected={selected===item.id} dragging={activeDrag?.id===item.id}
+          resizing={activeDrag?.id===item.id&&activeDrag.kind==='resize'} showLabels={showLabels}
+          appearanceTheme={appearanceTheme} shortcutSize={shortcutSize} shortcutShape={shortcutShape} active={active&&visible}
+          onSelect={()=>setSelected(item.id)} onMoveKey={event=>keyboardMove(event,item)}
+          onPointerDown={event=>startDrag(event,item,'move',true)} onClickCapture={event=>suppressDraggedClick(event,item)}
+          onContextMenu={event=>{cancelDrag();openMenu(event,item);}} onChange={patch=>updateConfig(item.id,patch)}
+          onRemove={()=>removeFromTile(item)} onResizeStart={event=>startDrag(event,item,'resize')}
+          onResize={(size,axis)=>resize(item,size,axis)}/>;
       })}
       {showEmptyHint&&!page.items.length&&<div className="board-empty"><button type="button" onClick={()=>setLibrary(true)}><Plus size={16} aria-hidden="true"/>添加</button></div>}
     </div>

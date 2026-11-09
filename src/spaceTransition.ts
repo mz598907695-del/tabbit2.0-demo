@@ -9,7 +9,7 @@ export function publishSpaceTransition(spaceId: number, progress: number) {
 }
 
 export const SPACE_GESTURE_EVENT = 'tabbit-space-gesture-progress';
-export type SpaceGestureProgress = { fromSpaceId:string; toSpaceId:string; progress:number };
+export type SpaceGestureProgress = { fromSpaceId:string; toSpaceId:string; progress:number; duration?:number };
 export function publishSpaceGesture(detail:SpaceGestureProgress | null) {
   window.dispatchEvent(new CustomEvent<SpaceGestureProgress | null>(SPACE_GESTURE_EVENT, {detail}));
 }

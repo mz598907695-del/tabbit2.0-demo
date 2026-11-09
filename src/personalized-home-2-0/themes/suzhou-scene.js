@@ -582,7 +582,7 @@ function drawRays(g, S, time) {
 }
 
 // ---- Near bank ---------------------------------------------------------------------------------------
-function makeGround(k, rand) {
+function makeGround(rand) {
   const path = new Path2D();
   path.moveTo(-160, 1030); path.bezierCurveTo(60, 1050, 280, 1070, 420, 1104); path.bezierCurveTo(500, 1124, 560, 1160, 600, 1230);
   path.lineTo(-160, 1260); path.closePath();
@@ -607,7 +607,7 @@ function drawGround(g, S, Gd, time) {
 export function createScene(k) {
   const rand = mulberry32(1311);
   const mountains = makeMountains(k, rand), clouds = makeClouds(k, rand), bank = makeBank(k, rand);
-  const water = makeWater(k, rand), lotus = makeLotus(k, rand), ground = makeGround(k, rand);
+  const water = makeWater(k, rand), lotus = makeLotus(k, rand), ground = makeGround(rand);
   return {
     bank,
     /** Everything above the waterline (sky to shore). */

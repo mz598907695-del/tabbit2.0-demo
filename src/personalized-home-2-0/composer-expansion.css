@@ -1,0 +1,86 @@
+@scope (.personalized-home) {
+.tb-composer-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tb-composer-frame::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  bottom: calc(var(--dock-expanded-height, 0px) - var(--dock-surface-height, 0px));
+  box-sizing: border-box;
+  border: .5px solid rgb(from var(--nine-color-border-alpha-subtle) r g b / 5%);
+  border-radius: var(--nine-radius-xl);
+  background: var(--composer-frame-fill, var(--nine-color-fill-layer-strong));
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+  opacity: 0;
+  visibility: hidden;
+  transition: inset 320ms cubic-bezier(.22, 1, .36, 1), border-radius 320ms cubic-bezier(.22, 1, .36, 1), opacity 200ms var(--nine-motion-easing-standard), visibility 0s linear 320ms;
+  pointer-events: none;
+}
+.tb-composer-wrap[data-expansion] > .tb-composer-frame::before {
+  inset: -6px;
+  bottom: calc(var(--dock-expanded-height, 0px) - var(--dock-surface-height, 0px) - 6px);
+  border-radius: calc(var(--nine-radius-xl) + 6px);
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.tb-composer-wrap[data-docked='true'] > .tb-composer-frame::before { opacity: 0; }
+/* Conversation inputs stay at their bottom anchor while the extension grows up. */
+:where(.aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap[data-expansion] > .tb-composer-frame::before {
+  top: calc(-6px - var(--composer-expansion-height, 0px));
+}
+:where(.aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap > .tb-composer-frame > .tb-composer-expansion {
+  position: absolute;
+  bottom: 100%;
+  inset-inline: 0;
+}
+.tb-composer-expansion {
+  position: relative;
+  z-index: 0;
+  flex: none;
+  height: 0;
+  min-width: 0;
+  overflow: hidden;
+  transition: height 320ms cubic-bezier(.22, 1, .36, 1);
+}
+.tb-composer-expansion.is-expanded { height: var(--composer-expansion-height, 0px); }
+.tb-composer-expansion-body {
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.tb-composer-expansion [hidden] { display: none; }
+.tb-composer-inline-panel {
+  padding: 12px 8px 8px;
+  color: var(--nine-color-text-title);
+  font-family: inherit;
+  font-size: var(--nine-font-size-13);
+  line-height: var(--nine-font-line-height-13);
+}
+.tb-composer-wrap[data-expansion-side='top'] .tb-composer-inline-panel { padding-block: 8px 12px; }
+.tb-composer-inline-model, .tb-composer-inline-ideas { max-height: inherit; }
+.tb-composer-inline-model .tb-model-options > [role='group'] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 12px; }
+.tb-composer-inline-model .tb-composer-menu-heading { grid-column: 1 / -1; }
+@container composer-controls (max-width: 480px) {
+  .tb-composer-inline-model .tb-model-options > [role='group'] { grid-template-columns: minmax(0, 1fr); }
+}
+.tb-composer-plus > svg { transition: transform 240ms var(--nine-motion-easing-standard); }
+.tb-composer-plus.is-open > svg { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) {
+  .tb-composer-wrap > .tb-composer-frame::before, .tb-composer-expansion, .tb-composer-plus > svg { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .tb-composer-frame::before {
+    background: var(--nine-color-fill-container-muted);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+}

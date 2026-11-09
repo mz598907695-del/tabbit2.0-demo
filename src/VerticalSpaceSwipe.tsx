@@ -73,7 +73,7 @@ export default function VerticalSpaceSwipe({ renderPreview, children, spaces, sp
       window.clearTimeout(settleTimer.current);
       setSettleDuration(duration);
       setSettling('commit');
-      publishSpaceGesture({fromSpaceId:String(spaceId),toSpaceId:String(spaceIds[next]),progress:1});
+      publishSpaceGesture({fromSpaceId:String(spaceId),toSpaceId:String(spaceIds[next]),progress:1,duration});
       settleTimer.current = window.setTimeout(() => {
         gestureCommitted.current = true;
         previewRef.current = null;

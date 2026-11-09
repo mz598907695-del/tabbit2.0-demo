@@ -53,7 +53,6 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
     let idleTimer = 0;
     let previewPending = false;
     let previewOrigin = null;
-    let committedInBurst = false;
     let nativePhases = false;
     let fingersDown = false;
     let nativeCommitted = false;
@@ -89,7 +88,7 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
     const up = () => { pointerDown = false; };
     const compositionStart = () => { composing = true; };
     const compositionEnd = () => { composing = false; };
-    const reset = () => { window.clearTimeout(idleTimer); window.clearTimeout(nativeEndTimer); nativeEnding = false; fingersDown = false; nativeCommitted = false; thresholdHaptic = false; committedInBurst = false; clearPreview(); pointerDown = false; composing = false; clearTarget(); gesture.reset(); };
+    const reset = () => { window.clearTimeout(idleTimer); window.clearTimeout(nativeEndTimer); nativeEnding = false; fingersDown = false; nativeCommitted = false; thresholdHaptic = false; clearPreview(); pointerDown = false; composing = false; clearTarget(); gesture.reset(); };
     function scheduleNativeEnd() {
       window.clearTimeout(nativeEndTimer);
       nativeEndTimer = window.setTimeout(() => {
@@ -110,7 +109,6 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
         fingersDown = true;
         nativeCommitted = false;
         thresholdHaptic = false;
-        committedInBurst = false;
       } else if (event.detail === 'cancelled') {
         window.clearTimeout(nativeEndTimer);
         nativeEnding = false;
@@ -147,7 +145,6 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
         window.clearTimeout(idleTimer);
         idleTimer = window.setTimeout(() => {
           settleGesture();
-          committedInBurst = false;
         }, 120);
       }
       // The native release phase settles the gesture. Momentum after that
@@ -193,7 +190,6 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
       const next = Math.max(0, Math.min(current.pages.length - 1, from + direction));
       previewOrigin = null;
       previewPending = false;
-      committedInBurst = true;
       if (nativePhases) nativeCommitted = true;
       if (next === current.index) return;
       trace('commit', { next });

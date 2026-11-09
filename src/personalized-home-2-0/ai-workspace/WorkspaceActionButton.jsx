@@ -1,4 +1,3 @@
-import React from 'react';
 import './workspace-action-button.css';
 
 export default function WorkspaceActionButton({ className = '', children, ...props }) {

@@ -12,7 +12,8 @@ export default function SidebarResizeHandle() {
   const [maximum, setMaximum] = useState(400);
   function apply(value) {
     const next = clampSidebarWidth(value, available.current);
-    handle.current?.parentElement.style.setProperty('--aiw-sidebar-width', `${next}px`);
+    const shell = handle.current?.parentElement;
+    if (shell && shell.style.getPropertyValue('--aiw-sidebar-width') !== `${next}px`) shell.style.setProperty('--aiw-sidebar-width', `${next}px`);
     currentWidth.current = next;
     setWidth(next);
     return next;
@@ -45,7 +46,7 @@ export default function SidebarResizeHandle() {
     observer.observe(shell);
     return () => { observer.disconnect(); shell.classList.remove('is-sidebar-resizing'); setNativeCursor('default'); };
   }, []);
-  function finish(event, cancel = false) {
+  function finish(cancel = false) {
     if (!drag.current) return;
     const start = drag.current;
     drag.current = null;
@@ -70,11 +71,11 @@ export default function SidebarResizeHandle() {
       setNativeCursor('colResize');
     }}
     onPointerMove={event => { if (drag.current) apply(drag.current.width + event.clientX - drag.current.x); }}
-    onPointerUp={event => finish(event)} onPointerCancel={event => finish(event, true)}
-    onLostPointerCapture={event => finish(event, true)}
+    onPointerUp={() => finish()} onPointerCancel={() => finish(true)}
+    onLostPointerCapture={() => finish(true)}
     onDoubleClick={() => save(apply(SIDEBAR_WIDTH_DEFAULT))}
     onKeyDown={event => {
-      if (event.key === 'Escape' && drag.current) { event.preventDefault(); finish(event, true); return; }
+      if (event.key === 'Escape' && drag.current) { event.preventDefault(); finish(true); return; }
       const step = event.shiftKey ? 32 : 8;
       const next = { ArrowLeft: width - step, ArrowRight: width + step, Home: SIDEBAR_WIDTH_MIN, End: maximum }[event.key];
       if (next === undefined) return;

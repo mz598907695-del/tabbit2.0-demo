@@ -31,6 +31,23 @@ export const processedSiteIcons: Record<string, string> = {
   "yang": "/site-icons/yang.png?v=cee954428390",
   "grok": "/site-icons/grok.png?v=86cf72d3474b"
 };
+const darkSiteIcons: Record<string, string> = {
+  notion: '/site-icons/notion-dark.png?v=dc4321136a70',
+  deepl: '/site-icons/deepl-dark.png?v=08feb7b30603',
+  perplexity: '/site-icons/perplexity-dark.png?v=2ba68460052b',
+  openai: '/site-icons/openai-dark.png?v=6a0238a1b5c6',
+  dribbble: '/site-icons/dribbble-dark.png?v=6a4668c3232e',
+  trickle: '/site-icons/trickle-dark.png?v=17f004bdb32e',
+  nio: '/site-icons/nio-dark.png?v=de3944865dc2',
+  dji: '/site-icons/dji-dark.png?v=414b06bf01be',
+  pinterest: '/site-icons/pinterest-dark.png?v=c7b46dff682a',
+};
+
+function iconForAppearance(url: string | undefined, appearance: 'light' | 'dark') {
+  const site = url?.match(/\/([^/]+)\.png(?:\?|$)/)?.[1];
+  return appearance === 'dark' && site ? darkSiteIcons[site] ?? url : url;
+}
+
 const hostIcons: Record<string, string> = {
   "notion.so": "/site-icons/notion.png?v=08fe78013664",
   "notion.com": "/site-icons/notion.png?v=08fe78013664",
@@ -73,11 +90,11 @@ const hostIcons: Record<string, string> = {
   "grok.com": "/site-icons/grok.png?v=86cf72d3474b"
 };
 
-export function processedSiteIconFor(value: string | undefined): string | undefined {
+export function processedSiteIconFor(value: string | undefined, appearance: 'light' | 'dark' = 'light'): string | undefined {
   if (!value) return undefined;
-  if (processedSiteIcons[value]) return processedSiteIcons[value];
+  if (processedSiteIcons[value]) return iconForAppearance(processedSiteIcons[value], appearance);
   try {
     const url = new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(value) ? value : `https://${value}`);
-    return hostIcons[url.hostname.toLowerCase().replace(/^www\./, "")];
+    return iconForAppearance(hostIcons[url.hostname.toLowerCase().replace(/^www\./, "")], appearance);
   } catch { return undefined; }
 }

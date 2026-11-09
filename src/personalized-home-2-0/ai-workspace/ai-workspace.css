@@ -25,7 +25,6 @@
 .aiw-stage-title { min-width:0; margin:0; font-size:14px; font-weight:500; line-height:20px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; pointer-events:auto; }
 .aiw-shell.has-content .aiw-stage-topbar { background:var(--aiw-sticky-surface); }
 .aiw-launcher { position:relative; pointer-events:auto; flex:none; }
-:scope[data-theme="dark"] .aiw-launcher { color:#c6c8cc; }
 .aiw-dialog { border:.5px solid var(--border); border-radius:20px; background:var(--surface); color:var(--text); box-shadow:0 20px 70px rgb(0 0 0 / 16%); padding:24px; width:min(680px,calc(var(--home-viewport-width) - 32px)); max-height:calc(var(--home-viewport-height) - 40px); overflow:auto; }
 .aiw-dialog::backdrop { background:rgb(0 0 0 / 18%); }
 .aiw-dialog-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:16px; }

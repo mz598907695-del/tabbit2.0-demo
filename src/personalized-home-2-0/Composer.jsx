@@ -1,7 +1,5 @@
-import { getHomeRoot } from "./home-host";
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
-import { cloneElement, forwardRef, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { forwardRef, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
+import ComposerPopover from './ComposerPopover';
 import { ArrowUp, ChevronDown, Cloud, Folder, Globe, Laptop, Lightbulb, Mic, Paperclip, Plus, Star, X } from "./icons";
 import { COMMAND_STORAGE_KEY, DEFAULT_COMMANDS, formatAttachmentSize, isPreviewableImage, partitionAttachments, readCustomCommands } from './composer-data';
 import { MIN_REPLY_MODELS, readModelSelection, setReplyModelMode, toggleReplyModel } from './composer-models';
@@ -10,164 +8,18 @@ import ComposerModelMenu from './ComposerModelMenu';
 import TaskMountMenus from './TaskMountMenus';
 import LocalTaskMenus, { APPROVAL_POLICIES } from './LocalTaskMenus';
 import ComposerAddMenu from './ComposerAddMenu';
+import ComposerExpansion from './ComposerExpansion';
+import ComposerWeather from './ComposerWeather';
+import ComposerInlinePanel from './ComposerInlinePanel';
 import ComposerIdeasMenu, { IDEAS } from './ComposerIdeasMenu';
 import ComposerIdeasManager from './ComposerIdeasManager';
 import { useComposerScroll } from './useComposerScroll';
+import { useTaskShockwave } from './useTaskShockwave';
 import './composer.css';
 import './task-mount.css';
 import './composer-scroll.css';
 
-function focusBesideTrigger(trigger, direction) {
-  const elements = [...document.querySelectorAll('button:not(:disabled), a[href], input:not(:disabled), textarea:not(:disabled), select:not(:disabled), [tabindex="0"]')]
-    .filter(node => !node.closest('.tb-composer-popover, [inert]') && node.getClientRects().length);
-  const index = elements.indexOf(trigger);
-  (elements[index + direction] || trigger)?.focus({ preventScroll: true });
-}
-
-// Retain each dropdown for its exit motion while its trigger and cards reset.
-function ComposerPopoverPresence({ active, children }) {
-  const retained = useRef(null);
-  const [present, setPresent] = useState(active);
-  if (active) retained.current = children;
-  useLayoutEffect(() => {
-    if (active) { setPresent(true); return; }
-    if (!present) return;
-    const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 300;
-    const timer = window.setTimeout(() => setPresent(false), duration);
-    return () => window.clearTimeout(timer);
-  }, [active, present]);
-  return (active || present) && retained.current
-    ? cloneElement(active ? children : retained.current, { closing: !active }) : null;
-}
-
-function ComposerPopover({ anchor, kind, id, label, width, maxHeight, onClose, children, closing = false }) {
-  const layerRef = useRef(null);
-  const closeRef = useRef(onClose);
-  closeRef.current = onClose;
-  const [geometry, setGeometry] = useState(null);
-  const isDialog = ['add', 'project', 'ideas'].includes(kind);
-
-  function position() {
-    const layer = layerRef.current;
-    if (!layer || !anchor?.isConnected) return;
-    const viewport = window.visualViewport;
-    const dialogBounds = anchor.closest('dialog')?.getBoundingClientRect();
-    const viewLeft = Math.max(viewport?.offsetLeft || 0, dialogBounds?.left || 0);
-    const viewTop = Math.max(viewport?.offsetTop || 0, dialogBounds?.top || 0);
-    const viewRight = Math.min((viewport?.offsetLeft || 0) + (viewport?.width || window.innerWidth), dialogBounds?.right ?? Infinity);
-    const viewBottom = Math.min((viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight), dialogBounds?.bottom ?? Infinity);
-    const viewWidth = viewRight - viewLeft;
-    const viewHeight = viewBottom - viewTop;
-    const triggerBounds = anchor.getBoundingClientRect();
-    const alignToComposer = ['add', 'ideas', 'model'].includes(kind);
-    const composer = anchor.closest('.tb-composer');
-    const surface = composer?.querySelector('.tb-composer-surface') || composer;
-    const bounds = alignToComposer && surface ? surface.getBoundingClientRect() : triggerBounds;
-    const layerWidth = Math.min(width, Math.max(0, viewWidth - 24));
-    const above = Math.max(0, bounds.top - viewTop - 20);
-    const below = Math.max(0, viewTop + viewHeight - bounds.bottom - 20);
-    const desiredHeight = Math.min(maxHeight, layer.scrollHeight + 2);
-    // Prefer opening below, shrinking the scrollable body to fit. Only flip
-    // when there is not enough room for even one usable menu row.
-    const side = below >= Math.min(desiredHeight, 48) || below >= above ? 'bottom' : 'top';
-    const height = Math.min(maxHeight, Math.max(0, viewHeight - 24), side === 'bottom' ? below : above);
-    const left = Math.min(viewLeft + viewWidth - layerWidth - 12, Math.max(viewLeft + 12, ['model', 'runtime', 'approval'].includes(kind) ? bounds.right - layerWidth : bounds.left));
-    const shownHeight = Math.min(desiredHeight, height);
-    const preferredTop = side === 'bottom' ? bounds.bottom + 8 : bounds.top - shownHeight - 8;
-    const top = Math.min(viewTop + viewHeight - shownHeight - 12, Math.max(viewTop + 12, preferredTop));
-    // A backdrop-filtered ancestor establishes a containing block for fixed
-    // descendants. Bounds above are viewport coordinates; CSS offsets are local.
-    const containingBlock = layer.offsetParent;
-    const containingBounds = containingBlock?.getBoundingClientRect();
-    const localLeft = left - (containingBounds ? containingBounds.left + containingBlock.clientLeft - containingBlock.scrollLeft : 0);
-    const localTop = top - (containingBounds ? containingBounds.top + containingBlock.clientTop - containingBlock.scrollTop : 0);
-    setGeometry(current => current && current.left === localLeft && current.top === localTop && current.width === layerWidth && current.maxHeight === height && current.side === side
-      ? current : { left: localLeft, top: localTop, width: layerWidth, maxHeight: height, side });
-  }
-
-  // Initial placement and real content changes need a measurement, not every
-  // render caused by the resulting coordinates themselves.
-  useLayoutEffect(position, [anchor, kind, width, maxHeight, children]);
-  useLayoutEffect(() => {
-    if (!geometry) return;
-    const layer = layerRef.current;
-    const target = layer.querySelector('[data-composer-initial], [aria-checked="true"]') || layer.querySelector('input, textarea, button');
-    target?.focus({ preventScroll: true });
-    if (target && !isDialog) {
-      const scrollArea = target.closest('.tb-model-options') || layer;
-      const offset = target.getBoundingClientRect().bottom - scrollArea.getBoundingClientRect().bottom + 6;
-      if (offset > 0) scrollArea.scrollTop += offset;
-    }
-  }, [Boolean(geometry)]);
-  useEffect(() => {
-    const outside = event => {
-      if (closing) return;
-      if (layerRef.current?.contains(event.target) || anchor?.contains(event.target)) return;
-      closeRef.current(false);
-    };
-    let frame = 0;
-    const schedulePosition = () => {
-      if (!frame) frame = requestAnimationFrame(() => { frame = 0; position(); });
-    };
-    const observer = new ResizeObserver(schedulePosition);
-    const composer = anchor?.closest('.tb-composer-wrap');
-    if (layerRef.current) observer.observe(layerRef.current);
-    if (anchor) observer.observe(anchor);
-    composer?.addEventListener('composergeometrychange', schedulePosition);
-    document.addEventListener('pointerdown', outside, true);
-    window.addEventListener('resize', schedulePosition);
-    window.addEventListener('scroll', schedulePosition, true);
-    window.visualViewport?.addEventListener('resize', schedulePosition);
-    window.visualViewport?.addEventListener('scroll', schedulePosition);
-    return () => {
-      observer.disconnect();
-      cancelAnimationFrame(frame);
-      composer?.removeEventListener('composergeometrychange', schedulePosition);
-      document.removeEventListener('pointerdown', outside, true);
-      window.removeEventListener('resize', schedulePosition);
-      window.removeEventListener('scroll', schedulePosition, true);
-      window.visualViewport?.removeEventListener('resize', schedulePosition);
-      window.visualViewport?.removeEventListener('scroll', schedulePosition);
-    };
-  }, [anchor, kind, width, maxHeight, closing]);
-
-  function keydown(event) {
-    event.stopPropagation();
-    if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
-    if (event.key === 'Escape') { event.preventDefault(); closeRef.current(true); return; }
-    const menuItems = [...layerRef.current.querySelectorAll('[data-composer-menu-item]:not(:disabled)')];
-    const current = menuItems.indexOf(document.activeElement);
-    if (!isDialog && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
-      event.preventDefault();
-      const next = event.key === 'Home' ? 0 : event.key === 'End' ? menuItems.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : menuItems.length - 1)) % menuItems.length;
-      menuItems[next]?.focus();
-    }
-    if (event.key === 'Tab') {
-      const controls = [...layerRef.current.querySelectorAll('input:not(:disabled), textarea, button:not(:disabled)')];
-      const atEdge = event.shiftKey ? document.activeElement === controls[0] : document.activeElement === controls.at(-1);
-      if (!isDialog || atEdge) {
-        event.preventDefault();
-        closeRef.current(false);
-        focusBesideTrigger(anchor, event.shiftKey ? -1 : 1);
-      }
-    }
-  }
-
-  return createPortal(<div
-    ref={layerRef}
-    data-composer-owner={anchor?.closest('[data-composer-owner]')?.dataset.composerOwner}
-    id={id}
-    className={`dropdown-surface tb-composer-popover tb-composer-${kind}-menu`}
-    role={isDialog ? 'dialog' : 'menu'}
-    aria-label={label}
-    data-placement={geometry?.side}
-    data-closing={closing || undefined}
-    inert={closing}
-    aria-hidden={closing || undefined}
-    style={geometry ? { left: geometry.left, top: geometry.top, width: geometry.width, maxHeight: geometry.maxHeight } : { width, visibility: 'hidden' }}
-    onKeyDown={keydown}
-  >{children}</div>, anchor?.closest('dialog') || getHomeRoot());
-}
+const INLINE_PANEL_LABELS = { add: '添加参考内容', ideas: '妙招', model: '选择模型' };
 
 export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVoice, onOverlayChange, externalOverlayOpen = false, initialSkill = null, initialQuery = '', initialDraft = null, simple = false }, ref) {
   const id = useId();
@@ -197,6 +49,7 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
   });
   const inputRef = useRef(null);
   const wrapRef = useRef(null);
+  const taskShockwave = useTaskShockwave(wrapRef, mode);
   const inputFrameRef = useRef(null);
   const inputMeasureRef = useRef(null);
   const [inputHeight, setInputHeight] = useState(50);
@@ -214,6 +67,8 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
   const canSend = Boolean(skill || query.trim() || attachments.length || references.length);
   const selectedProject = projects.find(project => project.id === selectedProjectId);
   const taskMode = mode === '任务';
+  const inlineKind = INLINE_PANEL_LABELS[overlay] ? overlay : null;
+  const expansionKind = inlineKind || (taskMode ? 'task' : null);
   const localTask = taskMode && runLocation === 'local';
   const selectedApproval = APPROVAL_POLICIES.find(entry => entry.id === approvalPolicy) || APPROVAL_POLICIES[0];
   const dockControlsHidden = useComposerScroll(wrapRef, {
@@ -315,6 +170,33 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
     window.addEventListener('focus', returned);
     return () => { window.removeEventListener('focus', returned); clearTimeout(timer); };
   }, [filePickerOpen]);
+
+  useEffect(() => {
+    if (!inlineKind) return;
+    const outside = event => {
+      if (wrapRef.current?.contains(event.target)) return;
+      setOverlay(current => INLINE_PANEL_LABELS[current] ? null : current);
+    };
+    const focusout = event => {
+      if (event.relatedTarget && !wrapRef.current?.contains(event.relatedTarget)) setOverlay(current => INLINE_PANEL_LABELS[current] ? null : current);
+    };
+    const owner = wrapRef.current;
+    document.addEventListener('pointerdown', outside, true);
+    owner?.addEventListener('focusout', focusout);
+    return () => {
+      document.removeEventListener('pointerdown', outside, true);
+      owner?.removeEventListener('focusout', focusout);
+    };
+  }, [inlineKind]);
+
+  function expansionKeydown(event) {
+    if (!inlineKind || event.defaultPrevented || event.nativeEvent.isComposing) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      closePopover();
+    }
+  }
 
   function toggleOverlay(kind) {
     setOverlay(current => current === kind ? null : kind);
@@ -483,9 +365,11 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
     return persistCommands(customCommands.filter(command => command.id !== commandId));
   }
 
-  return <div ref={wrapRef} className="tb-composer-wrap" data-composer-owner={id} style={{ '--composer-input-height': `${inputHeight}px`, '--composer-skill-indent': `${skillWidth}px` }}>
+  return <div ref={wrapRef} className="tb-composer-wrap" data-expansion={expansionKind || undefined} data-inline-panel={inlineKind || undefined} onKeyDown={expansionKeydown} data-composer-owner={id} style={{ '--composer-input-height': `${inputHeight}px`, '--composer-skill-indent': `${skillWidth}px` }}>
+    <div className="tb-composer-frame">
     <form className="tb-composer" onSubmit={submit}>
       <div className="tb-composer-surface" aria-hidden="true" onClick={() => focusInput()}/>
+      <ComposerWeather />
       <input ref={fileInputRef} type="file" multiple hidden onChange={addFiles} aria-label="选择本地文件" />
       <input ref={folderInputRef} type="file" multiple webkitdirectory="" hidden onChange={addFiles} aria-label="选择本地文件夹" />
       <input ref={projectFolderInputRef} type="file" multiple webkitdirectory="" hidden onChange={receiveProjectFolder} aria-label="选择项目文件夹" />
@@ -530,20 +414,28 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
         <div className="tb-composer-start">
           <button ref={node => { triggers.current.add = node; }} type="button" className={`tb-composer-icon tb-composer-plus${overlay === 'add' ? ' is-open' : ''}`} aria-label="添加参考内容" aria-haspopup="dialog" aria-expanded={overlay === 'add'} aria-controls={overlay === 'add' ? `${id}-add` : undefined} onClick={() => toggleOverlay('add')}><Plus size={18} /></button>
           {!simple && <>
-          <div className="tb-composer-modes" data-dock-secondary inert={dockControlsHidden} aria-hidden={dockControlsHidden} role="group" aria-label="搜索模式">{['对话', '任务'].map(value => <button type="button" key={value} aria-pressed={mode === value} aria-controls={value === '任务' ? `${id}-mount` : undefined} onClick={() => changeMode(value)}>{value}</button>)}</div>
+          <div className="tb-composer-modes" data-dock-secondary inert={dockControlsHidden} aria-hidden={dockControlsHidden} role="group" aria-label="搜索模式">{['对话', '任务'].map(value => <button type="button" key={value} {...(value === '任务' ? taskShockwave : {})} aria-pressed={mode === value} aria-controls={value === '任务' ? `${id}-mount` : undefined} onClick={() => changeMode(value)}>{value}</button>)}</div>
           <button ref={node => { triggers.current.ideas = node; }} type="button" data-dock-secondary inert={dockControlsHidden} aria-hidden={dockControlsHidden} className={`tb-composer-icon tb-composer-ideas${overlay === 'ideas' ? ' is-open' : ''}`} aria-label="妙招" title="妙招" aria-haspopup="dialog" aria-expanded={overlay === 'ideas'} aria-controls={overlay === 'ideas' ? `${id}-ideas` : undefined} onClick={() => toggleOverlay('ideas')}><Lightbulb size={18} aria-hidden="true" /></button>
           </>}
         </div>
         <div className="tb-composer-end">
-          <button ref={node => { triggers.current.model = node; }} type="button" className="tb-model-trigger" aria-label={`选择模型：${modelLabel}`} title={modelSummary || '选择模型'} aria-haspopup="menu" aria-expanded={overlay === 'model'} aria-controls={overlay === 'model' ? `${id}-model` : undefined} onClick={() => toggleOverlay('model')}><span>{modelLabel}</span><ChevronDown size={14} /></button>
+          <button ref={node => { triggers.current.model = node; }} type="button" className={`tb-model-trigger${overlay === 'model' ? ' is-open' : ''}`} aria-label={`选择模型：${modelLabel}`} title={modelSummary || '选择模型'} aria-haspopup="menu" aria-expanded={overlay === 'model'} aria-controls={overlay === 'model' ? `${id}-model` : undefined} onClick={() => toggleOverlay('model')}><span>{modelLabel}</span><ChevronDown size={14} /></button>
           <button type="button" className="tb-composer-icon tb-composer-voice" aria-label="语音输入" title="语音输入" onClick={() => { closeOverlays(); if (onVoice) onVoice(); else setFileError('语音输入尚未接入，可以直接输入小组件需求。'); }}><Mic size={18} aria-hidden="true" /></button>
           <button type="submit" className="tb-composer-send" aria-label="发送" title="发送"><ArrowUp size={18} aria-hidden="true" /></button>
         </div>
       </div>
     </form>
 
-    <div id={`${id}-mount`} className={`tb-task-mount-reveal${taskMode ? ' is-expanded' : ''}`} data-dock-secondary inert={!taskMode || dockControlsHidden} aria-hidden={!taskMode || dockControlsHidden}>
-      <div className="tb-task-mount" role="group" aria-label="任务挂载区">
+    <ComposerExpansion kind={expansionKind} ownerRef={wrapRef} disabled={dockControlsHidden}>
+      {inlineKind ? <ComposerInlinePanel key={inlineKind} kind={inlineKind} id={`${id}-${inlineKind}`} label={INLINE_PANEL_LABELS[inlineKind]} active={!dockControlsHidden}>
+        {inlineKind === 'add' && <ComposerAddMenu active={!dockControlsHidden} onReferences={addReferences} onFiles={openFiles} onFolder={openFolder}/>}
+        {inlineKind === 'model' && <ComposerModelMenu selection={modelSelection}
+          onSelect={name => { setModelSelection(current => toggleReplyModel(current, name)); if (!modelSelection.multiple) closePopover(); }}
+          onModeChange={multiple => setModelSelection(current => setReplyModelMode(current, multiple))}/>}
+        {inlineKind === 'ideas' && <ComposerIdeasMenu customCommands={customCommands}
+          onSelect={(prompt, nextMode) => { setSkill(null); if (nextMode) setMode(nextMode); fillPrompt(prompt); }}
+          onCreate={() => { setOverlay(null); setCommandEditor('create'); }} onManage={() => { setOverlay(null); setCommandEditor('manage'); }}/>}
+      </ComposerInlinePanel> : <div id={`${id}-mount`} className="tb-task-mount" role="group" aria-label="任务挂载区">
         <div className="tb-task-mount-controls">
           <button ref={node => { triggers.current.project = node; }} type="button" className={`tb-task-mount-button tb-task-project${overlay === 'project' ? ' is-open' : ''}`} aria-label={selectedProject ? `选择项目：${selectedProject.name}` : '选择项目'} title={selectedProject?.name || '选择项目'} aria-haspopup="dialog" aria-expanded={overlay === 'project'} aria-controls={overlay === 'project' ? `${id}-project` : undefined} onClick={() => toggleOverlay('project')}><Folder size={16} /><span>{selectedProject?.name || '选择项目'}</span></button>
         </div>
@@ -551,7 +443,8 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
           {!simple && localTask && <button ref={node => { triggers.current.approval = node; }} type="button" className={`tb-local-task-trigger${overlay === 'approval' ? ' is-open' : ''}${approvalPolicy === 'full' ? ' is-full-access' : ''}`} aria-label={`审批策略：${selectedApproval.name}`} aria-haspopup="menu" aria-expanded={overlay === 'approval'} aria-controls={overlay === 'approval' ? `${id}-approval` : undefined} onClick={() => toggleOverlay('approval')}><selectedApproval.Icon size={16} aria-hidden="true" /><span>{selectedApproval.name}</span><ChevronDown className="tb-local-task-chevron" size={14} aria-hidden="true" /></button>}
           <button ref={node => { triggers.current.runtime = node; }} type="button" className={`tb-task-runtime${overlay === 'runtime' ? ' is-open' : ''}`} aria-label={`运行位置：${runLocation === 'cloud' ? '云端' : '本地'}`} title={runLocation === 'cloud' ? '在云端运行' : '在你的计算机上运行'} aria-haspopup="menu" aria-expanded={overlay === 'runtime'} aria-controls={overlay === 'runtime' ? `${id}-runtime` : undefined} onClick={() => toggleOverlay('runtime')}>{runLocation === 'cloud' ? <Cloud size={17} aria-hidden="true" /> : <Laptop size={17} aria-hidden="true" />}<span>{runLocation === 'cloud' ? '云端' : '本地'}</span></button>
         </div>
-      </div>
+      </div>}
+    </ComposerExpansion>
     </div>
 
     {taskMode && ['project', 'runtime'].includes(overlay) && <TaskMountMenus key={overlay} kind={overlay} anchor={triggers.current[overlay]} id={`${id}-${overlay}`} Popover={ComposerPopover} onClose={closePopover}
@@ -561,17 +454,6 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
     {localTask && overlay === 'approval' && <LocalTaskMenus anchor={triggers.current.approval} id={`${id}-approval`} Popover={ComposerPopover} onClose={closePopover}
       approvalPolicy={approvalPolicy} onApprovalPolicyChange={setApprovalPolicy} />}
 
-    <ComposerPopoverPresence active={overlay === 'model'}><ComposerPopover key="model" anchor={triggers.current.model} kind="model" id={`${id}-model`} label="选择模型" width={280} maxHeight={430} onClose={closePopover}>
-      <ComposerModelMenu selection={modelSelection}
-        onSelect={name => { setModelSelection(current => toggleReplyModel(current, name)); if (!modelSelection.multiple) closePopover(); }}
-        onModeChange={multiple => setModelSelection(current => setReplyModelMode(current, multiple))} />
-    </ComposerPopover></ComposerPopoverPresence>
-    <ComposerPopoverPresence active={overlay === 'add'}><ComposerPopover key="add" anchor={triggers.current.add} kind="add" id={`${id}-add`} label="添加参考内容" width={280} maxHeight={430} onClose={closePopover}>
-      <ComposerAddMenu onReferences={addReferences} onFiles={openFiles} onFolder={openFolder} />
-    </ComposerPopover></ComposerPopoverPresence>
-    <ComposerPopoverPresence active={overlay === 'ideas'}><ComposerPopover key="ideas" anchor={triggers.current.ideas} kind="ideas" id={`${id}-ideas`} label="妙招" width={280} maxHeight={430} onClose={closePopover}>
-      <ComposerIdeasMenu customCommands={customCommands} onSelect={(prompt, nextMode) => { setSkill(null); if (nextMode) setMode(nextMode); fillPrompt(prompt); }} onCreate={() => { setOverlay(null); setCommandEditor('create'); }} onManage={() => { setOverlay(null); setCommandEditor('manage'); }} />
-    </ComposerPopover></ComposerPopoverPresence>
     {commandEditor && <ComposerIdeasManager initialCreate={commandEditor === 'create'} customCommands={customCommands} onSave={saveCommand} onDelete={deleteCommand} onClose={() => setCommandEditor(false)} returnFocus={triggers.current.ideas} owner={id} />}
   </div>;
 });

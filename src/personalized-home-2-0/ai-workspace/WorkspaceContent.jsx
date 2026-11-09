@@ -1,5 +1,4 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, ArrowUpRight, Bell, Bookmark, CalendarClock, Check, Cloud, Copy, Code2, CreditCard, File, FileImage, FileText, Folder, Gauge, Globe, House, LayoutDashboard, Lightbulb, MessageCircle, Monitor, Pause, Pin, Play, Plus, Search, Share2, Sparkles, Table2, Ticket, Upload, X } from '../icons';
 import { MODULES, PAGE_TABS, TYPE_LABELS, filterWorkspaceItems } from './workspace-data';
 import './workspace-content.css';
@@ -202,7 +201,7 @@ export default function WorkspaceContent({ active = true, page = 'chats', varian
     />}
     {notice && <p className="aiw-inline-feedback" role="status"><Check size={14}/>{notice}<button aria-label="关闭提示" onClick={() => setNotice('')}><X size={13}/></button></p>}
     <div className="aiw-content-browser"><div className="aiw-content-results" id={page === 'files' ? undefined : `aiw-${page}-results`} role={['files','skills'].includes(page) ? undefined : 'tabpanel'} aria-labelledby={['files','skills'].includes(page) ? undefined : `aiw-${page}-tab-${ui.filter}`}>
-    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem} onUse={onNewChat}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} setUI={setUI} onOpen={openDetail} onCreate={primaryAction} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} view={ui.view} query={ui.query} onOpen={openDetail} onUpdate={updateItem} onCreate={primaryAction}/> : page === 'usage' ? <UsagePanel filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)}/> : <>
+    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <UsagePanel filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)}/> : <>
       {ui.query && <p className="aiw-results-label" role="status">找到 {filtered.length} 项相关内容</p>}
       {!filtered.length ? <EmptyState icon={ICONS[page]} title={ui.query ? '没有找到相关内容' : '这里还没有内容'} description={ui.query ? '换个关键词，或者切换分类试试。' : '从添加第一项内容开始。'} action={!ui.query && !['notifications'].includes(page) ? module.action : null} onAction={primaryAction}/> : <div className={`aiw-content-items ${grid ? 'aiw-content-grid' : 'aiw-content-list'}`}>
         {filtered.map(item => {

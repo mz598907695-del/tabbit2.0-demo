@@ -2,7 +2,7 @@
 /* Avoid sampling through opaque backing fills. Keep the visible rim, highlight,
    shadow and foreground unchanged. Scroll-edge masks remain translucent even
    at this endpoint, so they are deliberately excluded. */
-:scope[data-material='liquid-glass'][data-material-opaque='true'] :is(.tb-task-mount, .promotion-inline-carousel, .promotion-card, .board-widget-card, .shortcut-icon, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)),
+:scope[data-material='liquid-glass'][data-material-opaque='true'] :is(.page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)),
 :scope[data-material='liquid-glass'][data-material-opaque='true'] .board-library-dialog:not(.page-manager-dialog)::before {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -10,7 +10,7 @@
 
 /* The library has one stationary blurred shell. Its nested icon/widget
    previews keep their material fills and lighting without a second sample. */
-:scope[data-material='liquid-glass'] .board-library-dialog :is(.shortcut-icon, .board-widget-card) {
+:scope[data-material='liquid-glass'] .board-library-dialog .board-card::before {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -27,42 +27,4 @@
   --glass-mask: linear-gradient(to bottom, #000 30%, rgb(0 0 0 / 60%) 60%, transparent);
 }
 
-/* The homepage composer uses the shared project surface in every material mode. */
-:scope[data-theme] .home-feed > .tb-composer-wrap .tb-composer-surface {
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.8);
-  border: 0;
-  -webkit-backdrop-filter: blur(30px) saturate(100%);
-  backdrop-filter: blur(30px) saturate(100%);
-  box-shadow: 0px 2px 4px -2px rgba(0, 0, 0, 0.04), inset 0px 0px 0px 0.5px rgba(0, 0, 0, 0.15);
-}
-:scope[data-theme='dark'] .home-feed > .tb-composer-wrap .tb-composer-surface {
-  background:rgba(60,60,60,.6);
-  box-shadow:0 2px 4px -2px rgba(0,0,0,.1),0 0 0 .5px rgba(255,255,255,.12) inset;
-}
-
-/* Preserve the active surface shadow above the material override. */
-:scope[data-theme] .home-feed > .tb-composer-wrap .tb-composer:focus-within .tb-composer-surface,
-:scope[data-theme] .home-feed > .tb-composer-wrap[data-editing='true'] .tb-composer-surface {
-  box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.04), inset 0px 0px 0px 0.5px rgba(0, 0, 0, 0.15);
-}
-:scope[data-theme='dark'] .home-feed > .tb-composer-wrap .tb-composer:focus-within .tb-composer-surface,
-:scope[data-theme='dark'] .home-feed > .tb-composer-wrap[data-editing='true'] .tb-composer-surface {
-  box-shadow:0 2px 4px -2px rgba(0,0,0,.1),0 0 0 .5px rgba(255,255,255,.2) inset;
-}
-
-/* The hidden tray has no pixels to sample. Removing its filter does not
-   change its flow slot or the reversible reveal animation. */
-:scope[data-material='liquid-glass'] .tb-task-mount-reveal.is-expanded[inert] .tb-task-mount {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-
-/* Match the composer's resting drop shadow; outlines remain owned by each tile. */
-:scope[data-theme] .home .board-item.is-widget:not(:hover):not(:focus-within):not(.is-dragging):not(.is-resizing),
-:scope[data-theme] .home .board-item.is-shortcut:not(:hover):not(:focus-within):not(.is-dragging):not(.is-resizing) .shortcut-icon {
-  box-shadow: var(--home-card-resting-shadow);
-}
-:scope[data-theme] .home .board-widget-card { box-shadow:none; }
 }

@@ -1,17 +1,17 @@
 @scope (.personalized-home) {
-.tb-composer-popover.tb-composer-ideas-menu {
+.tb-composer-ideas-menu {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
-.tb-ideas-:scope { display: flex; flex: 0 1 auto; flex-direction: column; min-height: 0; }
+.tb-ideas-body { display: flex; flex: 0 1 auto; flex-direction: column; min-height: 0; }
 .tb-ideas-list { display: flex; flex-direction: column; gap: 2px; flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .tb-ideas-section { flex: 0 0 auto; }
 .tb-ideas-create { display: inline-flex; align-items: center; gap: 4px; min-height: 24px; margin-right: -4px; padding: 2px 4px; border: 0; border-radius: 7px; background: transparent; color: var(--text, #202124); font: inherit; font-size: 12px; line-height: 16px; cursor: pointer; }
 .tb-ideas-create > svg { flex: 0 0 auto; }
 .tb-ideas-create:disabled { color: var(--muted, #858a92); opacity: .5; cursor: not-allowed; }
 .tb-composer-ideas-menu .tb-idea-row { flex: 0 0 auto; }
-.tb-composer-popover.tb-composer-ideas-menu .tb-idea-row > .tb-idea-icon {
+.tb-composer-ideas-menu .tb-ideas-body .tb-idea-row > .tb-idea-icon {
   display: grid;
   flex: 0 0 16px;
   place-items: center;
@@ -24,7 +24,7 @@
 .tb-idea-icon[data-tone='rose'] { --idea-color: #bb7788; }
 .tb-idea-icon[data-tone='amber'] { --idea-color: #be893b; }
 .tb-composer-ideas-menu .tb-idea-icon > svg { color: var(--idea-color, currentColor); }
-.tb-composer-popover.tb-composer-ideas-menu .tb-idea-row > .tb-idea-copy { display: block; min-width: 0; overflow: hidden; white-space: nowrap; }
+.tb-composer-ideas-menu .tb-ideas-body .tb-idea-row > .tb-idea-copy { display: block; min-width: 0; overflow: hidden; white-space: nowrap; }
 .tb-idea-copy strong { display: block; overflow: hidden; font: inherit; text-overflow: ellipsis; white-space: nowrap; }
 .tb-ideas-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 38px 12px; color: var(--muted, #858a92); text-align: center; }
 .tb-ideas-empty strong { color: var(--text, #202124); font-weight: 400; }

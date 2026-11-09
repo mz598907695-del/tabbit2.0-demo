@@ -67,7 +67,7 @@
      名  称：全局页面容器遮罩
      代  号：页面全局遮罩/container fill
      用  途：浏览器内容容器上方的全局渐变遮罩。
-     默认值：light 模式为浅灰到透明的渐变；dark 模式为 85% 的 #222222 到 20% 的 #191919 渐变。
+     默认值：light 模式为浅灰到透明的渐变；dark 模式为 60% 的 #222222 到 20% 的 #191919 渐变。
   */
   --nine-color-bg-global-mask: var(--color-bg-global-mask);
 

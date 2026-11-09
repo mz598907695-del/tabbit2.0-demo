@@ -1,4 +1,3 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 import { useEffect, useId, useLayoutEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Check, GripVertical, Pencil, Plus, Trash2, X } from "../icons";
 import { BoardConfirm } from './BoardDialogs';

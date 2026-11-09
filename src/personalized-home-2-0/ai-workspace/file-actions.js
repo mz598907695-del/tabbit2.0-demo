@@ -1,4 +1,3 @@
-/* eslint-disable -- Preserved upstream prototype snapshot; see ../README.md for isolated validation. */
 function safeFilename(title) {
   const cleaned = String(title || '未命名文件')
     .replace(/[<>:"/\\|?*\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g, '_')

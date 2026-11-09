@@ -4,6 +4,7 @@ import "./GlassControls.css";
 import { baseGlassSettings, defaultSpaceGlass, themedGlassSettings, GLASS_THEME_EVENT, GLASS_SPACE_THEME_EVENT } from "./demoDefaults";
 import { SPACE_GESTURE_EVENT, type SpaceGestureProgress } from "./spaceTransition";
 import { presetTintForMode } from "./spaceColors";
+import { resolveThemeSource } from './themeSelection';
 
 const defaults = baseGlassSettings;
 type Settings = typeof defaults;
@@ -46,6 +47,8 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
   const [open, setOpen] = useState(true);
   const [settings, setSettings] = useState<Settings>(() => {
     try {
+      const theme = localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light';
+      if (resolveThemeSource(theme, localStorage.getItem(`tabbit-glass-theme-source:${spaceId}`)) === 'gallery') return { ...defaults };
       const saved = localStorage.getItem(storageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -94,8 +97,11 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
   }, [spaceId]);
   useEffect(() => {
     const select = (event:Event) => {
-      const detail = (event as CustomEvent<{ color?:string; theme?:string; tint?:number; clear?:boolean; preset?:boolean; reset?:boolean }>).detail;
+      const detail = (event as CustomEvent<{ color?:string; theme?:string; themeSource?:string; appearance?:string; tint?:number; clear?:boolean; preset?:boolean; reset?:boolean }>).detail;
       if (!detail) return;
+      const currentTheme = localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light';
+      const gallery = resolveThemeSource(currentTheme, localStorage.getItem(`tabbit-glass-theme-source:${spaceId}`)) === 'gallery';
+      if (gallery && !detail.themeSource && (detail.tint !== undefined || detail.clear !== undefined || detail.color !== undefined)) return;
       if (detail.preset && typeof detail.tint === "number") {
         userAdjusted.current.tint = false;
         localStorage.setItem(`tabbit-glass-user-tint:${spaceId}`, "false");
@@ -113,12 +119,18 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
         clear:detail.preset && !detail.reset && userAdjusted.current.clear ? current.clear : detail.clear ?? current.clear,
       }));
       if (typeof detail.theme === 'string') localStorage.setItem(`tabbit-glass-theme:${spaceId}`, detail.theme);
+      if (detail.themeSource) localStorage.setItem(`tabbit-glass-theme-source:${spaceId}`, detail.themeSource);
+      if (detail.appearance) localStorage.setItem(`tabbit-glass-theme-appearance:${spaceId}`, detail.appearance);
     };
     window.addEventListener(GLASS_THEME_EVENT, select);
     return () => window.removeEventListener(GLASS_THEME_EVENT, select);
   }, [spaceId]);
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent(GLASS_SPACE_THEME_EVENT, { detail:{ theme:localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light', color:settings.color, tint:settings.tint, clear:settings.clear, spaceName } }));
+    const theme = localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light';
+    window.dispatchEvent(new CustomEvent(GLASS_SPACE_THEME_EVENT, { detail:{ spaceId, theme,
+      themeSource:resolveThemeSource(theme, localStorage.getItem(`tabbit-glass-theme-source:${spaceId}`)),
+      appearance:localStorage.getItem(`tabbit-glass-theme-appearance:${spaceId}`),
+      color:settings.color, tint:settings.tint, clear:settings.clear, spaceName } }));
   }, [settings.color, settings.tint, settings.clear, spaceId, spaceName]);
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(settings));

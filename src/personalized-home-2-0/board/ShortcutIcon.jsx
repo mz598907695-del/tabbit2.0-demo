@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import BoardCard from './BoardCard';
 import { Globe } from "../icons";
 import { getShortcutIconCandidates } from './shortcut-icon.js';
 import { shortcutIconCache } from './shortcut-icon-cache.js';
@@ -37,7 +38,7 @@ export default function ShortcutIcon({ item = {}, size = 24, iconSize = 'small',
 
 /** The same 50px surface in the board, catalogue and custom-add preview. */
 export function ShortcutIconTile({ item = {}, shape = 'circle', iconSize = 'small', appearanceTheme = 'light', ...props }) {
-  return <span {...props} className="shortcut-icon" data-shortcut-shape={shape} data-brand={item.key}>
+  return <BoardCard as="span" compact shape={shape} {...props} className="shortcut-icon" data-shortcut-shape={shape} data-brand={item.key}>
     <ShortcutIcon item={item} iconSize={iconSize} appearanceTheme={appearanceTheme} />
-  </span>;
+  </BoardCard>;
 }
