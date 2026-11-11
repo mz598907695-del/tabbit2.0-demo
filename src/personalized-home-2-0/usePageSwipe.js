@@ -194,7 +194,7 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
       if (next === current.index) return;
       trace('commit', { next });
       current.onSelect(next);
-      setAnnouncement(`已切换到${current.pages[next].name}，第 ${next + 1} 页，共 ${current.pages.length} 页`);
+      setAnnouncement(`已切换到${current.pages[next].name}，第 ${next + 1} 个看板，共 ${current.pages.length} 个`);
     }
     function settleGesture() {
       const result = gesture.finish();

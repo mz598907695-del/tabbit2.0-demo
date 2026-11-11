@@ -3,7 +3,7 @@ import { mergeOutputDemoData } from './workspace-output-mocks.js';
 export const MODULES = [
   { id: 'chats', label: '对话', description: '接着上次的思路，开始下一步。', action: '新建对话' },
   { id: 'files', label: 'AI 输出物', description: 'AI 对话里的资料与生成的内容，都在这里。', action: '创建输出物' },
-  { id: 'skills', label: '妙招', description: '把重复的步骤，变成顺手的一招。', action: '创建妙招' },
+  { id: 'skills', label: '妙招·连接器', description: '把重复的步骤，变成顺手的一招。', action: '创建妙招' },
   { id: 'tasks', label: '定时任务', description: '把需要持续关注的事交给 Tabbit。', action: '新建任务' },
   { id: 'bookmarks', label: '收藏', description: '值得再读的网页，随时找得到。', action: '添加收藏' },
   { id: 'shares', label: '分享', description: '统一查看和管理你分享的内容。', action: '创建示例分享' },

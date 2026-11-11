@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Check, ChevronLeft, ChevronRight, ListFilter, Plus, Search } from '../icons';
+import { ArrowDownUp, ArrowRight, Check, ChevronLeft, ChevronRight, ListFilter, Plus, Search } from '../icons';
 import { UserRound } from 'lucide-react';
 import DropdownPanel from '../../DropdownPanel';
 import OfficialSkills from './OfficialSkills';
@@ -7,6 +7,9 @@ import { SKILL_CATEGORIES, SKILL_TYPES, skillSections } from './workspace-skills
 import { getSkillCardIllustration } from './workspace-skill-icons';
 import { getSkillScrollAnchor } from './workspace-skill-scroll';
 import './workspace-skills.css';
+import SegmentedControl from './SegmentedControl';
+import ConnectorCard from './ConnectorCard';
+import { CONNECTOR_CATEGORIES, CONNECTOR_STORAGE_KEY, connectorSections, readConnectorIds } from './workspace-connectors';
 
 function authorAvatar(name) {
   const seed = [...name].reduce((sum, character) => sum + character.charCodeAt(0), 0);
@@ -18,7 +21,26 @@ function authorAvatar(name) {
 }
 
 export default function WorkspaceSkills({ active = true, items, ui, setUI, onCreate, onOpen, onUpdate }) {
-  const scope = ui.skillScope || 'discover';
+  const resource = ui.skillResource || 'skills';
+  const isConnector = resource === 'connectors';
+  const scope = isConnector ? 'discover' : ui.skillScope || 'discover';
+  const resourceLabel = isConnector ? '连接器' : '妙招';
+  const sort = ui.skillSort || 'latest';
+  const connectorCategory = ui.connectorCategory || 'all';
+  const [addedConnectors, setAddedConnectors] = useState(readConnectorIds);
+  const [sortOpen, setSortOpen] = useState(false);
+  const sortRef = useRef(null), sortButton = useRef(null);
+  useEffect(() => {
+    try { localStorage.setItem(CONNECTOR_STORAGE_KEY, JSON.stringify(addedConnectors)); } catch { /* session-only fallback */ }
+  }, [addedConnectors]);
+  function toggleConnector(id) { setAddedConnectors(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id]); }
+  useEffect(() => {
+    if (!sortOpen) return;
+    const outside = event => { if (!sortRef.current?.contains(event.target)) setSortOpen(false); };
+    document.addEventListener('pointerdown', outside);
+    return () => document.removeEventListener('pointerdown', outside);
+  }, [sortOpen]);
+  useEffect(() => { if (!active) { setSortOpen(false); setFilterOpen(false); setSearchOpen(false); } }, [active]);
   const [searchOpen,setSearchOpen] = useState(false);
   const [filterOpen,setFilterOpen] = useState(false);
   const [anchor,setAnchor] = useState('all');
@@ -27,8 +49,9 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
   const [scrolled,setScrolled] = useState(false);
   const [edges,setEdges] = useState({left:false,right:false});
   const headerRef=useRef(null), panelRef=useRef(null), tabsRef=useRef(null), searchWrapRef=useRef(null), searchRef=useRef(null), searchButton=useRef(null), filterRef=useRef(null), filterButton=useRef(null);
-  const sections=useMemo(() => skillSections(items,{scope,kind:ui.kind,query:ui.query}),[items,scope,ui.kind,ui.query]);
-  const categories=scope==='mine' ? [['installed','已安装'],['custom','我创建的']] : [['all','全部'],['official','官方预装'],['hot','最热'],['latest','最新'],...SKILL_CATEGORIES];
+  const sections=useMemo(() => isConnector ? connectorSections({scope,query:ui.query,sort,added:addedConnectors,category:connectorCategory}) : skillSections(items,{scope,kind:ui.kind,query:ui.query,sort}),[items,scope,ui.kind,ui.query,sort,isConnector,addedConnectors,connectorCategory]);
+  const categories=isConnector ? CONNECTOR_CATEGORIES : scope==='mine' ? [['official','官方预装'],['installed','已安装'],['custom','我创建的']] : [['all','全部'],...SKILL_CATEGORIES];
+  const firstCategory = categories[0][0];
   useLayoutEffect(() => {
     if (!active) return;
     const grids = [...panelRef.current.querySelectorAll('.aiws-cards')];
@@ -61,7 +84,7 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
           sections:nodes.map(node=>({id:node.dataset.skillSection,top:node.getBoundingClientRect().top-hostTop+host.scrollTop})),
           headerOffset:12,
           maxScroll:Math.max(0,host.scrollHeight-host.clientHeight),
-          fallback:scope==='mine'?'installed':'all',
+          fallback:firstCategory,
         };
         header.closest('.aiw-content')?.style.setProperty('--aiw-page-header-height',`${headerHeight}px`);
         measureEdges();
@@ -84,14 +107,14 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
       host.removeEventListener('scroll',schedule);
       document.removeEventListener('visibilitychange',refresh);
     };
-  },[active,scope,sections]);
+  },[active,scope,sections,firstCategory]);
   useEffect(() => {
     if (active) revealCategory(tabsRef.current?.querySelector(`[data-skill-category="${anchor}"]`));
   },[anchor,active]);
   useEffect(() => {
-    setAnchor(scope==='mine'?'installed':'all');
+    setAnchor(firstCategory);
     panelRef.current?.scrollTo({top:0});
-  },[scope,ui.kind,ui.query]);
+  },[scope,resource,ui.kind,ui.query,sort,firstCategory,connectorCategory]);
   useEffect(() => {
     if(!searchOpen) return;
     function outside(event) { if(!searchWrapRef.current?.contains(event.target)) setSearchOpen(false); }
@@ -128,6 +151,7 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
       behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',
     });
   }
+  function switchResource(value) { setUI({skillResource:value,kind:'all',query:''}); setExpanded({}); setFilterOpen(false); setSortOpen(false); setSearchOpen(false); panelRef.current?.scrollTo({top:0}); }
   function switchScope(value) { setUI({skillScope:value}); setAnchor('all'); setExpanded({}); panelRef.current?.scrollTo({top:0}); }
   function arrowKeys(event) {
     const buttons=[...event.currentTarget.querySelectorAll('[role="tab"]')];
@@ -144,33 +168,42 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
   }
   return <>
     <div className="aiwp-page-header aiws-header" data-scrolled={scrolled} ref={headerRef}>
-      <header className="aiwp-heading"><div className="aiwp-heading-copy"><h1>妙招</h1><p className="aiwp-heading-description">发现好用的方法，管理常用的妙招。</p></div><div className="aiwp-heading-actions">
-        <button className="aiwp-primary" onClick={onCreate}>创建妙招</button>
+      <header className="aiwp-heading"><div className="aiwp-heading-copy"><h1>妙招·连接器</h1><p className="aiwp-heading-description">发现好用的妙招与连接器，管理常用的工具。</p></div><div className="aiwp-heading-actions">
+        {!isConnector && <button className="aiwp-primary" onClick={onCreate}>创建妙招</button>}
       </div></header>
       <div className="aiws-toolbar">
-        <div className="aiws-segments" role="tablist" aria-label="妙招范围" onKeyDown={arrowKeys}>{[['discover','发现','zhinanzhen'],['mine','我的','ren']].map(([value,label,icon]) => <button key={value} role="tab" id={`aiws-scope-${value}`} aria-controls="aiws-panel" aria-selected={scope===value} tabIndex={scope===value?0:-1} onClick={() => switchScope(value)}><span className={`iconfont icon-${icon}`} aria-hidden="true"/><span className="aiws-tab-label">{label}</span></button>)}</div>
+        <div className="aiws-toolbar-navigation">
+        <SegmentedControl className="aiws-resource-switch" label="内容类型" value={resource} controlsId="aiws-panel" onChange={switchResource} options={[{value:'skills',label:'妙招'},{value:'connectors',label:'连接器'}]}/>
+        {!isConnector && <><span className="aiws-toolbar-divider" aria-hidden="true"/>
+        <div className="aiws-segments" role="tablist" aria-label={`${resourceLabel}范围`} onKeyDown={arrowKeys}>{[['discover','发现','zhinanzhen'],['mine','我的','ren']].map(([value,label,icon]) => <button key={value} role="tab" id={`aiws-scope-${value}`} aria-controls="aiws-panel" aria-selected={scope===value} tabIndex={scope===value?0:-1} onClick={() => switchScope(value)}><span className={`iconfont icon-${icon}`} aria-hidden="true"/><span className="aiws-tab-label">{label}</span></button>)}</div></>}
+        </div>
         <div className="aiwp-toolbar-actions">
         {searchOpen ? <div className="aiws-inline-search" role="search" ref={searchWrapRef}>
           <Search size={16} aria-hidden="true"/>
-          <input ref={searchRef} aria-label="搜索妙招内容" placeholder="搜索名称、简介或作者…" value={ui.query} onChange={event=>setUI({query:event.target.value})}/>
-        </div> : <button ref={searchButton} className="aiwp-icon-button aiws-search-button" aria-label="搜索妙招" aria-expanded={false} aria-pressed={Boolean(ui.query)} onClick={toggleSearch}><Search size={16}/></button>}
-          <div className="aiws-filter" ref={filterRef}><button ref={filterButton} className="aiwp-icon-button" aria-label="筛选妙招类型" title="筛选妙招类型" aria-haspopup="true" aria-expanded={filterOpen} aria-pressed={ui.kind!=='all'} onClick={() => setFilterOpen(!filterOpen)}><ListFilter size={16}/></button>
+          <input ref={searchRef} aria-label={`搜索${resourceLabel}内容`} placeholder="搜索名称、简介或作者…" value={ui.query} onChange={event=>setUI({query:event.target.value})}/>
+        </div> : <button ref={searchButton} className="aiwp-icon-button aiws-search-button" aria-label={`搜索${resourceLabel}`} aria-expanded={false} aria-pressed={Boolean(ui.query)} onClick={toggleSearch}><Search size={16}/></button>}
+          {!isConnector && <div className="aiws-filter" ref={filterRef}><button ref={filterButton} className="aiwp-icon-button" aria-label="筛选妙招类型" title="筛选妙招类型" aria-haspopup="true" aria-expanded={filterOpen} aria-pressed={ui.kind!=='all'} onClick={() => { setFilterOpen(!filterOpen); setSortOpen(false); }}><ListFilter size={16}/></button>
             {filterOpen && <DropdownPanel className="aiws-filter-popover" label="类型筛选" onClose={() => {setFilterOpen(false);filterButton.current?.focus();}}><h2 className="dropdown-heading">类型</h2>{SKILL_TYPES.map(([value,label]) => <button key={value} aria-pressed={ui.kind===value} onClick={() => {setUI({kind:value});setFilterOpen(false);filterButton.current?.focus();}}><span>{label}</span><span className="dropdown-item-trailing" aria-hidden="true">{ui.kind===value && <Check size={16}/>}</span></button>)}</DropdownPanel>}
+          </div>}
+          <div className="aiws-filter" ref={sortRef}>
+            <button ref={sortButton} type="button" className="aiwp-icon-button" aria-label={`排序：${sort === 'hot' ? '最热' : '最新'}`} title={`排序：${sort === 'hot' ? '最热' : '最新'}`} aria-haspopup="true" aria-expanded={sortOpen} onClick={() => { setSortOpen(!sortOpen); setFilterOpen(false); }}><ArrowDownUp size={16}/></button>
+            {sortOpen && <DropdownPanel className="aiws-filter-popover" label="排序方式" onClose={() => {setSortOpen(false);sortButton.current?.focus();}}>{[['latest','最新'],['hot','最热']].map(([value,label]) => <button type="button" key={value} aria-pressed={sort === value} onClick={() => { setUI({skillSort:value}); setSortOpen(false); sortButton.current?.focus(); }}><span>{label}</span><span className="dropdown-item-trailing" aria-hidden="true">{sort === value && <Check size={16}/>}</span></button>)}</DropdownPanel>}
           </div>
         </div>
       </div>
-      {<nav className="aiws-categories" data-left={edges.left} data-right={edges.right} aria-label="妙招分类锚点">
-        <div className="aiws-category-scroll" ref={tabsRef} onScroll={measureEdges}>{categories.map(([value,label]) => <button key={value} data-skill-category={value} aria-current={anchor===value?'location':undefined} disabled={value!=='all' && !sections.some(section=>section.id===value)} onClick={event => {jump(value);revealCategory(event.currentTarget);}}><span className="aiws-tab-label">{label}</span></button>)}</div>
+      {<nav className="aiws-categories" data-left={edges.left} data-right={edges.right} aria-label={isConnector ? '连接器分类' : '妙招分类锚点'}>
+        <div className="aiws-category-scroll" ref={tabsRef} onScroll={measureEdges}>{categories.map(([value,label]) => <button key={value} data-skill-category={value} aria-current={!isConnector && anchor===value?'location':undefined} aria-pressed={isConnector ? connectorCategory===value : undefined} disabled={!isConnector && value!=='all' && !sections.some(section=>section.id===value)} onClick={event => {if (isConnector) {setUI({connectorCategory:value});setExpanded({});} else jump(value);revealCategory(event.currentTarget);}}><span className="aiws-tab-label">{label}</span></button>)}</div>
         {edges.left && <button className="aiwp-tab-arrow aiws-scroll-arrow is-left" aria-label="向左查看更多分类" onClick={()=>tabsRef.current?.scrollBy({left:-320,behavior:'smooth'})}><ChevronLeft size={16}/></button>}
         {edges.right && <button className="aiwp-tab-arrow aiws-scroll-arrow is-right" aria-label="向右查看更多分类" onClick={()=>tabsRef.current?.scrollBy({left:320,behavior:'smooth'})}><ChevronRight size={16}/></button>}
       </nav>}
     </div>
-    <div id="aiws-panel" ref={panelRef} role="tabpanel" aria-labelledby={`aiws-scope-${scope}`} className="aiws-sections">
-      {scope==='discover' && !ui.query && ui.kind==='all' && <div className="aiws-banner"><img src="/personalized-home-2-0/asset/skills-banner.png" alt="开学没招，Tabbit 给你妙招，看看大学生都在用什么招" width="2400" height="400"/></div>}
-      {scope==='discover' && sections.every(section=>!section.items.length) ? <div className="aiws-empty"><Search size={24}/><h2>{'没有找到相关妙招'}</h2><p>{'试试其他关键词或类型。'}</p><button className="aiw-button" onClick={()=>setUI({query:'',kind:'all'})}>{'清除筛选'}</button></div> : sections.map(section => section.id==='official' ? <OfficialSkills key={section.id} section={section} onOpen={onOpen}/> : <section key={section.id} id={`aiws-section-${section.id}`} data-skill-section={section.id} className="aiws-section" aria-label={section.label}>
+    <div id="aiws-panel" ref={panelRef} role="tabpanel" aria-label={isConnector ? '连接器' : undefined} aria-labelledby={isConnector ? undefined : `aiws-scope-${scope}`} className="aiws-sections">
+      {!isConnector && scope==='discover' && !ui.query && ui.kind==='all' && <div className="aiws-banner"><img src="/personalized-home-2-0/asset/skills-banner.png" alt="开学没招，Tabbit 给你妙招，看看大学生都在用什么招" width="2400" height="400"/></div>}
+      {scope==='discover' && sections.every(section=>!section.items.length) ? <div className="aiws-empty"><Search size={24}/><h2>{`没有找到相关${resourceLabel}`}</h2><p>{'试试其他关键词或类型。'}</p><button className="aiw-button" onClick={()=>setUI({query:'',kind:'all',connectorCategory:'all'})}>{'清除筛选'}</button></div> : sections.map(section => section.id==='official' ? <OfficialSkills key={section.id} section={section} onOpen={onOpen}/> : <section key={section.id} id={`aiws-section-${section.id}`} data-skill-section={section.id} className="aiws-section" aria-label={section.label}>
         {<div className="aiws-section-heading"><h2>{section.label}</h2>{section.items.length>2*(columns[section.id]||1) && <button aria-expanded={Boolean(expanded[section.id])} onClick={()=>setExpanded(previous=>({...previous,[section.id]:!previous[section.id]}))}>{expanded[section.id]?'收起':'展开'}<ArrowRight size={14}/></button>}</div>}
-        {!section.items.length && <div className="aiws-module-empty"><p>{ui.query || ui.kind!=='all'?'没有符合筛选条件的妙招':section.id==='custom'?'还没有创建妙招':'还没有安装妙招'}</p><button className="aiw-button" onClick={()=>{if(ui.query || ui.kind!=='all')setUI({query:'',kind:'all'});else if(section.id==='custom')onCreate();else switchScope('discover');}}>{ui.query || ui.kind!=='all'?'清除筛选':section.id==='custom'?'创建妙招':'去发现'}</button></div>}
+        {!section.items.length && <div className="aiws-module-empty"><p>{ui.query || ui.kind!=='all' ? `没有符合筛选条件的${resourceLabel}` : isConnector ? '还没有添加连接器' : section.id==='custom' ? '还没有创建妙招' : '还没有安装妙招'}</p><button className="aiw-button" onClick={()=>{if(ui.query || ui.kind!=='all')setUI({query:'',kind:'all',connectorCategory:'all'});else if(section.id==='custom')onCreate();else switchScope('discover');}}>{ui.query || ui.kind!=='all'?'清除筛选':section.id==='custom'?'创建妙招':'去发现'}</button></div>}
         <div className="aiws-cards">{(expanded[section.id]?section.items:section.items.slice(0,2*(columns[section.id]||1))).map(item=>{
+          if (isConnector) return <ConnectorCard key={item.id} item={item} added={addedConnectors.includes(item.id)} onToggle={() => toggleConnector(item.id)}/>;
           const { Icon, color, fill } = getSkillCardIllustration(item);
           const author = item.author === 'Tabbit 官方' ? '官方' : item.author;
           const typeLabel = SKILL_TYPES.find(([value])=>value===item.skillType)?.[1];

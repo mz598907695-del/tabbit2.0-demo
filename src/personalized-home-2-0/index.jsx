@@ -9,7 +9,7 @@ import './themes/liquid-glass-performance.css';
 import './host.css';
 import './styles/home-surfaces.css';
 
-export default function PersonalizedHome() {
+export default function PersonalizedHome({ hostActive = true } = {}) {
   const root = useRef(null);
   useLayoutEffect(() => {
     const element = root.current;
@@ -25,5 +25,5 @@ export default function PersonalizedHome() {
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-  return <section ref={root} className="new-tab-page personalized-home"><App/></section>;
+  return <section ref={root} className="new-tab-page personalized-home"><App hostActive={hostActive}/></section>;
 }

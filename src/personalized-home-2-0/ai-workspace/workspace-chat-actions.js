@@ -52,6 +52,7 @@ export function deleteWorkspaceChats(data, ids = []) {
 }
 
 // Pinned conversations stay available; source tabs filter the recent list only.
-export function getSidebarChats(chats, source = 'cloud') {
-  return chats.filter(chat => chat.pinned || chat.type === source);
+export function getSidebarChats(chats, source = 'cloud', query = '') {
+  const keyword = query.trim().toLocaleLowerCase();
+  return chats.filter(chat => (chat.pinned || chat.type === source) && (!keyword || chat.title.toLocaleLowerCase().includes(keyword)));
 }

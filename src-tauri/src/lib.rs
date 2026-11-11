@@ -1,4 +1,5 @@
 mod shockwave;
+pub mod audio_visualizer;
 
 #[cfg(target_os = "macos")]
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
@@ -285,7 +286,7 @@ fn install_trackpad_phases(window: tauri::WebviewWindow) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![update_glass, set_window_appearance, page_switch_haptic, record_swipe_trace, set_app_icon, shockwave::capture_shockwave_content])
+        .invoke_handler(tauri::generate_handler![update_glass, set_window_appearance, page_switch_haptic, record_swipe_trace, set_app_icon, shockwave::capture_shockwave_content, audio_visualizer::audio_visualizer_start, audio_visualizer::audio_visualizer_sample, audio_visualizer::audio_visualizer_stop, audio_visualizer::audio_visualizer_output])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())

@@ -182,6 +182,7 @@
 .page-indicator-manage { right: 6px; --action-enter-x: 28px; }
 
 .page-indicator:has(:focus-visible) .page-indicator-action,
+.page-indicator.is-add-menu-open .page-indicator-action,
 .page-indicator.is-adding .page-indicator-action {
   opacity: 1;
   transform: none;
@@ -247,6 +248,23 @@
   max-height: calc(calc(var(--home-viewport-height) * 1.0) - 64px);
   transform: translateX(-50%);
 }
+
+/* Padding bridges the gap so moving from the plus into the menu stays hovered. */
+.page-indicator-add-menu {
+  position: absolute;
+  z-index: 4;
+  bottom: 100%;
+  left: calc(100% + 17px);
+  width: 216px;
+  max-width: calc(var(--home-viewport-width) - 16px);
+  box-sizing: border-box;
+  padding-bottom: 8px;
+  transform: translateX(-50%);
+}
+.page-indicator-add-menu .home-context-menu {
+  max-height: calc(var(--home-viewport-height) - 64px);
+}
+.page-indicator-form-error { margin: 8px 0 0; color: var(--danger, #d14343); font-size: 12px; line-height: 18px; }
 
 .page-indicator-form-heading {
   display: flex;

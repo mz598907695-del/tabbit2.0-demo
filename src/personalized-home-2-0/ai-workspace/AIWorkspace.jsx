@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Home, Search, X, ArrowUpRight, MessageSquare, Folder, Lightbulb, CalendarClock, LayoutGrid, Star, Share2, Bell, Gauge, Check, ArrowRight } from '../icons';
 import WorkspaceNavigation from './WorkspaceNavigation';
 import WorkspaceContent from './WorkspaceContent';
@@ -19,6 +19,8 @@ import { WorkspaceNavigationSlot } from './workspace-secondary-context';
 import { WallpaperTransitionBackground } from '../HomeBackground';
 
 
+const WorkspaceBookmarksPage = lazy(() => import('./bookmarks/WorkspaceBookmarksPage'));
+
 const destinations = [
   ['home', '首页', Home, '开始新对话，查看常用网站'], ['overview', '总览', LayoutGrid, '最近工作与待处理事项'], ['chats', '对话', MessageSquare, '云端与本地的对话记录'],
   ['files', 'AI 输出物', Folder, '文件、网页、文档、图片、表格、AI 卡片与 AI 看板'], ['skills', '妙招', Lightbulb, '提示词、网页脚本与任务'],
@@ -34,7 +36,7 @@ function readVariant() {
   try { stored = localStorage.getItem('personalized-home-2-0-ai-workspace-variant'); } catch { /* session-only fallback */ }
   return resolveWorkspaceVariant(fromUrl, stored);
 }
-export default function AIWorkspace({ children, wallpaper, reflectionWallpaper = wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNewChat, disabled = false }) {
+export default function AIWorkspace({ children, wallpaper, reflectionWallpaper = wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNavigatePage, onNewChat, disabled = false }) {
   const [open, setOpen] = useState(false);
   const [variant, setVariant] = useState(readVariant);
   const [page, setPage] = useState(() => new URLSearchParams(window.location.search).get('preview') === 'ai-sidebar' && variant === 8 ? 'overview' : 'home');
@@ -157,6 +159,7 @@ export default function AIWorkspace({ children, wallpaper, reflectionWallpaper =
     };
   }, [modal]);
   function navigate(next, nextFilter, trigger) {
+    onNavigatePage?.();
     ({ page: next, filter: nextFilter } = resolveWorkspaceRoute(next, nextFilter, workspaceData));
     if (next === 'notifications') {
       if (notificationOpen) { closeNotifications(true); return; }
@@ -263,7 +266,10 @@ export default function AIWorkspace({ children, wallpaper, reflectionWallpaper =
     {navigationOverlay && open && <button className="aiw-nav-backdrop" aria-label="关闭导航抽屉" tabIndex={-1} onClick={closeSidebar}/>} 
     <WorkspaceNavigationSlot.Provider value={navigationSlot}><div className="aiw-stage">
       <div className="aiw-home" hidden={activeContent} inert={activeContent || Boolean(modal) || (navigationOverlay && open)} aria-hidden={activeContent || undefined}>{children}</div>
-      {contentVisited && <div className="aiw-page-host" ref={pageHostRef} hidden={!activeModule} inert={!activeModule || (navigationOverlay && open)}><WorkspaceContent wallpaper={reflectionWallpaper} active={!disabled && activeModule} page={contentPage} variant={variant} initialFilter={filter} navigationKey={navigationKey} data={workspaceData} setData={setWorkspaceData} onFilterChange={setActiveFilter} onNavigate={navigate} onNewChat={newChat}/></div>}
+      {contentVisited && <div className="aiw-page-host" ref={pageHostRef} hidden={!activeModule} inert={!activeModule || (navigationOverlay && open)}>
+        <div hidden={contentPage === 'bookmarks'} inert={contentPage === 'bookmarks'}><WorkspaceContent wallpaper={reflectionWallpaper} active={!disabled && activeModule && contentPage !== 'bookmarks'} page={contentPage} variant={variant} initialFilter={filter} navigationKey={navigationKey} data={workspaceData} setData={setWorkspaceData} onFilterChange={setActiveFilter} onNavigate={navigate} onNewChat={newChat}/></div>
+        {contentPage === 'bookmarks' && <Suspense fallback={<div role="status">正在打开收藏…</div>}><WorkspaceBookmarksPage embedded active={!disabled && activeModule}/></Suspense>}
+      </div>}
       <div className="aiw-page-host aiw-overview-host" hidden={page !== 'overview'} inert={page !== 'overview' || (navigationOverlay && open)}><WorkspaceOverview data={workspaceData} onNavigate={navigate} onNewChat={newChat}/></div>
       {conversationId && <WorkspaceConversation conversations={workspaceData.chats} conversationId={conversationId} active={!disabled && page === 'conversation'} blocked={Boolean(modal) || (navigationOverlay && open)}/>} 
       <header className="aiw-stage-topbar" aria-label="导航和功能区">

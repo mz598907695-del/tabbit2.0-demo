@@ -7,7 +7,7 @@ export const boardItemName = item => item.type === 'widget' ? item.title : item.
 // Interactions and drag controls belong to the live article in WorkspaceBoard.
 export function BoardItemContent({ item, appearanceTheme, shortcutSize, shortcutShape, editing = false, active = false, onChange, onSelect, onKeyDown, preview = false }) {
   if (item.type === 'widget') {
-    return <WidgetCard kind={item.kind} item={item} size={item.size} inert={editing || preview} active={active} onChange={onChange}/>;
+    return <WidgetCard kind={item.kind} item={item} size={item.size} inert={editing || preview} active={active} onChange={onChange} appearanceTheme={appearanceTheme}/>;
   }
   const artwork = <ResizableShortcut item={item} appearanceTheme={appearanceTheme} iconSize={shortcutSize} shape={shortcutShape}/>;
   if (preview) return <span className="shortcut">{artwork}</span>;

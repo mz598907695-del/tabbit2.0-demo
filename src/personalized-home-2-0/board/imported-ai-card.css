@@ -1,0 +1,10 @@
+@scope (.personalized-home) {
+.imported-ai-card { position:relative;width:100%;height:100%;min-height:0;color:inherit; }
+.imported-ai-card > iframe { display:block;width:100%;height:100%;border:0;background:transparent; }
+.ai-card-fallback { display:flex;flex-direction:column;justify-content:center;gap:8px;padding:16px;height:100%;overflow:auto;font-size:12px; }
+.ai-card-fallback strong {font-weight:500;font-size:14px;}.ai-card-fallback span,.ai-card-fallback small{color:var(--muted);overflow-wrap:anywhere}
+.ai-card-loading {position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:var(--muted);pointer-events:none;}
+.ai-card-detail {width:min(640px,calc(100vw - 32px));height:min(680px,calc(100vh - 48px));max-height:calc(100vh - 48px);padding:0;border:1px solid var(--border);border-radius:24px;background:var(--surface,#fff);color:var(--text,#222);overflow:hidden;box-shadow:0 24px 80px #0004;}
+.ai-card-detail[open]{display:flex;flex-direction:column}.ai-card-detail::backdrop{background:#0005;backdrop-filter:blur(4px)}
+.ai-card-detail header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;gap:12px}.ai-card-detail header strong{font-size:14px;font-weight:500;overflow-wrap:anywhere}.ai-card-detail header button{width:32px;height:32px;border-radius:50%;font-size:24px;color:inherit}.ai-card-detail iframe{flex:1;min-height:0;width:100%;border:0}
+}

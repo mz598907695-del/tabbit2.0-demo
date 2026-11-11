@@ -1,7 +1,7 @@
 import { getHomeRoot } from "../home-host";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Check, ChevronDown, Grid2X2, Pencil, Plus, Search, X } from "../icons";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Grid2X2, Pencil, Plus, Search, X } from "../icons";
 import './board-dialogs.css';
 import ShortcutCatalog from './ShortcutCatalog';
 import FadeText from './FadeText';
@@ -9,6 +9,7 @@ import { daysUntil } from './widget-data';
 import Composer from '../Composer';
 import WidgetAIArtwork from '../WidgetAIArtwork';
 import { AIWidgetTreatmentCard } from './AIWidgetTreatment';
+import AIImportCard from './AIImportCard';
 import { WIDGET_SKILL, WIDGET_PROMPT } from '../widget-ai-data';
 import ShortcutIcon, { ShortcutIconTile } from './ShortcutIcon';
 import { shortcutIconFields } from './shortcut-icon';
@@ -110,10 +111,12 @@ function BoardModal({ title, description, className = '', initialFocusRef, skipR
         window.visualViewport?.removeEventListener('scroll', position);
       }
       if (dialog.open) dialog.close();
-      // A library may be replaced directly by an editor. Do not pull focus out
-      // of the new modal, or back into a menu that has already been removed.
+      // Preserve focus when the library hands off to another modal or an
+      // inline form, such as naming a new board.
       queueMicrotask(() => {
-        if (!skipRestoreFocusRef?.current && !document.querySelector('dialog[open]') && opener?.isConnected && typeof opener.focus === 'function') {
+        const active = document.activeElement;
+        const focusMoved = active && active !== document.body && active !== opener && !dialog.contains(active);
+        if (!focusMoved && !skipRestoreFocusRef?.current && !document.querySelector('dialog[open]') && opener?.isConnected && typeof opener.focus === 'function') {
           opener.focus({ preventScroll: true });
         }
       });
@@ -200,6 +203,7 @@ export function BoardItemDialog({ item = null, onSave, onClose, embedded = false
   const widget = item?.type === 'widget';
   const shortcutEditor = !widget && !embedded;
   const kind = item?.kind;
+  const unifiedWidget = widget && !['reminder', 'joke', 'image', 'workday-countdown'].includes(kind);
   const title = widget ? '编辑小组件' : item ? '编辑快捷方式' : '添加快捷方式';
 
   useEffect(() => {
@@ -272,6 +276,11 @@ export function BoardItemDialog({ item = null, onSave, onClose, embedded = false
       return;
     }
 
+    if (unifiedWidget) {
+      const result = onSave({ ...item, title: name });
+      if (result?.ok === false) fail('name', result.message || '保存失败，请重试');
+      return;
+    }
     let config = { ...(item.config || {}) };
     if (kind === 'reminder' || kind === 'joke' || kind === 'quote') config.text = draft.text.trim();
     if (kind === 'image') config.caption = draft.caption.trim();
@@ -348,18 +357,18 @@ export function BoardItemDialog({ item = null, onSave, onClose, embedded = false
           <input ref={nameRef} id={`${id}-name`} value={draft.name} onChange={(event) => update('name', event.target.value)} maxLength={MAX_NAME_LENGTH} placeholder={widget ? '小组件名称' : '例如：我的常用网站'} autoComplete="off" required aria-invalid={error?.field === 'name' || undefined} aria-describedby={error?.field === 'name' ? `${id}-error` : undefined} />
         </div>
         {!widget && field({ key: 'url', label: '网址', placeholder: 'https://example.com', inputMode: 'url', autoComplete: 'url', autoCapitalize: 'none', spellCheck: false, required: true, maxLength: MAX_URL_LENGTH })}
-        {widget && kind === 'reminder' && field({ key: 'text', label: '提醒内容', multiline: true, rows: 4, maxLength: 2000, placeholder: '每行填写一条提醒', hint: '卡片展示前两条，其余内容保留在编辑中。' })}
-        {widget && kind === 'joke' && field({ key: 'text', label: '笑话内容', multiline: true, rows: 4, maxLength: 2000, placeholder: '写下一句让人轻松的话' })}
-        {widget && kind === 'quote' && <>
+        {widget && !unifiedWidget && kind === 'reminder' && field({ key: 'text', label: '提醒内容', multiline: true, rows: 4, maxLength: 2000, placeholder: '每行填写一条提醒', hint: '卡片展示前两条，其余内容保留在编辑中。' })}
+        {widget && !unifiedWidget && kind === 'joke' && field({ key: 'text', label: '笑话内容', multiline: true, rows: 4, maxLength: 2000, placeholder: '写下一句让人轻松的话' })}
+        {widget && !unifiedWidget && kind === 'quote' && <>
           {field({ key: 'text', label: '句子', multiline: true, rows: 3, maxLength: 500, placeholder: '留空使用内置每日一句' })}
           {field({ key: 'author', label: '署名', maxLength: 60, placeholder: '选填' })}
         </>}
-        {widget && kind === 'countdown' && <>
+        {widget && !unifiedWidget && kind === 'countdown' && <>
           {field({ key: 'event', label: '倒计时名称', maxLength: 40, required: true })}
           {field({ key: 'targetDate', label: '目标日期', type: 'date', required: true })}
         </>}
-        {widget && kind === 'image' && field({ key: 'caption', label: '图片说明', multiline: true, rows: 3, maxLength: 200, placeholder: '为这片风景写一句话（选填）' })}
-        {widget && kind === 'weather' && <>
+        {widget && !unifiedWidget && kind === 'image' && field({ key: 'caption', label: '图片说明', multiline: true, rows: 3, maxLength: 200, placeholder: '为这片风景写一句话（选填）' })}
+        {widget && !unifiedWidget && kind === 'weather' && <>
           {field({ key: 'city', label: '城市', maxLength: 40, autoComplete: 'off', required: true })}
           <div className="board-dialog-field-pair">
             {field({ key: 'temperature', label: '温度（°C）', maxLength: 12, inputMode: 'decimal', required: true })}
@@ -367,17 +376,17 @@ export function BoardItemDialog({ item = null, onSave, onClose, embedded = false
           </div>
           <p className="board-dialog-hint">此处为演示数据，修改后不会查询实时天气。</p>
         </>}
-        {widget && kind === 'codex-usage' && <>
+        {widget && !unifiedWidget && kind === 'codex-usage' && <>
           {field({ key: 'usedPercent', label: '已用额度（%）', type: 'number', min: 0, max: 100, step: 1, required: true })}
           {field({ key: 'resetDate', label: '重置日期', type: 'date', required: true })}
           <p className="board-dialog-hint">可配置的 7 天周期示例数据，尚未连接 Codex 账户。</p>
         </>}
-        {widget && kind === 'workday-countdown' && <>
+        {widget && !unifiedWidget && kind === 'workday-countdown' && <>
           {field({ key: 'startTime', label: '上班时间', type: 'time', required: true })}
           {field({ key: 'workHours', label: '工作时长（小时）', type: 'number', min: 1, max: 16, step: 0.5, required: true })}
           <p className="board-dialog-hint">按本机时间计算，每天从上班时间起计时。</p>
         </>}
-        {widget && !KNOWN_KINDS.includes(kind) && field({ key: 'customConfig', label: '组件配置', multiline: true, rows: 6, spellCheck: false, className: 'board-dialog-code' })}
+        {unifiedWidget && <p className="board-dialog-hint">在卡片右上角打开详情以调整内容。</p>}
         {error && !embedded && <p className="board-dialog-error" id={`${id}-error`} role="alert">{error.message}</p>}
       </div>
       {embedded ? <div className="board-shortcut-actions">
@@ -432,7 +441,7 @@ function LibrarySearch({ value, onChange, placeholder }) {
   </div>;
 }
 
-export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, onShortcut, onGenerateWidget, onClose, homeAnchorRef, shortcutShape = 'circle', shortcutSize = 'small', appearanceTheme = 'light' }) {
+export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, onShortcut, onGenerateWidget, onImport, onClose, homeAnchorRef, shortcutShape = 'circle', shortcutSize = 'small', appearanceTheme = 'light' }) {
   const id = useId();
   const [category, setCategory] = useState('widgets');
   const [aiComposerFocused, setAIComposerFocused] = useState(false);
@@ -453,9 +462,10 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
   const targetPageId = targetPage?.id || '';
   const full = Boolean(targetPage && (targetPage.items?.length || 0) >= MAX_BOARD_ITEMS);
   const unavailable = !targetPage || full;
-  const capacityMessage = !targetPage ? '暂无可添加的页面。' : full ? `此页面已达到 ${MAX_BOARD_ITEMS} 项上限，请选择其他页面。` : '';
+  const capacityMessage = !targetPage ? '暂无可添加的看板。' : full ? `此看板已达到 ${MAX_BOARD_ITEMS} 项上限，请选择其他看板。` : '';
   const widgetQuery = queries.widgets.trim().toLocaleLowerCase();
   const visibleCatalog = catalog.filter(item => `${item.title} ${item.description || ''}`.toLocaleLowerCase().includes(widgetQuery));
+  const showImportCard = Boolean(onImport && (!widgetQuery || '上传 自定义 ai 卡片 json 导入'.includes(widgetQuery)));
   const showAICard = Boolean(onGenerateWidget && (!widgetQuery || 'ai 生成 定制小组件 个性化你的首页'.includes(widgetQuery)));
 
   useEffect(() => {
@@ -553,7 +563,7 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
     <div className="board-library-destination">
       <label htmlFor={`${id}-page`}>添加到</label>
       <span className="overlay-select-wrap"><select id={`${id}-page`} aria-describedby={capacityMessage ? `${id}-capacity` : undefined} value={targetPageId} disabled={!pages.length} onChange={event => { setTargetId(event.target.value); setFeedback({}); dismissToast(); }}>
-        {pages.length ? pages.map(page => <option key={page.id} value={page.id}>{page.name}{(page.items?.length || 0) >= MAX_BOARD_ITEMS ? '（已满）' : ''}</option>) : <option value="">暂无页面</option>}
+        {pages.length ? pages.map(page => <option key={page.id} value={page.id}>{page.name}{(page.items?.length || 0) >= MAX_BOARD_ITEMS ? '（已满）' : ''}</option>) : <option value="">暂无看板</option>}
       </select><ChevronDown size={12} aria-hidden="true" /></span>
     </div>
     <div className="board-library-tabs" role="tablist" aria-label="添加内容类型">
@@ -576,10 +586,10 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
   </header>;
 
   return <BoardModal title="添加内容" className="board-library-dialog" homeAnchorRef={homeAnchorRef} initialFocusRef={firstFocusRef} skipRestoreFocusRef={skipRestoreFocusRef} header={header} onClose={onClose}>
-    <div ref={bodyRef} className="board-dialog-body board-library-body">
+    <div ref={bodyRef} className="board-dialog-body board-library-body" data-category={category}>
       {capacityMessage && <p className="board-library-capacity" id={`${id}-capacity`} role="status" aria-live="polite">{capacityMessage}</p>}
       <div className="board-library-panel" id={`${id}-panel-shortcuts`} role="tabpanel" aria-labelledby={`${id}-category-shortcuts`} hidden={category !== 'shortcuts'}>
-        <ShortcutCatalog query={queries.shortcuts} scrollContainerRef={bodyRef} active={category === 'shortcuts'} targetId={targetPageId} disabled={unavailable || !onShortcut} onAdd={addShortcut} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} customForm={<BoardItemDialog embedded disabled={unavailable || !onShortcut} onSave={addShortcut} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} />} />
+        <ShortcutCatalog query={queries.shortcuts} active={category === 'shortcuts'} targetId={targetPageId} disabled={unavailable || !onShortcut} onAdd={addShortcut} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} customForm={<BoardItemDialog embedded disabled={unavailable || !onShortcut} onSave={addShortcut} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} />} />
       </div>
       <div className="board-library-panel" id={`${id}-panel-widgets`} role="tabpanel" aria-labelledby={`${id}-category-widgets`} hidden={category !== 'widgets'} tabIndex={0}>
       <div className="board-library-grid">
@@ -590,11 +600,19 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
           </div>
           <Composer ref={aiComposerRef} initialSkill={WIDGET_SKILL} initialQuery={WIDGET_PROMPT} simple onHandoff={generateWidget} />
         </AIWidgetTreatmentCard>}
+        {onImport && <AIImportCard hidden={!showImportCard} disabled={unavailable} onImport={async pkg => {
+          const result = await onImport(pkg, targetPageId);
+          if (result?.ok) showAddedToast(pkg.catalog.title);
+          return result;
+        }} />}
         {visibleCatalog.map(item => {
           const choices = DEFAULT_SIZES;
           const selectedSize = choices.find(size => `${size.w}-${size.h}` === sizeKeys[item.kind])
             || choices.find(size => size.w === item.defaultSize?.w && size.h === item.defaultSize?.h)
             || choices[1];
+          const selectedIndex = choices.indexOf(selectedSize);
+          const stepSize = direction => selectSize(item.kind, choices[(selectedIndex + direction + choices.length) % choices.length]);
+          const previewId = `${id}-${item.kind}-preview`;
           const itemFeedback = feedback[item.kind]?.targetPageId === targetPageId ? feedback[item.kind] : null;
           // Keep all presets inside one steady preview stage; only the card's proportion changes.
           const cardWidth = 50 + (selectedSize.w - 1) * 81.25;
@@ -602,7 +620,8 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
           const previewWidth = cardWidth * Math.min(1.3, 214 / cardHeight);
           return <article key={item.kind} className="board-library-card" data-library-kind={item.kind} aria-labelledby={`${id}-${item.kind}-title`}>
             <div className="board-library-preview-stage">
-              <div className="board-library-preview-frame" style={{ '--library-preview-width': `${previewWidth}px`, aspectRatio: `${cardWidth} / ${cardHeight}` }} data-size={`${selectedSize.w}x${selectedSize.h}`}>
+              <button type="button" className="board-library-step" aria-label={`${item.title}：上一种尺寸`} aria-controls={previewId} onClick={() => stepSize(-1)}><ChevronLeft size={18} aria-hidden="true" /></button>
+              <div id={previewId} className="board-library-preview-frame" style={{ '--library-preview-width': `${previewWidth}px`, aspectRatio: `${cardWidth} / ${cardHeight}` }} data-size={`${selectedSize.w}x${selectedSize.h}`}>
                 <div className="board-library-preview" inert aria-hidden="true"><LibraryPreview preview={item.preview} /></div>
                 <button
                   type="button"
@@ -614,7 +633,9 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
                   onClick={() => addWidget(item, selectedSize)}
                 >{itemFeedback?.checked ? <Check size={17} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.2} />}</button>
               </div>
+              <button type="button" className="board-library-step" aria-label={`${item.title}：下一种尺寸`} aria-controls={previewId} onClick={() => stepSize(1)}><ChevronRight size={18} aria-hidden="true" /></button>
             </div>
+            <span className="board-dialog-sr-only" role="status" aria-live="polite" aria-atomic="true">{item.title}：{selectedSize.label}，{selectedSize.w} × {selectedSize.h}</span>
             <div className="board-library-sizes" role="radiogroup" aria-label={`${item.title}尺寸`}>
               {choices.map((size, index) => {
                 const key = `${size.w}-${size.h}`;
@@ -631,7 +652,7 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
           </article>;
         })}
       </div>
-      {!visibleCatalog.length && !showAICard && <p className="board-library-empty">{widgetQuery ? '没有找到相关小组件。' : '此分类暂无小组件。'}</p>}
+      {!visibleCatalog.length && !showAICard && !showImportCard && <p className="board-library-empty">{widgetQuery ? '没有找到相关小组件。' : '此分类暂无小组件。'}</p>}
       {onGenerateWidget && <p className="board-library-generate">
         没找到满意的？试试通过 <button type="button" aria-label="AI 生成小组件" onClick={() => generateWidget()}>AI 生成</button>小组件
       </p>}

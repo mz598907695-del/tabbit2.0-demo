@@ -78,7 +78,7 @@ export function getSkillCatalogue(saved = []) {
     installed:item.installed ?? item.type === 'installed',
   }));
 }
-export function skillSections(items, { scope='discover', kind='all', query='' } = {}) {
+export function skillSections(items, { scope='discover', kind='all', query='', sort='latest' } = {}) {
   const officialOrder = [
     ['代码评审搭子','5'], ['界面灵感收集','3'], ['会议行动清单','4'], ['小红书选题搭子','6'],
     ['论文阅读助手','1'], ['写作搭子','2'], ['行业研究框架','7'],
@@ -107,18 +107,23 @@ export function skillSections(items, { scope='discover', kind='all', query='' } 
     .filter(item => (kind === 'all' || item.skillType === kind) && `${item.title} ${item.description} ${item.author}`.toLocaleLowerCase().includes(term));
   const filtered = items.filter(item => (kind === 'all' || item.skillType === kind) &&
     `${item.title} ${item.description} ${item.author}`.toLocaleLowerCase().includes(term));
+  const preinstalledIds = new Set(items.filter(item => item.type === 'official' && officialIcons.has(item.title)).map(item => item.id));
+  const ordered = sortSkillItems(filtered, sort);
   if (scope === 'mine') return [
-    { id:'installed', label:'已安装', items:filtered.filter(item => item.installed && item.type !== 'custom') },
-    { id:'custom', label:'我创建的', items:filtered.filter(item => item.type === 'custom') },
+    { id:'official', label:'官方预装', items:sortSkillItems(officialItems, sort) },
+    { id:'installed', label:'已安装', items:ordered.filter(item => item.installed && item.type !== 'custom' && !preinstalledIds.has(item.id)) },
+    { id:'custom', label:'我创建的', items:ordered.filter(item => item.type === 'custom') },
   ];
-  const available = filtered.filter(item => item.type !== 'custom');
+  const available = ordered.filter(item => item.type !== 'custom' && !preinstalledIds.has(item.id));
   return [
-    { id:'official', label:'官方预装', items:officialItems },
-    { id:'hot', label:'最热', items:[...available].sort((a,b) => b.usageCount-a.usageCount).slice(0,8) },
-    { id:'latest', label:'最新', items:[...available].sort((a,b) => (b.createdAt||0)-(a.createdAt||0)).slice(0,8) },
+    { id:'all', label:sort === 'hot' ? '最热' : '最新', items:available.slice(0,8) },
     ...SKILL_CATEGORIES.map(([id,label]) => ({ id,label,items:available.filter(item => item.category === id) })),
   ].filter(section => section.items.length);
 }
 export function saveSkill(items, item) {
   return items.some(existing => existing.id === item.id) ? items.map(existing => existing.id === item.id ? item : existing) : [...items,item];
+}
+
+export function sortSkillItems(items, sort = 'latest') {
+  return [...items].sort((a,b) => sort === 'hot' ? (b.usageCount || 0) - (a.usageCount || 0) || (b.createdAt || 0) - (a.createdAt || 0) : (b.createdAt || 0) - (a.createdAt || 0));
 }

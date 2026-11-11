@@ -8,16 +8,18 @@ import { formatWorkspaceOutputDate, groupWorkspaceOutputs } from './workspace-ou
 import './workspace-files.css';
 import WorkspacePageHeader from './WorkspacePageHeader';
 import WorkspaceActionButton from './WorkspaceActionButton';
+import WorkspaceAICardPreview from './WorkspaceAICardPreview';
 
 const TYPE_ICONS = { all: Folder, web: Globe, doc: FileText, image: Image, table: Table2, other: Paperclip, card: Sparkles, board: PanelsTopLeft };
 
 export function WorkspaceFilesHeader({ ui, setUI, onCreate, onRefresh }) {
-  return <WorkspacePageHeader page="files" title="AI 输出物" action="创建输出物" onAction={onCreate} tabs={PAGE_TABS.files} ui={ui} setUI={setUI} hasViews onRefresh={onRefresh}/>;
+  return <WorkspacePageHeader page="files" title={ui.filter === 'card' ? 'AI 卡片' : 'AI 输出物'} action={ui.filter === 'card' ? '添加 AI 卡片' : '创建输出物'} onAction={onCreate} tabs={PAGE_TABS.files} ui={ui} setUI={setUI} hasViews onRefresh={onRefresh}/>;
 }
 
 function FileThumbnail({ item }) {
   const [failed, setFailed] = useState(false);
   const Icon = TYPE_ICONS[item.type] || Paperclip;
+  if (item.type === 'card') return <WorkspaceAICardPreview item={item}/>;
   if (item.image && !failed) return <img className="aiwf-thumbnail-image" src={item.image} alt="" loading="lazy" onError={() => setFailed(true)}/>;
   return <div className={`aiwf-preview-art aiwf-preview-${item.type}`} aria-hidden="true">
     {item.type === 'web' ? <><div className="aiwf-web-bar"><i/><i/><i/><span>{item.format || '网页'}</span></div><div className="aiwf-web-cover"><Globe size={24}/><strong>{item.title}</strong></div><p>{item.description}</p><div className="aiwf-preview-lines"><i/><i/><i/></div></>
@@ -79,7 +81,7 @@ function FileActions({ item, chats, onNavigate, onNotice, onShare }) {
   </div>;
 }
 
-export function WorkspaceFiles({ items, ui, onOpen, selectedId, chats, onNavigate, onNotice, onShare }) {
+export function WorkspaceFiles({ items, ui, onOpen, selectedId, chats, onNavigate, onNotice, onShare, onCreate }) {
   const masonryRef = useRef(null);
   useLayoutEffect(() => {
     const grid = masonryRef.current;
@@ -96,14 +98,23 @@ export function WorkspaceFiles({ items, ui, onOpen, selectedId, chats, onNavigat
     const cards = [...grid.children];
     update(cards.map(target => ({ target })));
     cards.forEach(card => observer.observe(card));
-    return () => observer.disconnect();
-  }, [items, ui.view]);
+    return () => {
+      observer.disconnect();
+      // These row spans belong only to the one-pixel masonry layout. React can
+      // otherwise retain them on keyed articles when switching to a regular grid.
+      cards.forEach(card => card.style.removeProperty('grid-row-end'));
+    };
+  }, [items, ui.view, ui.filter]);
   const empty = !items.length;
   const periods = groupWorkspaceOutputs(items, { sort: ui.sort });
   const orderedItems = periods.flatMap(period => period.items);
   return <div id="aiwf-results" className="aiwf-results" role="tabpanel" aria-labelledby={`aiwf-tab-${ui.filter}`}>
-    {empty ? <div className="aiwf-empty"><span className="aiwf-empty-collection" aria-hidden="true"/><div className="aiwf-empty-copy"><h2>{ui.query ? '没有找到相关输出物' : '这里还没有输出物'}</h2><p>{ui.query ? '试试其他关键词，或查看全部输出物。' : '对话中的资料和你创建的内容会收纳在这里。'}</p></div></div>
-      : ui.view === 'grid' ? <div className="aiwf-masonry" ref={masonryRef}>{orderedItems.map(item => <article className={`aiwf-card ${selectedId === item.id ? 'is-previewed' : ''}`} key={item.id}>
+    {empty ? <div className="aiwf-empty">{ui.filter === 'card' ? <Sparkles size={40} strokeWidth={1.4}/> : <span className="aiwf-empty-collection" aria-hidden="true"/>}<div className="aiwf-empty-copy"><h2>{ui.query ? ui.filter === 'card' ? '没有找到相关 AI 卡片' : '没有找到相关输出物' : ui.filter === 'card' ? '还没有 AI 卡片' : '这里还没有输出物'}</h2><p>{ui.query ? '试试其他关键词，或查看全部输出物。' : ui.filter === 'card' ? '把常用信息收进卡片，在这里查看和整理。' : '对话中的资料和你创建的内容会收纳在这里。'}</p></div>{ui.filter === 'card' && !ui.query && <button className="aiw-button aiw-button-primary aiwc-empty-action" onClick={onCreate}>添加 AI 卡片</button>}</div>
+      : ui.view === 'grid' && ui.filter === 'card' ? <div key="card-gallery" className="aiwc-gallery">{orderedItems.map(item => <article className="aiwc-gallery-card" key={item.id}>
+        <button className="aiwc-gallery-open" aria-label={`预览 ${item.title}`} onClick={() => onOpen(item)}><div className="aiwc-gallery-preview"><WorkspaceAICardPreview item={item}/></div><div className="aiwc-gallery-copy"><strong>{item.title}</strong><span>{item.description || 'AI 卡片'}</span></div></button>
+        <div className="aiwc-gallery-footer"><span>{item.image ? '卡片预览' : '样式预览'}</span><FileActions item={item} chats={chats} onNavigate={onNavigate} onNotice={onNotice} onShare={onShare}/></div>
+      </article>)}</div>
+      : ui.view === 'grid' ? <div key="file-masonry" className="aiwf-masonry" ref={masonryRef}>{orderedItems.map(item => <article className={`aiwf-card ${selectedId === item.id ? 'is-previewed' : ''}`} key={item.id}>
         <button className="aiwf-card-open" aria-label={`预览 ${item.title}`} onClick={() => onOpen(item)}>
           <div className={`aiwf-card-preview aiwf-ratio-${item.type}`}><FileThumbnail item={item}/></div>
           <div className="aiwf-card-copy"><span className="aiwf-card-title" title={item.title}>{item.title}</span><span className="aiwf-card-description">{TYPE_LABELS[item.type] || '其他'}</span></div>

@@ -104,7 +104,7 @@ export const Mic = icon("\ue36f", 0);
 export const Microscope = icon("\ue008", 0);
 export const Minus = icon("\ue13f", 0);
 export const Monitor = icon("\ue39f", 0);
-export const MoveDiagonal2 = icon("\ue025", 0);
+export { MoveDiagonal2 } from "lucide-react";
 export const Network = icon("\ue4d9", 0);
 export const Newspaper = icon("\ue40d", 0);
 export const Palette = icon("\ue46f", 0);

@@ -17,7 +17,7 @@ import ThemeSidebarResizeHandle from './ThemeSidebarResizeHandle';
 import { resolvePreferences } from "./preferences";
 import { spaceColors } from "../spaceColors";
 import { normalizeAppIcon } from "./appIcons";
-import { useBoardState, transferBoardItem } from "./board/state";
+import { useBoardState, transferBoardItem, applyBoardPageChange } from "./board/state";
 import { getIllustratedTheme } from "./themes/catalog";
 import { getThemeBackground, getThemeSelectionAppearance } from "./themes/appearance";
 import { isWallpaperTheme } from "./themes/wallpapers";
@@ -46,7 +46,7 @@ function readPreferences() {
   }
 }
 
-export function App() {
+export function App({ hostActive = true } = {}) {
   const [widgetAI, setWidgetAI] = useState(false);
   const [widgetAIVisited, setWidgetAIVisited] = useState(false);
   const [widgetAIEntryId, setWidgetAIEntryId] = useState('initial');
@@ -164,6 +164,7 @@ export function App() {
   const composerRef = useRef(null);
   const aiComposerRef = useRef(null);
   const boardRef = useRef(null);
+  const pageIndicatorRef = useRef(null);
   function setShortcutPage(update) {
     const next = typeof update === 'function' ? update(shortcutPage) : update;
     if (next !== shortcutPage) boardRef.current?.preparePageTransition(next > shortcutPage ? 1 : -1);
@@ -263,6 +264,14 @@ export function App() {
     dismissPageOverlays();
     updatePreference('shortcuts', true);
     boardRef.current?.openLibrary();
+  }
+
+  function openAddShortcutPage() {
+    dismissPageOverlays();
+    boardRef.current?.stopEditing();
+    setBoardEditing(false);
+    updatePreference('shortcuts', true);
+    pageIndicatorRef.current?.openAddPage();
   }
 
   function editCurrentPage() {
@@ -517,7 +526,7 @@ export function App() {
 
   return (
     <ComposerWeatherContext.Provider value={selectedWallpaper?.weather || null}>
-    <AIWorkspace wallpaper={selectedWallpaper} reflectionWallpaper={selectedWallpaper || { url:illustratedTheme?.scene ? `/personalized-home-2-0/asset/themes/previews/${illustratedTheme.scene.id}.webp` : undefined, color:getThemeBackground(preferences.theme, appearanceTheme), name:illustratedTheme?.name || '当前主题' }} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNewChat={prompt => {
+    <AIWorkspace wallpaper={selectedWallpaper} reflectionWallpaper={selectedWallpaper || { url:illustratedTheme?.scene ? `/personalized-home-2-0/asset/themes/previews/${illustratedTheme.scene.id}.webp` : undefined, color:getThemeBackground(preferences.theme, appearanceTheme), name:illustratedTheme?.name || '当前主题' }} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNavigatePage={() => setPageManagerOpen(false)} onNewChat={prompt => {
       setWidgetAI(false); aiComposerRef.current?.closeOverlays();
       setDialog(null); setThemeOpen(false); setPageManagerOpen(false); boardRef.current?.dismissOverlays(); setBoardEditing(false);
       composerRef.current?.startNew(prompt);
@@ -560,13 +569,14 @@ export function App() {
         }}
         promotionProps={preferences.promotion && preferences.promotionStyle === 'inline' ? promotionProps : null}
         boardProps={{
-          ref: boardRef, visible: preferences.shortcuts, active: !widgetAI && !aiWorkspaceBusy,
+          ref: boardRef, visible: preferences.shortcuts, active: hostActive && !widgetAI && !aiWorkspaceBusy,
           showEmptyHint: shortcutPage !== 2,
           editing: boardEditing, overlayBlocked: Boolean(aiWorkspaceBusy || composerOpen || dialog || pageActionsOpen || pageManagerOpen || pageContextOpen),
           onPageContextMenu: event => pageContextRef.current?.open(event),
+          onAddPage: openAddShortcutPage,
           onEditModeChange: setBoardEditing,
           page: shortcutPages[shortcutPage], pages: shortcutPages,
-          onPageChange: next => setShortcutPages(pages => pages.map(page => page.id === next.id ? next : page)),
+          onPageChange: (update, pageId) => setShortcutPages(pages => applyBoardPageChange(pages, update, pageId)),
           onInitializeLayoutOrder: boardState.initializeLayoutOrder,
           onRenameGroup: name => renameShortcutPage(shortcutPages[shortcutPage].id, name),
           onDeleteGroup: () => deleteShortcutPage(shortcutPages[shortcutPage].id),
@@ -586,6 +596,7 @@ export function App() {
         promotionProps={preferences.promotion && preferences.promotionStyle === 'card' ? promotionProps : null}
         themeButtonProps={{ref: themeTriggerRef, expanded: themeOpen, onClick: toggleThemePanel}}
         pageProps={!widgetAI ? {
+          ref: pageIndicatorRef,
           visible: preferences.shortcuts,
           pages: shortcutPages, selectedIndex: shortcutPage,
           onRename: renameShortcutPage, onDelete: deleteShortcutPage,
@@ -595,13 +606,21 @@ export function App() {
             setShortcutPage(index);
             updatePreference('shortcuts', true);
           },
-          onManage: openPageManager, onAdd: () => boardRef.current?.openLibrary(),
+          onManage: openPageManager, onAddPage: addShortcutPage, onAdd: () => boardRef.current?.openLibrary(),
         } : null}
         announcement={pageSwipeAnnouncement}
       />
       {pageManagerOpen && !widgetAI && <PageManagerDialog
+        homeAnchorRef={homeRef}
+        appearanceTheme={appearanceTheme}
         pages={shortcutPages}
         activePageId={shortcutPages[shortcutPage].id}
+        onSelect={id => {
+          const index = shortcutPages.findIndex(page => page.id === id);
+          if (index < 0) return;
+          setShortcutPage(index);
+          setPageManagerOpen(false);
+        }}
         onReorder={boardState.reorderPage}
         onRename={renameShortcutPage}
         onDelete={deleteShortcutPage}
@@ -618,9 +637,9 @@ export function App() {
         {themeSidebar}
       </div>, themePortalHost
     )}
-    <PageContextMenu ref={pageContextRef} enabled={!widgetAI && !aiWorkspaceBusy} canEdit={shortcutPages[shortcutPage].items.length > 0}
+    <PageContextMenu ref={pageContextRef} enabled={!widgetAI && !aiWorkspaceBusy && !pageManagerOpen} canEdit={shortcutPages[shortcutPage].items.length > 0} canAddPage={shortcutPages.length < 20}
       preferences={preferences} onPreferenceChange={updatePageMenuPreference}
-      onAdd={openPageLibrary} onEdit={editCurrentPage} onPageSettings={openPageManager}
+      onAdd={openPageLibrary} onAddPage={openAddShortcutPage} onEdit={editCurrentPage} onPageSettings={openPageManager}
       onThemeSettings={openThemeGallery} onOpenChange={setPageContextOpen} />
     {widgetAIVisited && widgetAIEntries.map(entry => {
       const active = widgetAI && entry.id === widgetAIEntryId;

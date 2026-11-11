@@ -9,7 +9,7 @@ const MODULES = {
   home: { label: '首页', Icon: Home },
   chats: { label: '对话', Icon: MessageSquare },
   files: { label: 'AI 输出物', Icon: FolderOpen },
-  skills: { label: '妙招', Icon: Lightbulb },
+  skills: { label: '妙招·连接器', Icon: Lightbulb },
   tasks: { label: '定时任务', Icon: CalendarClock },
   bookmarks: { label: '收藏', Icon: Star },
   shares: { label: '分享', Icon: Share2 },

@@ -1,0 +1,12 @@
+@scope (.personalized-home) {
+.aiw-segmented-control { position:relative; isolation:isolate; display:flex; flex:none; gap:2px; padding:2px; margin:0; border-radius:999px; background:var(--nine-color-fill-layer-strong); }
+.aiw-segmented-control > button { position:relative; z-index:1; display:flex; align-items:center; justify-content:center; gap:4px; flex:none; width:var(--segmented-item-width,64px); height:var(--segmented-item-height,24px); padding:0 8px; border:0; border-radius:999px; background:transparent; color:var(--nine-color-text-tertiary); font-family:inherit; font-size:12px; line-height:16px; font-weight:400; }
+.aiw-segmented-control > button > svg { width:14px; height:14px; flex:none; }
+.aiw-segmented-control::before { content:""; position:absolute; top:2px; left:2px; width:calc((100% - 6px) / 2); height:var(--segmented-item-height,24px); border-radius:999px; background:var(--nine-color-fill-layer-base); box-shadow:var(--nine-shadow-level-1); pointer-events:none; transform:translateX(0); transition:transform 300ms var(--nine-motion-easing-standard); }
+.aiw-segmented-control:has(button:last-child[aria-selected="true"])::before { transform:translateX(calc(100% + 2px)); }
+.aiw-segmented-control > button[aria-selected="true"] { color:var(--nine-color-text-title); }
+.aiw-segmented-control > button:focus-visible { outline:2px solid var(--focus-ring,#96999f); outline-offset:-2px; }
+:scope[data-theme="dark"] .aiw-segmented-control { background:rgba(0,0,0,.2); }
+:scope[data-theme="dark"] .aiw-segmented-control::before { background:rgba(255,255,255,.12); box-shadow:0 4px 12px rgba(0,0,0,.1),0 -1px 2px rgba(0,0,0,.1),0 0 1px .5px rgba(255,255,255,.12) inset; }
+@media(prefers-reduced-motion:reduce) { .aiw-segmented-control::before { transition:none; } }
+}

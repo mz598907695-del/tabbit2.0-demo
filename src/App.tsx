@@ -24,8 +24,8 @@ import { VerticalSidebar, VerticalTabPreview } from './browser/VerticalTabs';
 import { SPACE_TABS, spaceTabLayouts, sampleSpace, initialSpaceTab, isTabGroup } from './browser/tabs-data';
 import type { Mode } from './browser/types';
 
-const NewTabPage = memo(function NewTabPage() {
-  return <PersonalizedHome/>;
+const NewTabPage = memo(function NewTabPage({ hostActive }: { hostActive:boolean }) {
+  return <PersonalizedHome hostActive={hostActive}/>;
 });
 
 function BrowserContent({ children, isNewTab }: { children:React.ReactNode; isNewTab:boolean }) {
@@ -33,7 +33,7 @@ function BrowserContent({ children, isNewTab }: { children:React.ReactNode; isNe
     <div className={`content-area ${isNewTab ? "is-new-tab" : ""}`}>
       <div className={`content-container ${isNewTab ? "is-new-tab" : ""}`}>
         <div className="content-viewport">
-          <div className="persistent-new-tab" hidden={!isNewTab} inert={!isNewTab}><NewTabPage/></div>
+          <div className="persistent-new-tab" hidden={!isNewTab} inert={!isNewTab}><NewTabPage hostActive={isNewTab}/></div>
           <div className="persistent-browser-page" hidden={isNewTab} inert={isNewTab}>{children}</div>
         </div>
       </div>

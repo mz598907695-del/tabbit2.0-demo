@@ -9,6 +9,7 @@ import WorkspaceTasks from './WorkspaceTasks';
 import WorkspaceUsage from './WorkspaceUsage';
 import UsageRecordsDialog from './UsageRecordsDialog';
 import WorkspaceSkillDetail from './WorkspaceSkillDetail';
+import WorkspaceAICardDetail from './WorkspaceAICardDetail';
 import { getFileShareText, refreshWorkspaceOutputs } from './file-actions';
 import { getSkillCatalogue, saveSkill } from './workspace-skills';
 import { getWorkspaceItems, outputCollection, updateWorkspaceOutput } from './workspace-outputs';
@@ -46,7 +47,7 @@ function Modal({ title, children, onClose, wide = false }) {
 function CreateForm({ page, onClose, onSave, defaultType }) {
   const [name, setName] = useState(''); const [description, setDescription] = useState(''); const [type, setType] = useState(defaultType || ({ files: 'doc', skills: 'prompt', tasks: 'daily', assets: 'board', bookmarks: 'AI', shares: 'chat' })[page] || 'cloud');
   const [url, setUrl] = useState(''); const [time, setTime] = useState('09:00'); const [error, setError] = useState(''); const [file, setFile] = useState(null);
-  const title = page === 'files' ? '创建 AI 输出物' : page === 'assets' && defaultType === 'card' ? '添加 AI 卡片' : MODULES.find(module => module.id === page)?.action || '添加内容';
+  const title = ['files', 'assets'].includes(page) && defaultType === 'card' ? '添加 AI 卡片' : page === 'files' ? '创建 AI 输出物' : MODULES.find(module => module.id === page)?.action || '添加内容';
   function submit(event) {
     event.preventDefault();
     if (!name.trim()) { setError('请填写名称。'); return; }
@@ -125,7 +126,8 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
     observer.observe(node);
     return () => observer.disconnect();
   }, [variant]);
-  const inlinePreview = variant === 7 && previewRoom && !['usage', 'skills'].includes(page);
+  const inlinePreview = variant === 7 && previewRoom && !['usage', 'skills'].includes(page)
+    && !(page === 'files' && pageUI[page]?.filter === 'card');
   const module = MODULES.find(item => item.id === page) || MODULES[0];
   const ui = { ...DEFAULT_UI, view: page === 'tasks' ? 'list' : 'grid', filter: page === 'usage' ? 'membership' : 'all', ...pageUI[page] };
   const setUI = patch => setPageUI(previous => ({ ...previous, [page]: { ...DEFAULT_UI, view: page === 'tasks' ? 'list' : 'grid', ...previous[page], ...patch } }));
@@ -139,18 +141,20 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
     const found = items.find(item => initialFilter === `detail:${item.id}` || initialFilter === item.title);
     if (found) { setDetail(found.id); if (page === 'notifications' && found.unread) setData(previous => ({ ...previous, notifications: previous.notifications.map(item => item.id === found.id ? { ...item, unread: false } : item) })); return; }
     const tab = (PAGE_TABS[page] || []).find(([value, label]) => value === initialFilter || label === initialFilter);
-    if (tab) setPageUI(previous => ({ ...previous, [page]: { ...DEFAULT_UI, view: page === 'tasks' ? 'list' : 'grid', ...previous[page], filter: tab[0], ...(page === 'skills' ? { skillScope: ['installed', 'custom'].includes(tab[0]) ? 'mine' : 'discover', skillMine: tab[0] === 'custom' ? 'custom' : 'installed' } : {}) } }));
+    if (tab) setPageUI(previous => ({ ...previous, [page]: { ...DEFAULT_UI, view: page === 'tasks' ? 'list' : 'grid', ...previous[page], filter: tab[0], ...(page === 'skills' ? { skillScope: ['official', 'installed', 'custom'].includes(tab[0]) ? 'mine' : 'discover', skillMine: tab[0] === 'custom' ? 'custom' : 'installed' } : {}) } }));
   }, [page, initialFilter, navigationKey]);
   useEffect(() => { onFilterChange?.(ui.filter); }, [ui.filter, page, onFilterChange]);
   const filtered = useMemo(() => filterWorkspaceItems(items, ui), [items, ui.query, ui.filter, ui.kind, ui.sort]);
   const selected = items.find(item => item.id === detail);
   const skillDetail = active && page === 'skills' && selected;
+  const cardDetail = active && page === 'files' && selected?.type === 'card' && selected;
+  const secondaryDetail = skillDetail || cardDetail;
   useLayoutEffect(() => {
     const host = contentRef.current?.closest('.aiw-page-host');
-    if (skillDetail && host) host.scrollTop = 0;
-    else if (restoreList.current && host && page === 'skills') host.scrollTop = listScroll.current;
+    if (secondaryDetail && host) host.scrollTop = 0;
+    else if (restoreList.current && host) host.scrollTop = listScroll.current;
     restoreList.current = false;
-  }, [skillDetail?.id, page]);
+  }, [secondaryDetail?.id, page]);
   function updateItem(item) { setData(previous => page === 'files' ? updateWorkspaceOutput(previous, item) : { ...previous, [page]: page === 'skills' ? saveSkill(previous.skills, item) : previous[page].map(existing => existing.id === item.id ? item : existing) }); }
   function openDetail(item) { if (page === 'chats') { onNavigate('chats', `detail:${item.id}`); return; } detailTrigger.current = document.activeElement; listScroll.current = contentRef.current?.closest('.aiw-page-host')?.scrollTop || 0; setDetail(item.id); if (page === 'notifications' && item.unread) updateItem({ ...item, unread: false }); }
   function closeDetail() {
@@ -160,6 +164,7 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
       const trigger = detailTrigger.current;
       if (trigger?.isConnected && trigger.getClientRects().length && !trigger.closest('[inert]')) trigger.focus?.({ preventScroll: true });
       else if (page === 'skills') contentRef.current?.querySelector('.aiws-header button')?.focus({ preventScroll: true });
+      else if (page === 'files') contentRef.current?.querySelector('.aiwp-page-header button')?.focus({ preventScroll: true });
     });
   }
   function refreshOutputs() {
@@ -187,16 +192,17 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
   }
   const grid = GRID_PAGES.has(page) && ui.view === 'grid';
   const countFor = filter => filter === 'all' ? items.length : filter === 'pinned' ? items.filter(item => item.pinned).length : items.filter(item => filter === 'installed' ? item.type === 'installed' || item.installed : item.type === filter).length;
-  return <section ref={contentRef} className={`aiw-content aiw-content-${page} aiw-content-variant-${variant} ${inlinePreview ? 'has-inspector' : ''}`} aria-label={`${module.label}内容`}>
+  return <section ref={contentRef} className={`aiw-content aiw-content-${page} aiw-content-variant-${variant} ${inlinePreview && !cardDetail ? 'has-inspector' : ''}`} aria-label={`${module.label}内容`}>
     {skillDetail && <WorkspaceSkillDetail key={selected.id} item={selected} backLabel={ui.skillScope === 'mine' ? '返回我的妙招' : '返回发现妙招'} onBack={closeDetail} onUpdate={updateItem} onUse={onNewChat}/>}
-    <div className="aiw-content-primary" hidden={Boolean(skillDetail)} inert={Boolean(skillDetail)}>
+    {cardDetail && <WorkspaceAICardDetail key={selected.id} item={selected} backLabel={ui.filter === 'card' ? '返回 AI 卡片' : '返回 AI 输出物'} onBack={closeDetail} chats={data.chats} onNavigate={onNavigate} onShare={setShareItem}/>}
+    <div className="aiw-content-primary" hidden={Boolean(secondaryDetail)} inert={Boolean(secondaryDetail)}>
     {page === 'skills' ? null : page === 'files' ? <WorkspaceFilesHeader ui={ui} setUI={setUI} onCreate={primaryAction} onRefresh={refreshOutputs}/> : <WorkspacePageHeader key={page} page={page} title={page === 'usage' ? '会员计划' : module.label} action={module.action} onAction={primaryAction} tabs={PAGE_TABS[page] || []} ui={ui} setUI={setUI} searchable={page !== 'usage'} hasViews={page !== 'tasks' && GRID_PAGES.has(page)} counts={page === 'tasks' ? Object.fromEntries(PAGE_TABS.tasks.map(([value]) => [value, countFor(value)])) : undefined}
       secondaryActions={<>{page === 'assets' && <button className="aiwp-secondary" onClick={() => setCreate('card')}>上传 AI 卡片</button>}</>}
       filters={page === 'skills' && <select className="aiwp-kind-filter" aria-label="妙招类型" value={ui.kind} onChange={event => setUI({ kind: event.target.value })}><option value="all">所有类型</option><option value="prompt">提示词</option><option value="script">网页脚本</option><option value="task">任务</option></select>}
     />}
     {notice && <p className="aiw-inline-feedback" role="status"><Check size={14}/>{notice}<button aria-label="关闭提示" onClick={() => setNotice('')}><X size={13}/></button></p>}
     <div className="aiw-content-browser"><div className="aiw-content-results" id={page === 'files' ? undefined : `aiw-${page}-results`} role={['files','skills'].includes(page) ? undefined : 'tabpanel'} aria-labelledby={['files','skills'].includes(page) ? undefined : `aiw-${page}-tab-${ui.filter}`}>
-    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <WorkspaceUsage wallpaper={wallpaper} filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)} onPurchaseCoupons={() => setPlans('coupons')} onUsageRecords={() => setPlans('records')}/> : <>
+    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem} onCreate={primaryAction}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <WorkspaceUsage wallpaper={wallpaper} filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)} onPurchaseCoupons={() => setPlans('coupons')} onUsageRecords={() => setPlans('records')}/> : <>
       {ui.query && <p className="aiw-results-label" role="status">找到 {filtered.length} 项相关内容</p>}
       {!filtered.length ? <EmptyState icon={ICONS[page]} title={ui.query ? '没有找到相关内容' : '这里还没有内容'} description={ui.query ? '换个关键词，或者切换分类试试。' : '从添加第一项内容开始。'} action={!ui.query && !['notifications'].includes(page) ? module.action : null} onAction={primaryAction}/> : <div className={`aiw-content-items ${grid ? 'aiw-content-grid' : 'aiw-content-list'}`}>
         {filtered.map(item => {
@@ -213,7 +219,7 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
       </div>}
     </>}
     </div>
-    {selected && page !== 'skills' && <Detail key={selected.id} inline={inlinePreview} page={selected._outputSource?.collection || page} item={selected} onClose={closeDetail} onNavigate={onNavigate} onNewChat={onNewChat} onUpdate={updateItem}/>}
+    {active && selected && page !== 'skills' && !cardDetail && <Detail key={selected.id} inline={inlinePreview} page={selected._outputSource?.collection || page} item={selected} onClose={closeDetail} onNavigate={onNavigate} onNewChat={onNewChat} onUpdate={updateItem}/>}
     {inlinePreview && !selected && <aside className="aiw-inspector aiw-inspector-empty" aria-label="内容预览"><FileText size={28} strokeWidth={1.3}/><h2>在这里预览</h2><p>选择一项内容，详情会在这里展开。<br/>列表保持可见，方便继续浏览。</p></aside>}
     </div>
     </div>

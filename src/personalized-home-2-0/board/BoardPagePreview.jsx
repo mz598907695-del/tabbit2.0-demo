@@ -1,10 +1,13 @@
 import { memo, useMemo } from 'react';
 import { BoardItemContent, BoardItemLabel } from './BoardItemContent';
-import { projectPage } from './state';
+import { boardColumns, gridProfile, projectPage } from './state';
 import { getBoardRows } from './layout';
 import { boardAlignmentOffset } from './drag-geometry';
 
-function BoardPagePreview({ page, columns, width, columnWidth, profile, sourceColumns, appearanceTheme, shortcutSize, shortcutShape, showLabels }) {
+function BoardPagePreview({ page, width, sourceColumns, appearanceTheme, shortcutSize, shortcutShape, showLabels }) {
+  const columns = boardColumns(width, showLabels, page.preferredColumns);
+  const profile = gridProfile('gap', showLabels, (width - 50) / (columns - 1));
+  const columnWidth = profile.pitch;
   const items = useMemo(() => projectPage(page, columns, 'gap', showLabels, 'free', sourceColumns), [page, columns, showLabels, sourceColumns]);
   const offset = boardAlignmentOffset(items, width, columnWidth, profile.gap);
   return <div className="board-grid" style={{ height: Math.max(1, getBoardRows(items)) * profile.pitch }}>

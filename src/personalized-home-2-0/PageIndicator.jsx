@@ -1,6 +1,6 @@
 import { useVisibilityMotion } from './useVisibilityMotion';
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { TextCursorInput, Plus, Controls, Trash2, X } from "./icons";
+import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
+import { TextCursorInput, Plus, Controls, Trash2, X, FilePlus2, LayoutGrid } from "./icons";
 import { BoardConfirm } from "./board/BoardDialogs";
 import { isPageGestureClick, pageDragPosition, pageEdgeVelocity, pagePreviewOffset } from "./page-reorder";
 import "./page-indicator.css";
@@ -43,8 +43,8 @@ function usePageReorder({ pages, onReorder, onStart, capsuleRef }) {
 
     if (commit && session.active && session.targetIndex !== session.from) {
       latest.current.onReorder?.(session.pageId, session.targetIndex);
-      setAnnouncement(`已将${session.name}移到第 ${session.targetIndex + 1} 个位置，共 ${session.count} 个页面`);
-    } else if (session.active && reason === "escape") setAnnouncement("已取消页面排序");
+      setAnnouncement(`已将${session.name}移到第 ${session.targetIndex + 1} 个位置，共 ${session.count} 个看板`);
+    } else if (session.active && reason === "escape") setAnnouncement("已取消看板排序");
     if (reason === "pointerup" || reason === "escape") {
       cancelAnimationFrame(focusFrameRef.current);
       focusFrameRef.current = requestAnimationFrame(() => {
@@ -140,7 +140,7 @@ function usePageReorder({ pages, onReorder, onStart, capsuleRef }) {
     const targetIndex = Math.max(0, Math.min(pages.length - 1, index + (event.key === "ArrowLeft" ? -1 : 1)));
     if (targetIndex !== index) {
       onReorder(page.id, targetIndex);
-      setAnnouncement(`已将${page.name}移到第 ${targetIndex + 1} 个位置，共 ${pages.length} 个页面`);
+      setAnnouncement(`已将${page.name}移到第 ${targetIndex + 1} 个位置，共 ${pages.length} 个看板`);
       const button = event.currentTarget;
       cancelAnimationFrame(focusFrameRef.current);
       focusFrameRef.current = requestAnimationFrame(() => {
@@ -211,11 +211,13 @@ function usePageReorder({ pages, onReorder, onStart, capsuleRef }) {
 }
 
 export function PageIndicator({
+  ref,
   visible = true,
   pages = defaultPages,
   selectedIndex = 0,
   onSelect,
   onAdd,
+  onAddPage,
   onManage,
   onRename,
   onDelete,
@@ -225,6 +227,14 @@ export function PageIndicator({
   const [editingPageId, setEditingPageId] = useState(null);
   const [deletingPageId, setDeletingPageId] = useState(null);
   const [pageMenu, setPageMenu] = useState(null);
+  const [addMenuOpen, setAddMenuOpen] = useState(false);
+  const [addingPage, setAddingPage] = useState(false);
+  const [addError, setAddError] = useState("");
+  const addMenuRef = useRef(null);
+  const addMenuTimer = useRef(null);
+  const addMenuFocus = useRef(null);
+  const addMenuId = useId();
+  useEffect(() => () => window.clearTimeout(addMenuTimer.current), []);
   const [name, setName] = useState("");
   const [tooltip, setTooltip] = useState(null);
   const tooltipTimer = useRef(null);
@@ -312,20 +322,124 @@ export function PageIndicator({
   const tooltipId = useId();
   const menuId = useId();
   const reorderHelpId = useId();
-  const isFormOpen = editingPageId !== null;
+  const isFormOpen = addingPage || editingPageId !== null;
   const deletingPage = pages.find((entry) => entry.id === deletingPageId);
   const reorder = usePageReorder({ pages, onReorder, capsuleRef, onStart: () => {
     window.clearTimeout(tooltipTimer.current);
     setTooltip(null);
     setPageMenu(null);
     setEditingPageId(null);
+    setAddingPage(false);
+    closeAddMenu();
   } });
   const isReordering = Boolean(reorder.preview);
 
   useEffect(() => {
-    onBusyChange?.(Boolean(isFormOpen || pageMenu || deletingPage || isReordering));
+    onBusyChange?.(Boolean(isFormOpen || pageMenu || addMenuOpen || deletingPage || isReordering));
     return () => onBusyChange?.(false);
-  }, [isFormOpen, pageMenu, Boolean(deletingPage), isReordering, onBusyChange]);
+  }, [isFormOpen, pageMenu, addMenuOpen, Boolean(deletingPage), isReordering, onBusyChange]);
+
+  function closeAddMenu() {
+    window.clearTimeout(addMenuTimer.current);
+    addMenuFocus.current = null;
+    setAddMenuOpen(false);
+  }
+
+  function beginAddPage() {
+    // The global menu may reveal the indicator and open this form in one update.
+    if (!onAddPage || pages.length >= 20) return false;
+    reorder.cancel();
+    closeAddMenu();
+    window.clearTimeout(tooltipTimer.current);
+    setTooltip(null);
+    setPageMenu(null);
+    setEditingPageId(null);
+    setDeletingPageId(null);
+    actionTriggerRef.current = addButtonRef.current;
+    setName('');
+    setAddError('');
+    setAddingPage(true);
+    return true;
+  }
+
+  useImperativeHandle(ref, () => ({ openAddPage: beginAddPage }));
+
+  function openAddMenu(focus = null) {
+    window.clearTimeout(addMenuTimer.current);
+    if (reorder.engaged() || !visible || deletingPage) return;
+    window.clearTimeout(tooltipTimer.current);
+    setTooltip(null);
+    setPageMenu(null);
+    setEditingPageId(null);
+    setAddingPage(false);
+    addMenuFocus.current = focus;
+    setAddMenuOpen(true);
+    if (addMenuOpen && focus) focusAddMenu(focus);
+  }
+
+  function focusAddMenu(position) {
+    const buttons = addMenuRef.current?.querySelectorAll('button:not(:disabled)');
+    buttons?.[position === 'last' ? buttons.length - 1 : 0]?.focus({ preventScroll: true });
+  }
+
+  function leaveAddMenu() {
+    window.clearTimeout(addMenuTimer.current);
+    addMenuTimer.current = window.setTimeout(() => {
+      if (!addMenuRef.current?.contains(document.activeElement)) closeAddMenu();
+    }, 180);
+  }
+
+  useLayoutEffect(() => {
+    if (!addMenuOpen) return;
+    const root = rootRef.current;
+    const home = root.closest('.home');
+    const menu = addMenuRef.current;
+    function reposition() {
+      const region = home.getBoundingClientRect();
+      const bounds = addButtonRef.current.getBoundingClientRect();
+      const halfWidth = menu.getBoundingClientRect().width / 2;
+      const center = Math.max(region.left + halfWidth + 8, Math.min(bounds.left + bounds.width / 2, region.right - halfWidth - 8));
+      menu.style.left = `${center - root.getBoundingClientRect().left}px`;
+    }
+    reposition();
+    if (addMenuFocus.current) focusAddMenu(addMenuFocus.current);
+    const observer = new ResizeObserver(reposition);
+    observer.observe(home);
+    observer.observe(root);
+    window.addEventListener('resize', reposition);
+    const dismiss = event => {
+      if (!menu.contains(event.target) && !addButtonRef.current?.contains(event.target)) closeAddMenu();
+    };
+    const keyboard = event => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopPropagation();
+      closeAddMenu();
+      addButtonRef.current?.focus({ preventScroll: true });
+    };
+    document.addEventListener('pointerdown', dismiss);
+    document.addEventListener('focusin', dismiss);
+    document.addEventListener('keydown', keyboard, true);
+    window.addEventListener('blur', closeAddMenu);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', reposition);
+      document.removeEventListener('pointerdown', dismiss);
+      document.removeEventListener('focusin', dismiss);
+      document.removeEventListener('keydown', keyboard, true);
+      window.removeEventListener('blur', closeAddMenu);
+    };
+  }, [addMenuOpen]);
+
+  useEffect(() => {
+    closeAddMenu();
+    if (!visible) setAddingPage(false);
+  }, [visible]);
+
+  useEffect(() => {
+    closeAddMenu();
+    setAddingPage(false);
+  }, [selectedIndex]);
 
   function tooltipPosition(anchor) {
     const root = rootRef.current.getBoundingClientRect();
@@ -339,7 +453,7 @@ export function PageIndicator({
   }
 
   function showTooltip(event, label) {
-    if (reorder.engaged() || isFormOpen || pageMenu || deletingPage || event.pointerType === "touch") return;
+    if (reorder.engaged() || isFormOpen || pageMenu || addMenuOpen || deletingPage || event.pointerType === "touch") return;
     const anchor = event.currentTarget;
     window.clearTimeout(tooltipTimer.current);
     tooltipTimer.current = window.setTimeout(() => {
@@ -395,11 +509,11 @@ export function PageIndicator({
   }, [Boolean(tooltip)]);
 
   useLayoutEffect(() => {
-    if (isFormOpen) {
+    if (isFormOpen && visible && indicatorPresent) {
       inputRef.current?.focus({ preventScroll: true });
       if (editingPageId !== null) inputRef.current?.select();
     }
-  }, [isFormOpen, editingPageId]);
+  }, [isFormOpen, editingPageId, visible, indicatorPresent]);
 
   useEffect(() => {
     if (!isFormOpen && !pageMenu) return undefined;
@@ -407,6 +521,7 @@ export function PageIndicator({
     function onPointerDown(event) {
       if (!rootRef.current?.contains(event.target)) {
         setEditingPageId(null);
+        setAddingPage(false);
         setPageMenu(null);
       }
     }
@@ -416,6 +531,7 @@ export function PageIndicator({
       event.preventDefault();
       event.stopPropagation();
       setEditingPageId(null);
+      setAddingPage(false);
       setPageMenu(null);
       (actionTriggerRef.current || addButtonRef.current)?.focus({ preventScroll: true });
     }
@@ -463,6 +579,8 @@ export function PageIndicator({
     actionTriggerRef.current = anchor;
     window.clearTimeout(tooltipTimer.current);
     setTooltip(null);
+    closeAddMenu();
+    setAddingPage(false);
     setEditingPageId(null);
     setPageMenu({ id: targetPage.id, x: center - root.left });
   }
@@ -477,6 +595,8 @@ export function PageIndicator({
 
   function closeForm() {
     setEditingPageId(null);
+    setAddingPage(false);
+    setAddError("");
     (actionTriggerRef.current || addButtonRef.current)?.focus({ preventScroll: true });
   }
 
@@ -487,14 +607,20 @@ export function PageIndicator({
       inputRef.current?.focus({ preventScroll: true });
       return;
     }
-    onRename?.(editingPageId, nextName);
+    if (addingPage) {
+      const result = onAddPage?.(nextName);
+      if (result === false || result?.ok === false) {
+        setAddError(result?.message || (pages.length >= 20 ? '最多可添加 20 个看板' : '添加失败，请重试'));
+        return;
+      }
+    } else onRename?.(editingPageId, nextName);
     setName("");
     closeForm();
   }
 
   return (
     <div
-      className={`page-indicator${isFormOpen ? " is-adding" : ""}${isReordering ? " is-reordering" : ""}${onReorder ? " can-reorder" : ""}`}
+      className={`page-indicator${isFormOpen ? " is-adding" : ""}${addMenuOpen ? " is-add-menu-open" : ""}${isReordering ? " is-reordering" : ""}${onReorder ? " can-reorder" : ""}`}
       ref={rootRef}
       hidden={!indicatorPresent}
       inert={!visible}
@@ -508,27 +634,29 @@ export function PageIndicator({
         type="button"
         className="page-indicator-action page-indicator-manage"
         ref={manageButtonRef}
-        aria-label="页面设置"
+        aria-label="看板设置"
         aria-haspopup="dialog"
         aria-describedby={tooltip?.anchor === manageButtonRef.current ? tooltipId : undefined}
-        {...tooltipHandlers("页面设置")}
+        {...tooltipHandlers("看板设置")}
         onClick={() => {
           window.clearTimeout(tooltipTimer.current);
     setTooltip(null);
           setPageMenu(null);
           setEditingPageId(null);
+          setAddingPage(false);
+          closeAddMenu();
           onManage();
         }}
       >
         <Controls size={12} aria-hidden="true" />
       </button></span>}
-      <nav ref={capsuleRef} className="page-indicator-capsule" aria-label="首页页面" onScroll={() => { setTooltip(null); setPageMenu(null); reorder.scroll(); }}>
+      <nav ref={capsuleRef} className="page-indicator-capsule" aria-label="首页看板" onScroll={() => { setTooltip(null); setPageMenu(null); reorder.scroll(); }}>
         {pages.map((page, index) => (
           <button
             type="button"
             className={`page-indicator-page${reorder.preview?.pageId === page.id ? " is-held" : ""}`}
             key={page.id ?? index}
-            aria-label={`${page.name}页面`}
+            aria-label={`${page.name}看板`}
             aria-pressed={selectedIndex === index}
             aria-describedby={[onReorder && reorderHelpId, tooltip?.anchor.dataset.pageIndex === String(index) && tooltipId].filter(Boolean).join(" ") || undefined}
             aria-keyshortcuts={onReorder ? "Alt+ArrowLeft Alt+ArrowRight" : undefined}
@@ -552,6 +680,8 @@ export function PageIndicator({
               window.clearTimeout(tooltipTimer.current);
     setTooltip(null);
               setEditingPageId(null);
+              setAddingPage(false);
+              closeAddMenu();
               setPageMenu(null);
               onSelect?.(index);
             }}
@@ -561,36 +691,62 @@ export function PageIndicator({
         ))}
         {reorder.preview && <span className="page-indicator-drop-target" data-drop-index={reorder.preview.to} aria-hidden="true" style={{ left: reorder.preview.marker }} />}
       </nav>
-      {onReorder && <span className="page-indicator-sr-only" id={reorderHelpId}>按住拖动可调整页面顺序，也可使用 Alt 加左右方向键；Escape 取消拖动。</span>}
+      {onReorder && <span className="page-indicator-sr-only" id={reorderHelpId}>按住拖动可调整看板顺序，也可使用 Alt 加左右方向键；Escape 取消拖动。</span>}
       <span className="page-indicator-sr-only" role="status" aria-live="polite">{reorder.announcement}</span>
 
-      {onAdd && <span className="page-indicator-action-slot page-indicator-add-slot"><button
+      {(onAdd || onAddPage) && <span className="page-indicator-action-slot page-indicator-add-slot"><button
         type="button"
         className="page-indicator-action page-indicator-add"
         ref={addButtonRef}
-        aria-label="添加内容"
-        aria-haspopup="dialog"
-        aria-describedby={tooltip?.anchor === addButtonRef.current ? tooltipId : undefined}
-        {...tooltipHandlers("添加快捷方式或小组件")}
-        onClick={() => {
-          window.clearTimeout(tooltipTimer.current);
-    setTooltip(null);
-          setPageMenu(null);
-          setEditingPageId(null);
-          onAdd();
+        aria-label="添加"
+        aria-haspopup="menu"
+        aria-expanded={addMenuOpen}
+        aria-controls={addMenuOpen ? addMenuId : undefined}
+        onPointerEnter={event => {
+          window.clearTimeout(addMenuTimer.current);
+          if (event.pointerType !== 'touch' && !isFormOpen) addMenuTimer.current = window.setTimeout(() => openAddMenu(), 120);
+        }}
+        onPointerLeave={leaveAddMenu}
+        onClick={() => openAddMenu('first')}
+        onKeyDown={event => {
+          if (!['ArrowDown', 'ArrowUp'].includes(event.key)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          openAddMenu(event.key === 'ArrowUp' ? 'last' : 'first');
         }}
       >
         <Plus size={12} aria-hidden="true" />
       </button></span>}
 
-      {tooltip && !isReordering && !isFormOpen && !pageMenu && !deletingPage && (
+      {addMenuOpen && <div ref={addMenuRef} className="page-indicator-add-menu"
+        onPointerEnter={() => window.clearTimeout(addMenuTimer.current)} onPointerLeave={leaveAddMenu}>
+        <div id={addMenuId} className="home-context-menu" role="menu" aria-label="添加菜单" onKeyDown={event => {
+          if (event.key === 'Tab') { closeAddMenu(); addButtonRef.current?.focus(); return; }
+          if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          event.stopPropagation();
+          const buttons = [...event.currentTarget.querySelectorAll('button:not(:disabled)')];
+          const index = buttons.indexOf(document.activeElement);
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : buttons.length - 1)) % buttons.length;
+          buttons[next]?.focus();
+        }}>
+          {onAddPage && <button type="button" role="menuitem" disabled={pages.length >= 20} title={pages.length >= 20 ? '最多可添加 20 个看板' : undefined} onClick={beginAddPage}><FilePlus2 size={16} aria-hidden="true" />添加看板</button>}
+          {onAdd && <button type="button" role="menuitem" onClick={() => {
+            closeAddMenu();
+            addButtonRef.current?.focus({ preventScroll: true });
+            onAdd();
+          }}><LayoutGrid size={16} aria-hidden="true" />添加组件</button>}
+        </div>
+      </div>}
+
+      {tooltip && !isReordering && !isFormOpen && !pageMenu && !addMenuOpen && !deletingPage && (
         <div id={tooltipId} role="tooltip" className="space-tooltip page-indicator-tooltip" style={{ left: tooltip.x, maxWidth: tooltip.maxWidth }}>
           {tooltip.label}
         </div>
       )}
 
       {pageMenu && (
-        <div ref={menuRef} id={menuId} className="page-indicator-menu home-context-menu" role="menu" aria-label="页面菜单" style={{ left: pageMenu.x }} onKeyDown={(event) => {
+        <div ref={menuRef} id={menuId} className="page-indicator-menu home-context-menu" role="menu" aria-label="看板菜单" style={{ left: pageMenu.x }} onKeyDown={(event) => {
           if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
           event.preventDefault();
           const buttons = [...event.currentTarget.querySelectorAll("button:not(:disabled)")];
@@ -603,15 +759,15 @@ export function PageIndicator({
             if (target) { setName(target.name); setEditingPageId(target.id); }
             setPageMenu(null);
           }}><TextCursorInput size={16} aria-hidden="true" />编辑名称</button>}
-          {onDelete && <button type="button" role="menuitem" className="is-danger" disabled={pages.length <= 1} title={pages.length <= 1 ? "至少保留一个页面" : undefined} onClick={() => { setDeletingPageId(pageMenu.id); setPageMenu(null); }}><Trash2 size={16} aria-hidden="true" />删除</button>}
+          {onDelete && <button type="button" role="menuitem" className="is-danger" disabled={pages.length <= 1} title={pages.length <= 1 ? "至少保留一个看板" : undefined} onClick={() => { setDeletingPageId(pageMenu.id); setPageMenu(null); }}><Trash2 size={16} aria-hidden="true" />删除</button>}
         </div>
       )}
 
       {isFormOpen && (
-        <form id={formId} className="page-indicator-form" aria-label="编辑页面名称" onSubmit={renamePage}>
+        <form id={formId} className="page-indicator-form" aria-label={addingPage ? "添加看板" : "编辑看板名称"} onSubmit={renamePage}>
           <div className="page-indicator-form-heading">
-            <label htmlFor={`${formId}-name`}>页面名称</label>
-            <button type="button" className="page-indicator-form-close" aria-label="关闭编辑页面名称" onClick={closeForm}>
+            <label htmlFor={`${formId}-name`}>{addingPage ? '添加看板' : '看板名称'}</label>
+            <button type="button" className="page-indicator-form-close" aria-label={addingPage ? '取消添加看板' : '关闭编辑看板名称'} onClick={closeForm}>
               <X size={13} />
             </button>
           </div>
@@ -620,22 +776,26 @@ export function PageIndicator({
               id={`${formId}-name`}
               ref={inputRef}
               type="text"
-              placeholder="输入页面名称"
+              aria-label={addingPage ? '新看板名称' : undefined}
+              aria-invalid={Boolean(addingPage && addError)}
+              aria-describedby={addingPage && addError ? `${formId}-error` : undefined}
+              placeholder="输入看板名称"
               value={name}
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) => { setName(event.target.value); setAddError(''); }}
               maxLength={24}
               autoComplete="off"
               onKeyDown={(event) => {
-                if (event.key === "Enter" && event.nativeEvent.isComposing) event.preventDefault();
+                if (event.key === "Enter" && (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)) event.preventDefault();
               }}
             />
-            <button type="submit" className="page-indicator-confirm" disabled={!name.trim()}>保存</button>
+            <button type="submit" className="page-indicator-confirm" disabled={!name.trim()}>{addingPage ? '添加' : '保存'}</button>
           </div>
+          {addingPage && addError && <p id={`${formId}-error`} className="page-indicator-form-error" role="alert">{addError}</p>}
         </form>
       )}
       {deletingPage && <BoardConfirm
-        title={`删除页面“${deletingPage.name}”？`}
-        description={`将移除本页的 ${deletingPage.items?.length || 0} 个项目，可在批量编辑中撤销。`}
+        title={`删除看板“${deletingPage.name}”？`}
+        description={`将移除此看板中的 ${deletingPage.items?.length || 0} 个项目，可在批量编辑中撤销。`}
         onClose={() => { setDeletingPageId(null); restorePageFocus(); }}
         onConfirm={() => { if (pages.length > 1) onDelete?.(deletingPage.id); setDeletingPageId(null); restorePageFocus(); }}
       />}

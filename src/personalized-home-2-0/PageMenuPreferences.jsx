@@ -2,7 +2,7 @@ import { ArrowLeftRight, Check, ChevronRight, LayoutGrid, Scaling, Type } from "
 
 const choices = {
   shortcutSize: { label: '图标大小', Icon: Scaling, options: [['large', '大'], ['medium', '中'], ['small', '小']] },
-  pageWidth: { label: '页面宽度', Icon: ArrowLeftRight, options: [['standard', '标宽'], ['wide', '超宽']] },
+  pageWidth: { label: '看板宽度', Icon: ArrowLeftRight, options: [['standard', '标宽'], ['wide', '超宽']] },
 };
 
 export const isPagePreferenceView = view => Object.hasOwn(choices, view);

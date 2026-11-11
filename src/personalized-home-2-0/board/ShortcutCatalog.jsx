@@ -26,7 +26,7 @@ const unifiedCatalog = shortcutCatalog.filter(item => {
 const categories = [...new Set(unifiedCatalog.map(item => item.section))];
 const navigation = ['全部', ...categories];
 
-export default function ShortcutCatalog({ customForm, onAdd, disabled, targetId, query = '', scrollContainerRef, active = true, shortcutShape = 'circle', shortcutSize = 'small', appearanceTheme = 'light' }) {
+export default function ShortcutCatalog({ customForm, onAdd, disabled, targetId, query = '', active = true, shortcutShape = 'circle', shortcutSize = 'small', appearanceTheme = 'light' }) {
   const id = useId();
   const [category, setCategory] = useState('全部');
   const [added, setAdded] = useState({});
@@ -36,6 +36,7 @@ export default function ShortcutCatalog({ customForm, onAdd, disabled, targetId,
   const [retry, setRetry] = useState(0);
   const timers = useRef({});
   const navigationRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const buttonRefs = useRef({});
   const sectionRefs = useRef({});
   const groups = useMemo(() => {
@@ -76,8 +77,7 @@ export default function ShortcutCatalog({ customForm, onAdd, disabled, targetId,
     const target = sectionRefs.current[name];
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
     if (scroller && nav) {
-      const glassTail = parseFloat(window.getComputedStyle(nav.parentElement).marginBottom) || 20;
-      const top = name === '全部' || !target ? 0 : scroller.scrollTop + target.getBoundingClientRect().top - nav.getBoundingClientRect().bottom - glassTail;
+      const top = name === '全部' || !target ? 0 : scroller.scrollTop + target.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
       scroller.scrollTo({ top: Math.max(0, top), behavior });
     }
     const button = buttonRefs.current[name];
@@ -123,8 +123,6 @@ export default function ShortcutCatalog({ customForm, onAdd, disabled, targetId,
   const sectionTitle = name => <h3 className="shortcut-catalog-section-title" id={headingId(name)}>{name}</h3>;
 
   return <div className="shortcut-catalog">
-    <div className="shortcut-catalog-chrome">
-    <div className="shortcut-catalog-glass" aria-hidden="true"><span /><span /><span /></div>
     <nav className="shortcut-catalog-navigation" ref={navigationRef} aria-label="网站分类">
       {navigation.map(name => <button
         key={name}
@@ -138,8 +136,7 @@ export default function ShortcutCatalog({ customForm, onAdd, disabled, targetId,
         onKeyDown={event => handleNavigationKey(event, name)}
       >{name}</button>)}
     </nav>
-    </div>
-    <div className="shortcut-catalog-sections" id={`${id}-sections`}>
+    <div className="shortcut-catalog-sections" ref={scrollContainerRef} id={`${id}-sections`}>
       <section className="shortcut-catalog-section shortcut-catalog-frequent" aria-labelledby={`${id}-frequent-heading`}>
         <h3 className="shortcut-catalog-section-title" id={`${id}-frequent-heading`}>经常访问的网站</h3>
         <div className="shortcut-catalog-grid">

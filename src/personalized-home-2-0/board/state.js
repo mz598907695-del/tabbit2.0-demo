@@ -1,4 +1,5 @@
-import { createCuratedSecondDesktop, refreshProvidedSecondPageIcons, CURATED_SECOND_DESKTOP_VERSION } from './curated-desktop.js';
+import { createCuratedSecondDesktop, CURATED_SECOND_DESKTOP_VERSION } from './curated-desktop.js';
+import { createDefaultWidgetBoard, DEFAULT_WIDGET_BOARD_VERSION, DEFAULT_WIDGET_BOARD_COLUMNS } from './default-widget-board.js';
 import { useCallback, useEffect, useState } from 'react';
 import { compactBoardItems, firstVacancy, layoutItems, reflowBoardItems } from './layout.js';
 import { isWidgetSize, MAX_WIDGET_WIDTH } from './widget-size.js';
@@ -7,13 +8,22 @@ import { daysUntil, safeIndex, DRAW_RESULTS, DAILY_QUOTES, DEMO_NEWS } from './w
 import { COMMON_SCROLL_DEMO_VERSION, COMMON_SCROLL_DEMO_COUNT, makeCommonScrollDemoItems } from './scroll-demo-content.js';
 import { sanitizeShortcutCustomIcon, shortcutHostname } from './shortcut-icon.js';
 import { normalizeCodexUsageConfig, normalizeWorkdayConfig } from './utility-widget-data.js';
+import { coreWidgetCatalog } from './core-widget-data.js';
+import { extraWidgetCatalog } from './extra-widget-data.js';
+import { leisureWidgetCatalog } from './leisure-widget-data.js';
+import { audioWidgetCatalog } from './audio-widget-catalog.js';
+import { sanitizeWidgetConfig, sanitizeHabitWidgetConfig, sanitizeAICardStorage } from './unified-widget-config.js';
+import { validateAICardPackage } from './ai-card-import.js';
+export { applyBoardPageChange, patchBoardWidgetConfig } from './board-page-updates.js';
 
 export const BOARD_STORAGE = 'personalized-home-2-0-board-v1';
+export const DEFAULT_BOARD_BACKUP_STORAGE = `${BOARD_STORAGE}-before-widget-gallery-v1`;
 export const MAX_BOARD_ITEMS = 300;
 const MAX_BOARD_COLUMNS = MAX_WIDGET_WIDTH;
 const LAYOUT_VERSION = 3;
 const MAX_HISTORY = 30;
-const widgetNames = {reminder:'提醒',joke:'笑话',image:'风景',weather:'天气',calendar:'日历',countdown:'倒计时',draw:'抽签',quote:'每日一句',news:'新闻','codex-usage':'Codex 用量监测','workday-countdown':'下班倒计时'};
+const unifiedWidgetNames = Object.fromEntries([...coreWidgetCatalog, ...extraWidgetCatalog, ...leisureWidgetCatalog, ...audioWidgetCatalog].map(def => [def.kind, def.title]));
+const widgetNames = {...unifiedWidgetNames, 'ai-card':'AI 卡片',reminder:'提醒',joke:'笑话',image:'每日一图',weather:'天气',calendar:'日历',countdown:'倒计时',draw:'抽签',quote:'每日一句',news:'新闻','codex-usage':'Codex 用量监测','workday-countdown':'下班倒计时'};
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = (value, fallback = '', max = 60) => typeof value === 'string' ? value.slice(0, max) : fallback;
 const validUrl = (value) => { try { const url=new URL(value);return typeof value==='string'&&['http:', 'https:'].includes(url.protocol)&&Boolean(url.hostname); } catch { return false; } };
@@ -137,6 +147,18 @@ function migratedItems(page) {
 
 function cleanConfig(kind, config) {
   const source=record(config)?config:{};
+  if(kind==='ai-card') {
+    try { return {aiCardPackage:validateAICardPackage(source.aiCardPackage),aiCardStorage:sanitizeAICardStorage(source.aiCardStorage),aiCardConfig:sanitizeWidgetConfig(source.aiCardConfig)}; }
+    catch { return {aiCardError:'卡片文件无效，请重新上传。'}; }
+  }
+  if(kind==='image') {
+    const {photo,...rest}=source;
+    const clean=sanitizeWidgetConfig(rest);
+    if(typeof photo==='string'&&photo.length<=700000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(photo))clean.photo=photo;
+    return clean;
+  }
+  if(kind==='habits')return sanitizeHabitWidgetConfig(source);
+  if(Object.hasOwn(unifiedWidgetNames,kind)||kind==='reminder')return sanitizeWidgetConfig(source);
   if(kind==='reminder')return {text:typeof source.text==='string'?source.text.slice(0,2000):Array.isArray(source.lines)?source.lines.slice(0,20).map(line=>text(typeof line==='string'?line:line?.text,'',80)).join('\n').slice(0,2000):''};
   if(kind==='joke')return {text:text(source.text,'代码是程序员思维的镜子',2000)};
   if(kind==='image')return {caption:text(source.caption,'',200)};
@@ -158,7 +180,7 @@ export function makeInitialPages(seeds, brands) {
 }
 export function makeSamplePage(seeds, brands) {
   const links=(makeInitialPages(seeds,brands)[0]?.items||[]).slice(0,12).map(i=>({...i,id:crypto.randomUUID()}));
-  const widgets=[['reminder','提醒',{text:''}],['joke','笑话',{text:'代码是程序员思维的镜子'}],['image','风景',{caption:''}],['weather','天气',{city:'北京市',temperature:'32',condition:'多云'}]].map(([kind,title,config])=>({id:crypto.randomUUID(),type:'widget',kind,title,config,size:{w:2,h:2}}));
+  const widgets=[['note','便签',{text:''}],['clock','时钟',{}],['calendar','日历',{}],['weather','天气',{city:'北京市'}]].map(([kind,title,config])=>({id:crypto.randomUUID(),type:'widget',kind,title,config,size:{w:2,h:2}}));
   const positions=Object.fromEntries([
     ...links.map((item,index)=>[item.id,{x:index%6,y:Math.floor(index/6)}]),
     ...widgets.map((item,index)=>[item.id,index===0?{x:6,y:0}:{x:(index-1)*3,y:3}]),
@@ -181,14 +203,18 @@ export function sanitizePages(saved, fallback, legacyOptions = {}) {
       itemIds.add(itemId);
       if(isWidget){
         const preset=widgetSize(item,version);
-        return [{id:itemId,type:'widget',kind:item.kind,title:text(item.title,widgetNames[item.kind],40),config:cleanConfig(item.kind,item.config),size:{w:preset.w,h:preset.h}}];
+        const title=item.kind==='image'&&['风景','风景相册','图片'].includes(item.title)?widgetNames.image:text(item.title,widgetNames[item.kind],40);
+        return [{id:itemId,type:'widget',kind:item.kind,title,config:cleanConfig(item.kind,item.config),size:{w:preset.w,h:preset.h}}];
       }
       const label=text(item.label,text(item.service,'快捷方式',40),40);
       const size=shortcutSize(item);
       return [{id:itemId,type:'shortcut',key:text(item.key,'custom'),label,service:text(item.service,label),url:item.url,image:typeof item.image==='string'?item.image:undefined,darkImage:typeof item.darkImage==='string'?item.darkImage:undefined,customIcon:sanitizeShortcutCustomIcon(item.customIcon),iconHostname:typeof item.iconHostname==='string'?shortcutHostname(item.iconHostname):undefined,size:{w:size.w,h:size.h}}];
     });
     const layoutOrder=cleanLayoutOrder(page.layoutOrder,items);
-    return {...(page.curatedLayoutVersion===CURATED_SECOND_DESKTOP_VERSION?{curatedLayoutVersion:page.curatedLayoutVersion}:{}),id,name:page.name==='混排体验'?'我的空间':text(page.name,'未命名',24)||'未命名',layoutVersion:LAYOUT_VERSION,items,layouts:cleanLayouts(page.layouts,items,legacyOptions),...(layoutOrder?{layoutOrder}:{})};
+    return {...(page.curatedLayoutVersion===CURATED_SECOND_DESKTOP_VERSION?{curatedLayoutVersion:page.curatedLayoutVersion}:{}),
+      ...(page.defaultWidgetBoardVersion===DEFAULT_WIDGET_BOARD_VERSION?{defaultWidgetBoardVersion:DEFAULT_WIDGET_BOARD_VERSION}:{}),
+      ...(page.preferredColumns===DEFAULT_WIDGET_BOARD_COLUMNS?{preferredColumns:DEFAULT_WIDGET_BOARD_COLUMNS}:{}),
+      id,name:page.name==='混排体验'?'我的空间':text(page.name,'未命名',24)||'未命名',layoutVersion:LAYOUT_VERSION,items,layouts:cleanLayouts(page.layouts,items,legacyOptions),...(layoutOrder?{layoutOrder}:{})};
   });
   return pages.length?pages:fallback;
 }
@@ -295,16 +321,48 @@ export function useBoardState(seeds, brands) {
     if (saved?.thirdDesktopEmptyVersion !== 1 && pages[2]) {
       pages[2] = { ...pages[2], items: [], layouts: {}, layoutOrder: [] };
     }
-    if (saved?.curatedSecondDesktopVersion !== CURATED_SECOND_DESKTOP_VERSION && pages[1]) {
-      pages[1] = createCuratedSecondDesktop(pages[1], brands);
+    // Find the provided board by identity, including after users rename/reorder it.
+    let defaultIndex=pages.findIndex(page=>page.defaultWidgetBoardVersion);
+    if(defaultIndex<0)defaultIndex=pages.findIndex(page=>page.curatedLayoutVersion);
+    if(defaultIndex<0)defaultIndex=pages.findIndex(page=>['group-0','group-1'].includes(page.id)&&page.name==='常用');
+    if(defaultIndex<0){
+      // Earlier demo versions swapped group-0/group-1. A moved starter item
+      // alone must never turn another board into the default template.
+      const candidates=pages.map((page,index)=>({page,index,count:page.items.filter(item=>item.id.startsWith('curated-v1-')).length}))
+        .filter(({page,count})=>['group-0','group-1'].includes(page.id)&&count>=8&&count>page.items.length/2)
+        .sort((a,b)=>b.count-a.count);
+      defaultIndex=candidates[0]?.index??-1;
     }
-    if(pages[1])pages[1]=refreshProvidedSecondPageIcons(pages[1]);
-    return pages;
+    let defaultWidgetBoardVersion=saved?.defaultWidgetBoardVersion || 0;
+    let migrated=false;
+    if(defaultWidgetBoardVersion<DEFAULT_WIDGET_BOARD_VERSION && defaultIndex>=0){
+      let backedUp=!saved?.pages?.length;
+      if(!backedUp)try{
+        if(!localStorage.getItem(DEFAULT_BOARD_BACKUP_STORAGE))localStorage.setItem(DEFAULT_BOARD_BACKUP_STORAGE,JSON.stringify({
+          savedAt:new Date().toISOString(),board:saved,preferences,
+          activeId:localStorage.getItem('personalized-home-2-0-board-active-id'),
+          index:localStorage.getItem('personalized-home-2-0-board-index'),
+        }));
+        backedUp=true;
+      }catch{ /* Keep the existing board if its backup cannot be saved. */ }
+      if(backedUp){
+        const target=pages[defaultIndex];
+        const starters=createCuratedSecondDesktop({...target,items:[]},brands).items.filter(item=>item.type==='shortcut');
+        const reservedIds=pages.filter((_,index)=>index!==defaultIndex).flatMap(page=>page.items.map(item=>item.id));
+        pages[defaultIndex]=createDefaultWidgetBoard(target,starters,reservedIds);
+        defaultWidgetBoardVersion=DEFAULT_WIDGET_BOARD_VERSION;
+        migrated=true;
+      }
+    }
+    // Do not recreate a deliberately deleted default board on every launch.
+    if(defaultIndex<0)defaultWidgetBoardVersion=DEFAULT_WIDGET_BOARD_VERSION;
+    return {pages,defaultWidgetBoardVersion,migrated,defaultPageId:pages[defaultIndex]?.id};
   };
   const [history,setHistory] = useState(()=>{
-    const pages=initial();
-    try{return {...createBoardHistory(pages,localStorage.getItem('personalized-home-2-0-board-active-id'),localStorage.getItem('personalized-home-2-0-board-index')??0),commonScrollDemoVersion:COMMON_SCROLL_DEMO_VERSION,desktopOrderVersion:2,firstDesktopShortcutsVersion:1,thirdDesktopEmptyVersion:1,curatedSecondDesktopVersion:CURATED_SECOND_DESKTOP_VERSION};}
-    catch{return {...createBoardHistory(pages),commonScrollDemoVersion:COMMON_SCROLL_DEMO_VERSION,desktopOrderVersion:2,firstDesktopShortcutsVersion:1,thirdDesktopEmptyVersion:1,curatedSecondDesktopVersion:CURATED_SECOND_DESKTOP_VERSION};}
+    const {pages,defaultWidgetBoardVersion,migrated,defaultPageId}=initial();
+    const versions={defaultWidgetBoardVersion,commonScrollDemoVersion:COMMON_SCROLL_DEMO_VERSION,desktopOrderVersion:2,firstDesktopShortcutsVersion:1,thirdDesktopEmptyVersion:1,curatedSecondDesktopVersion:CURATED_SECOND_DESKTOP_VERSION};
+    try{return {...createBoardHistory(pages,migrated?defaultPageId:localStorage.getItem('personalized-home-2-0-board-active-id')||defaultPageId,localStorage.getItem('personalized-home-2-0-board-index')??0),...versions};}
+    catch{return {...createBoardHistory(pages,defaultPageId),...versions};}
   });
   const selectedIndex=selectedPageIndex(history);
   useEffect(()=>{try{
@@ -314,7 +372,7 @@ export function useBoardState(seeds, brands) {
   }catch{}},[selectedIndex,history.activeId]);
   // The marker belongs to the initialized history, not the module version:
   // Fast Refresh can retain a history that has not received the sample set yet.
-  useEffect(()=>{try{localStorage.setItem(BOARD_STORAGE,JSON.stringify({version:LAYOUT_VERSION,desktopOrderVersion:history.desktopOrderVersion,firstDesktopShortcutsVersion:history.firstDesktopShortcutsVersion,thirdDesktopEmptyVersion:history.thirdDesktopEmptyVersion,curatedSecondDesktopVersion:history.curatedSecondDesktopVersion,commonScrollDemoVersion:history.commonScrollDemoVersion,pages:history.present.map(page=>({...page,layoutVersion:LAYOUT_VERSION}))}));}catch{}},[history.present,history.commonScrollDemoVersion,history.desktopOrderVersion,history.firstDesktopShortcutsVersion,history.thirdDesktopEmptyVersion,history.curatedSecondDesktopVersion]);
+  useEffect(()=>{try{localStorage.setItem(BOARD_STORAGE,JSON.stringify({version:LAYOUT_VERSION,defaultWidgetBoardVersion:history.defaultWidgetBoardVersion,desktopOrderVersion:history.desktopOrderVersion,firstDesktopShortcutsVersion:history.firstDesktopShortcutsVersion,thirdDesktopEmptyVersion:history.thirdDesktopEmptyVersion,curatedSecondDesktopVersion:history.curatedSecondDesktopVersion,commonScrollDemoVersion:history.commonScrollDemoVersion,pages:history.present.map(page=>({...page,layoutVersion:LAYOUT_VERSION}))}));}catch{}},[history.present,history.defaultWidgetBoardVersion,history.commonScrollDemoVersion,history.desktopOrderVersion,history.firstDesktopShortcutsVersion,history.thirdDesktopEmptyVersion,history.curatedSecondDesktopVersion]);
   const setPages=useCallback(update=>setHistory(current=>boardHistoryReducer(current,{type:'pages',update})),[]);
   const setIndex=useCallback(update=>setHistory(current=>boardHistoryReducer(current,{type:'index',update})),[]);
   const reorderPage=useCallback((id,index)=>setPages(pages=>reorderPages(pages,id,index)),[setPages]);
@@ -328,8 +386,9 @@ export const sizePresets = [
 ];
 
 /** Preserve compact breakpoints; wider boards fit 15 icons at 1100px with 25px gaps. */
-export function boardColumns(width = 700, labels = true) {
+export function boardColumns(width = 700, labels = true, preferredColumns) {
   const measured=Number.isFinite(width)?Math.max(0,width):700;
+  if(preferredColumns===DEFAULT_WIDGET_BOARD_COLUMNS)return Math.max(3,Math.min(preferredColumns,Math.floor((measured+14)/64)));
   if (!labels) return Math.max(3, Math.min(MAX_BOARD_COLUMNS, Math.round((measured-50)/66)+1));
   return measured<=700
     ? Math.max(3,Math.min(9,Math.floor(measured/72)))
@@ -337,9 +396,9 @@ export function boardColumns(width = 700, labels = true) {
 }
 
 /** Hidden boards report zero width; retain their last measured projection. */
-export function updateBoardMeasurement(previous, width, labels = true) {
+export function updateBoardMeasurement(previous, width, labels = true, preferredColumns) {
   if(!Number.isFinite(width)||width<=0)return previous;
-  const columns=boardColumns(width,labels);
+  const columns=boardColumns(width,labels,preferredColumns);
   if(previous.ready&&previous.width===width&&previous.columns===columns)return previous;
   return {width,columns,ready:true,sourceColumns:columns===previous.columns?previous.sourceColumns:previous.columns};
 }
@@ -436,11 +495,11 @@ export function savePositions(page,key,placed) {
 /** Add to the chosen page without selecting it or overwriting other widths. */
 export function addBoardItemToPage(page, item, {columns=9,showLabels=true,sourceColumns} = {}) {
   const fail=message=>({ok:false,message});
-  if(!record(page)||!validId(page.id)||!Array.isArray(page.items))return fail('页面已不存在，请重新选择');
-  if(page.items.length>=MAX_BOARD_ITEMS)return fail(`“${page.name}”已有 ${MAX_BOARD_ITEMS} 个项目，请选择其他页面`);
+  if(!record(page)||!validId(page.id)||!Array.isArray(page.items))return fail('看板已不存在，请重新选择');
+  if(page.items.length>=MAX_BOARD_ITEMS)return fail(`“${page.name}”已有 ${MAX_BOARD_ITEMS} 个项目，请选择其他看板`);
   if(!record(item)||!validId(item.id))return fail('项目无效，请重新添加');
   const id=String(item.id);
-  if(page.items.some(entry=>String(entry.id)===id))return fail('此页面中已存在这个项目');
+  if(page.items.some(entry=>String(entry.id)===id))return fail('此看板中已存在这个项目');
   if(!['widget','shortcut'].includes(item.type))return fail('不支持此项目类型');
   const widget=item.type==='widget';
   if(widget&&(typeof item.kind!=='string'||!Object.hasOwn(widgetNames,item.kind)))return fail('不支持此小组件');
@@ -465,12 +524,12 @@ export function transferBoardItem(pages, sourceId, targetId, itemId, context = {
   const fail = message => ({ ok: false, message, pages });
   const source = pages.find(page => page.id === sourceId);
   const target = pages.find(page => page.id === targetId);
-  if (!source || !target) return fail('页面已不存在，请重新选择');
-  if (sourceId === targetId) return fail('项目已经在这个页面中');
+  if (!source || !target) return fail('看板已不存在，请重新选择');
+  if (sourceId === targetId) return fail('项目已经在这个看板中');
   const item = source.items.find(entry => entry.id === itemId);
   if (!item) return fail('项目已不存在，请重新选择');
-  if (target.items.length >= MAX_BOARD_ITEMS) return fail(`“${target.name}”已有 ${MAX_BOARD_ITEMS} 个项目，请选择其他页面`);
-  if (target.items.some(entry => entry.id === itemId)) return fail('目标页面中已存在这个项目');
+  if (target.items.length >= MAX_BOARD_ITEMS) return fail(`“${target.name}”已有 ${MAX_BOARD_ITEMS} 个项目，请选择其他看板`);
+  if (target.items.some(entry => entry.id === itemId)) return fail('目标看板中已存在这个项目');
 
   const strategy = 'gap';
   const mode = ['free', 'compact', 'sections'].includes(context.mode) ? context.mode : 'free';

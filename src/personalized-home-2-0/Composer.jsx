@@ -32,8 +32,8 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
   const [mode, setMode] = useState('对话');
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [runLocation, setRunLocation] = useState('cloud');
-  const [approvalPolicy, setApprovalPolicy] = useState('full');
+  const [runLocation, setRunLocation] = useState('local');
+  const [approvalPolicy, setApprovalPolicy] = useState('ask');
   const [modelSelection, setModelSelection] = useState(() => readModelSelection(initialDraft));
   const model = modelSelection.models[0] || 'Auto';
   const modelLabel = modelSelection.multiple ? `${modelSelection.models.length} 个模型` : model;
@@ -215,6 +215,8 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
 
   function changeMode(nextMode) {
     if (nextMode === '任务' && nextMode !== mode) {
+      setRunLocation('local');
+      setApprovalPolicy('ask');
       const owner = wrapRef.current;
       owner?.setAttribute('data-mode-switch-instant', '');
       if (owner?.parentElement?.classList.contains('home-feed')) {
@@ -462,7 +464,7 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
           onSelect={name => { setModelSelection(current => toggleReplyModel(current, name)); if (!modelSelection.multiple) closePopover(); }}
           onModeChange={multiple => setModelSelection(current => setReplyModelMode(current, multiple))}/>}
         {inlineKind === 'ideas' && <ComposerIdeasMenu customCommands={customCommands}
-          onSelect={(prompt, nextMode) => { setSkill(null); if (nextMode) setMode(nextMode); fillPrompt(prompt); }}
+          onSelect={(prompt, nextMode) => { setSkill(null); if (nextMode) changeMode(nextMode); fillPrompt(prompt); }}
           onCreate={() => { setOverlay(null); setCommandEditor('create'); }} onManage={() => { setOverlay(null); setCommandEditor('manage'); }}/>}
       </ComposerInlinePanel>}
     </ComposerExpansion>

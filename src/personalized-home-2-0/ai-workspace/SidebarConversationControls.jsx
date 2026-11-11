@@ -1,40 +1,67 @@
+import { ArrowUpRight } from 'lucide-react';
+import { openBookmarkTab } from './bookmarks/open-bookmarks';
 import { Fragment, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getHomeRoot } from '../home-host';
 import warningIcon from '../../assets/delete-space-warning.png';
 import '../../DeleteSpaceDialog.css';
 import '../../EditSpaceDialog.css';
-import { BatchListChecks, ChevronRight, Cloud, Ellipsis, Laptop } from '../icons';
+import { BatchListChecks, ChevronRight, Cloud, Ellipsis, Laptop, Plus, Search, X } from '../icons';
 import '../context-menu.css';
 import '../../styles/dropdown.css';
 import './workspace-checkbox.css';
 import SidebarAnimatedIcon from './SidebarAnimatedIcon';
+import SegmentedControl from './SegmentedControl';
 
-export function HistoryGroup({ title, records, onNavigate, activeConversationId, editing, selectedIds, onSelect, onMenu, menuId, onBatchEdit, hasChats, source, onSourceChange }) {
+export function HistorySourceTabs({ source, onSourceChange, controlsId, search, onSearchChange }) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const triggerRef = useRef(null);
+  const searchId = useId();
+  function closeSearch() { setSearchOpen(false); onSearchChange(''); triggerRef.current?.focus(); }
+  return <>
+    <div className="aiwc-source-switch">
+      <SegmentedControl className="aiwc-source-tabs" label="最近对话来源" value={source} controlsId={controlsId} onChange={onSourceChange} options={[{ value:'local', label:'本地', Icon:Laptop }, { value:'cloud', label:'云端', Icon:Cloud }]}/>
+      <button ref={triggerRef} type="button" className="aiwc-small-icon aiwc-search-trigger" aria-label={searchOpen ? '收起会话搜索' : '搜索会话'} title={searchOpen ? '收起搜索' : '搜索会话'} aria-expanded={searchOpen} aria-controls={searchOpen ? searchId : undefined} onClick={() => searchOpen ? closeSearch() : setSearchOpen(true)}><Search size={14} aria-hidden="true"/></button>
+    </div>
+    {searchOpen && <HistorySearch id={searchId} value={search} onChange={onSearchChange} onClose={closeSearch}/>}
+  </>;
+}
+
+function HistorySearch({ id, value, onChange, onClose }) {
+  const inputRef = useRef(null);
+  useLayoutEffect(() => { inputRef.current?.focus(); }, []);
+  return <div id={id} className="aiwc-history-search" role="search" aria-label="搜索侧栏会话">
+    <Search size={14} aria-hidden="true"/>
+    <input ref={inputRef} type="search" aria-label="搜索会话" placeholder="搜索会话…" value={value} autoComplete="off" spellCheck={false} onChange={event => onChange(event.target.value)} onKeyDown={event => {
+      if (event.key === 'Escape' && !event.nativeEvent.isComposing) { event.preventDefault(); event.stopPropagation(); onClose(); }
+    }}/>
+    <button type="button" className="aiwc-small-icon" aria-label={value ? '清空会话搜索' : '关闭会话搜索'} onClick={() => { if (value) { onChange(''); inputRef.current?.focus(); } else onClose(); }}><X size={12} aria-hidden="true"/></button>
+  </div>;
+}
+
+export function HistoryGroup({ title, records, onNavigate, activeConversationId, editing, selectedIds, onSelect, onMenu, menuId, onBatchEdit, onNewChat, hasChats, source, panelId, searching = false }) {
   const [expanded, setExpanded] = useState(true);
-  const listId = useId();
+  const generatedListId = useId();
+  const listId = panelId || generatedListId;
   const batchTooltipId = useId();
-  const isExpanded = editing || expanded;
-  return <section className="aiwc-history-group" aria-label={title}>
+  const newChatTooltipId = useId();
+  const isExpanded = editing || searching || expanded;
+  return <section className="aiwc-history-group" data-source={source} aria-label={title}>
     <div className="aiwc-group-header">
-      <button type="button" className="aiwc-group-heading" aria-expanded={isExpanded} aria-controls={listId} disabled={editing} onClick={() => setExpanded(value => !value)}>
+      <button type="button" className="aiwc-group-heading" aria-expanded={isExpanded} aria-controls={listId} disabled={editing || searching} onClick={() => setExpanded(value => !value)}>
         <span>{title}</span><ChevronRight className="aiwc-group-chevron" size={14} strokeWidth={1.8} aria-hidden="true"/>
       </button>
       {onBatchEdit && <div className="aiwc-group-actions aiwc-batch-actions">
+        {onNewChat && <span className="aiwc-batch-tooltip-anchor">
+          <button type="button" className="aiwc-small-icon" aria-label="新建对话" aria-describedby={newChatTooltipId} onClick={onNewChat}><Plus size={14} aria-hidden="true"/></button>
+          <span id={newChatTooltipId} role="tooltip" className="space-tooltip aiwc-batch-tooltip">新建对话</span>
+        </span>}
         <span className="aiwc-batch-tooltip-anchor">
           <button type="button" className="aiwc-small-icon" data-history-actions aria-label="批量编辑会话" aria-pressed={editing} aria-describedby={batchTooltipId} disabled={!hasChats} onClick={onBatchEdit}><BatchListChecks size={14}/></button>
           <span id={batchTooltipId} role="tooltip" className="space-tooltip aiwc-batch-tooltip">批量编辑</span>
         </span>
       </div>}
-      {source && <div className="aiwc-source-tabs" role="tablist" aria-label="最近对话来源">
-        {[['local', '本地', Laptop], ['cloud', '云端', Cloud]].map(([value, label, Icon]) => <button key={value} type="button" role="tab" aria-label={label} aria-describedby={`${listId}-${value}-tooltip`} aria-selected={source === value} aria-controls={listId} tabIndex={source === value ? 0 : -1} onClick={() => { onSourceChange(value); setExpanded(true); }} onKeyDown={event => {
-          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-          event.preventDefault(); event.stopPropagation();
-          const next = event.key === 'Home' ? 'local' : event.key === 'End' ? 'cloud' : source === 'cloud' ? 'local' : 'cloud';
-          onSourceChange(next); setExpanded(true);
-          event.currentTarget.parentElement.querySelector(`[aria-label="${next === 'cloud' ? '云端' : '本地'}"]`)?.focus();
-        }}><Icon size={14} strokeWidth={1.8} aria-hidden="true"/><span id={`${listId}-${value}-tooltip`} role="tooltip" className="space-tooltip aiwc-source-tooltip">{label}</span></button>)}
-      </div>}
+
     </div>
     <div className="aiwc-history-collapse" data-expanded={isExpanded} inert={!isExpanded} aria-hidden={!isExpanded || undefined}>
     <div id={listId} className="aiwc-history-list" role={source ? 'tabpanel' : undefined} aria-label={source ? `${source === 'cloud' ? '云端' : '本地'}最近对话` : undefined}>
@@ -46,7 +73,7 @@ export function HistoryGroup({ title, records, onNavigate, activeConversationId,
           <button type="button" className="aiwc-history-item" title={record.title} aria-current={record.id === activeConversationId ? 'page' : undefined} onClick={() => onNavigate('chats', `detail:${record.id}`)}>{record.title}</button>
           <button type="button" className="aiwc-small-icon aiwc-row-more" aria-label={`${record.title}的更多操作`} title="更多操作" aria-haspopup="menu" aria-expanded={menuId === record.id} onClick={event => onMenu(event.currentTarget, record)}><Ellipsis size={14}/></button>
         </>}
-      </div>) : <p className="aiwc-empty">{title === '置顶' ? '暂无置顶对话' : `暂无${source === 'cloud' ? '云端' : '本地'}对话`}</p>}
+      </div>) : <p className="aiwc-empty" role="status">{searching ? '未找到匹配的会话' : title === '置顶' ? '暂无置顶对话' : `暂无${source === 'cloud' ? '云端' : '本地'}对话`}</p>}
     </div>
     </div>
   </section>;
@@ -90,17 +117,21 @@ export function HistoryMenu({ anchor, label, items, onClose, placement = 'bottom
     event.stopPropagation();
     if (event.key === 'Escape') { event.preventDefault(); onClose(true); }
     else if (event.key === 'Tab') { event.preventDefault(); onClose(true); }
-    else if (['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+    else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
       event.preventDefault();
       const buttons = [...event.currentTarget.querySelectorAll('[role="menuitem"]:not(:disabled)')];
       const index = buttons.indexOf(document.activeElement);
-      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : buttons.length - 1)) % buttons.length;
+      const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (['ArrowDown', 'ArrowRight'].includes(event.key) ? 1 : buttons.length - 1)) % buttons.length;
       buttons[next]?.focus();
     }
   }}>
-    {items.map(({ label: text, Icon, iconName, animatedKind, danger, disabled, href, onClick }, index) => {
+    {items.map(({ label: text, Icon, iconName, animatedKind, danger, disabled, href, onClick, trailingAction, secondaryAction }, index) => {
       const Tag = href ? 'a' : 'button';
-      return <Fragment key={text}>{danger && index > 0 && <div className="dropdown-divider-container" role="separator"><div className="dropdown-divider"/></div>}<Tag {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : { type: 'button', disabled })} role="menuitem" className={danger ? 'danger' : undefined} onClick={onClick} onPointerEnter={event => { if (event.pointerType !== 'touch') setHoveredItem(text); }} onPointerLeave={() => setHoveredItem(null)} onPointerCancel={() => setHoveredItem(null)} onFocus={event => setFocusedItem(event.currentTarget.matches(':focus-visible') ? text : null)} onBlur={() => setFocusedItem(null)}><span className="dropdown-item-content">{animatedKind ? <SidebarAnimatedIcon kind={animatedKind} size={iconSize} active={hoveredItem === text || focusedItem === text}/> : iconName ? <span className={`iconfont icon-${iconName}`} aria-hidden="true"/> : Icon && <Icon size={iconSize}/>}<span>{text}</span></span></Tag></Fragment>;
+      const item = <Tag {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : { type: 'button', disabled })} role="menuitem" className={danger ? 'danger' : undefined} onClick={onClick} onPointerEnter={event => { if (event.pointerType !== 'touch') setHoveredItem(text); }} onPointerLeave={() => setHoveredItem(null)} onPointerCancel={() => setHoveredItem(null)} onFocus={event => setFocusedItem(event.currentTarget.matches(':focus-visible') ? text : null)} onBlur={() => setFocusedItem(null)}><span className="dropdown-item-content">{animatedKind ? <SidebarAnimatedIcon kind={animatedKind} size={iconSize} active={hoveredItem === text || focusedItem === text}/> : iconName ? <span className={`iconfont icon-${iconName}`} aria-hidden="true"/> : Icon && <Icon size={iconSize}/>}<span>{text}</span></span></Tag>;
+      return <Fragment key={text}>
+        {danger && index > 0 && <div className="dropdown-divider-container" role="separator"><div className="dropdown-divider"/></div>}
+        {trailingAction ? <div className="aiwc-menu-action-row" role="none">{item}{secondaryAction && <a onClick={openBookmarkTab} className="aiwc-menu-jump" role="menuitem" href={secondaryAction.href} target="_blank" rel="noopener noreferrer" aria-label={secondaryAction.label} title={secondaryAction.label}><ArrowUpRight size={14} aria-hidden="true"/></a>}<button type="button" role="menuitem" className="aiwc-menu-pin" aria-label={trailingAction.label} title={trailingAction.title} data-pinned={trailingAction.active || undefined} onClick={trailingAction.onClick}><span className={`iconfont icon-${trailingAction.iconName}`} aria-hidden="true"/></button></div> : item}
+      </Fragment>;
     })}
   </div>;
 }

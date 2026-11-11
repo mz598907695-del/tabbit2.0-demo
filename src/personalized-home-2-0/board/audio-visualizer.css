@@ -1,0 +1,78 @@
+.av-widget .uw-main{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:34px minmax(0,1fr);gap:6px 8px}
+.av-hero{grid-column:1;grid-row:1;display:flex;align-items:center;min-width:0}
+.av-value{display:flex;align-items:baseline;gap:7px;min-width:0}
+.av-value .uw-dot-number{width:auto;min-width:42px;max-width:120px;height:34px}
+.av-value>span:last-child{font-size:12px;color:var(--uw-muted)}
+.av-state{grid-column:2;grid-row:1;align-self:center;min-width:0;max-width:100%;font-size:11px;line-height:16px;color:var(--uw-muted);text-align:right;overflow:hidden;text-overflow:ellipsis}
+.av-graph{grid-column:1/3;grid-row:2;min-width:0;min-height:0;display:flex;align-items:center}
+.av-spectrum{width:100%;height:100%;min-height:0;max-height:260px;display:block}
+.av-spectrum circle{fill:currentColor;opacity:.08}
+.av-spectrum circle.is-baseline{opacity:.18}
+.av-spectrum circle.is-lit{opacity:.92}
+.av-spectrum circle.is-peak{fill:#c98b52;opacity:1}
+.av-footer{display:flex;justify-content:space-between;gap:6px;font-size:10px;line-height:16px}
+.av-card-error{display:none}
+.av-live{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--uw-line);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--uw-muted)}
+.av-live i{width:5px;height:5px;background:currentColor;border-radius:50%;opacity:.5}
+.av-live.is-on i{background:var(--uw-accent);opacity:1}
+.av-detail-status{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--uw-muted)}
+.av-detail-graph{height:200px}
+.av-readings{display:flex;flex-wrap:wrap;gap:24px;padding:8px 0}
+.av-readings>div{display:flex;flex-direction:column;gap:6px}
+.av-readings strong{font-size:30px;font-weight:450;letter-spacing:-.03em}
+.av-readings small{font-size:11px;color:var(--uw-muted);margin-left:5px;letter-spacing:0}
+.av-readings>div>span,.av-source-name{font-size:11px;color:var(--uw-muted)}
+.av-source-name{overflow-wrap:anywhere}
+.av-error{font-size:12px;line-height:1.6;color:#bb7357}
+.av-connect{border-radius:20px;font-size:12px}
+@container uw (max-width:190px){
+ .av-widget .uw-main{gap:4px;grid-template-rows:30px minmax(0,1fr)}
+ .av-value .uw-dot-number{height:30px;min-width:30px;max-width:100px}
+ .av-state{font-size:10px;max-width:68px;line-height:14px}
+ .av-footer{font-size:9px}
+}
+@container uw (min-width:191px) and (max-height:190px){
+ .av-widget .uw-main{grid-template-columns:minmax(58px,.7fr) minmax(0,1.6fr);grid-template-rows:1fr auto;gap:4px 12px;align-items:center}
+ .av-hero{grid-column:1;grid-row:1}
+ .av-value .uw-dot-number{height:34px;min-width:30px;max-width:80px}
+ .av-state{grid-column:1;grid-row:2;text-align:left;font-size:10px;line-height:14px}
+ .av-graph{grid-column:2;grid-row:1/3;height:100%}
+}
+@container uw (max-height:135px){.av-widget .uw-footer{display:none}}
+@container uw (max-width:135px){
+ .av-widget .uw-footer,.av-state{display:none}
+ .av-widget .uw-main{grid-template-columns:minmax(0,1fr);grid-template-rows:1fr 1fr;align-items:center}
+ .av-value .uw-dot-number{min-width:28px;max-width:64px;height:auto}
+ .av-value .uw-dot-fallback{font-size:27px}
+ .av-graph{grid-column:1;grid-row:2}
+}
+@container uw (max-width:135px) and (max-height:135px){
+ .av-widget .uw-main{grid-template-rows:1fr 18px;gap:3px}
+ .av-graph{height:18px}
+}
+@container uw (max-height:70px){
+ .av-widget .uw-main{display:flex;flex-direction:row;align-items:center;gap:8px}
+ .av-hero{flex:none}
+ .av-value{gap:4px}
+ .av-value .uw-dot-number{max-width:none;min-width:0;height:auto}
+ .av-value .uw-dot-fallback{font-size:24px;line-height:28px}
+ .av-value>span:last-child{font-size:11px;line-height:16px}
+ .av-graph{height:28px;min-width:0;flex:1}
+ .av-state{display:none}
+}
+@container uw (max-width:70px){
+ .av-widget .uw-main{display:flex;flex-direction:column;justify-content:center}
+ .av-hero{justify-content:center}
+ .av-value{flex-direction:column;align-items:center;gap:0}
+ .av-value .uw-dot-number{width:auto;min-width:0}
+ .av-value .uw-dot-fallback{font-size:20px}
+ .av-value>span:last-child{font-size:9px}
+ .av-graph,.av-state{display:none}
+}
+@container uw (min-width:191px) and (min-height:191px){
+ .av-widget .uw-main{grid-template-rows:46px minmax(26px,1fr);gap:10px 8px}
+ .av-value .uw-dot-number{height:44px;min-width:36px;max-width:112px}
+ .av-value>span:last-child{font-size:11px}
+ .av-state{font-size:10px;line-height:15px;max-width:84px}
+ .av-graph{padding-block:1px}
+}

@@ -75,7 +75,7 @@ export const initialShortcutPages = [
   },
   {
     name: "常用",
-    items: [], // The curated desktop supplies its arranged widgets and eight unique links.
+    items: [], // The default board supplies two link rows and the complete widget catalog.
   },
   {
     name: "灵感",

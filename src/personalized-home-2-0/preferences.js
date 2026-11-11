@@ -22,7 +22,8 @@ export function resolvePreferences(saved = {}, systemDark = false) {
     shortcutSize: ['large', 'medium', 'small'].includes(saved.shortcutSize)
       ? saved.shortcutSize
       : saved.shortcutFill === 'full' ? 'large' : saved.shortcutFill === 'center' ? 'small' : 'medium',
-    pageWidth: ['wide', 'full'].includes(saved.pageWidth) ? 'wide' : 'standard',
+    defaultBoardWidthVersion: 1,
+    pageWidth: saved.defaultBoardWidthVersion === 1 && ['wide', 'full'].includes(saved.pageWidth) ? 'wide' : 'standard',
     shortcuts: saved.shortcuts !== false,
     shortcutLabels: saved.shortcutLabels === true,
     // Reveal the corner activity card once for existing demo preferences too.

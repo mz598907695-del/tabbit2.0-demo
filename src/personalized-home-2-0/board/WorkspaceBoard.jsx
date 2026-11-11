@@ -1,4 +1,6 @@
 import './curated-desktop.css';
+import { importedAICardSize, validateAICardPackage } from './ai-card-import';
+import { BOARD_STORAGE } from './state';
 import { createFrameBatch } from './frame-batch';
 import BoardPagePreview from './BoardPagePreview';
 import { useBoardPageMotion } from './useBoardPageMotion';
@@ -6,7 +8,7 @@ import { useVisibilityMotion } from '../useVisibilityMotion';
 import { getHomeRoot } from "../home-host";
 import { createPortal } from 'react-dom';
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Plus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, PanelTop, Check, Undo2, Redo2 } from "../icons";
+import { Plus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, FilePlus2, LayoutGrid, PanelTop, Check, Undo2, Redo2 } from "../icons";
 import WidgetCard, { widgetCatalog } from './WidgetCards';
 import BoardItem from './BoardItem';
 import { boardItemName as itemName } from './BoardItemContent';
@@ -17,14 +19,14 @@ import { boardAlignmentOffset, boardDragPosition, boardResizeMaxWidth } from './
 import { normalizeWidgetSize } from './widget-size';
 import { normalizeShortcutSize, SHORTCUT_SIZE_PRESETS } from './shortcut-size';
 import useBatchEditJiggle from './useBatchEditJiggle';
-import { addBoardItemToPage, updateBoardMeasurement, boardReadingOrder, gridProfile, layoutKey, projectPage, savePositions } from './state';
+import { addBoardItemToPage, updateBoardMeasurement, boardReadingOrder, gridProfile, layoutKey, projectPage, savePositions, patchBoardWidgetConfig } from './state';
 import './workspace-board.css';
 import '../context-menu.css';
 
 const normalizeItemSize=(item,size,options)=>item.type==='shortcut'
   ? normalizeShortcutSize(size) : normalizeWidgetSize(size,options);
 
-export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitializeLayoutOrder,onRenameGroup,onDeleteGroup,onTransfer,onPageContextMenu,showLabels,appearanceTheme,shortcutSize='medium',shortcutShape='circle',showEmptyHint=true,visible=true,active=true,onEditingChange,onGenerateWidget,editing=false,onEditModeChange,overlayBlocked=false,undo,redo,canUndo=false,canRedo=false}){
+export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitializeLayoutOrder,onRenameGroup,onDeleteGroup,onTransfer,onPageContextMenu,onAddPage,showLabels,appearanceTheme,shortcutSize='medium',shortcutShape='circle',showEmptyHint=true,visible=true,active=true,onEditingChange,onGenerateWidget,editing=false,onEditModeChange,overlayBlocked=false,undo,redo,canUndo=false,canRedo=false}){
   const setEditing=value=>onEditModeChange?.(value);
   const [selected,setSelected]=useState(null);
   const [library,setLibrary]=useState(false);
@@ -107,13 +109,13 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
       // Read layout width, independent of gesture translation. Height-only changes
       // return the existing measurement object and do not project the board again.
       const width=entries?.[0]?.contentRect.width ?? grid.clientWidth;
-      setMeasurement(previous=>updateBoardMeasurement(previous,width,showLabels));
+      setMeasurement(previous=>updateBoardMeasurement(previous,width,showLabels,page.preferredColumns));
     };
     observe();
     const ro=new ResizeObserver(observe);
     ro.observe(grid);
     return()=>ro.disconnect();
-  },[showLabels]);
+  },[showLabels,page.preferredColumns]);
   useLayoutEffect(()=>{
     cancelDrag();setSelected(null);setMenu(null);setNotice('');setError('');
     setLibrary(false);setEditor(null);setEditorTargetId(null);setConfirm(null);
@@ -173,7 +175,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     next=savePositions(next,key,positions);
     onPageChange(next);setError('');if(description)setNotice(description);
   };
-  const updateConfig=(id,patch)=>onPageChange({...page,items:page.items.map(i=>i.id===id?{...i,config:{...i.config,...patch}}:i)});
+  const updateConfig=(id,patch)=>onPageChange(current=>patchBoardWidgetConfig(current,id,patch),page.id);
   const commitMove=(id,x,y)=>{const next=movePackedBoardItem(placed,id,x,y,columns);persist(page.items,next,'位置已更新');};
   const resize=(item,requested,axis)=>{
     const size=normalizeItemSize(item,requested,{maxWidth:columns,axis,fallback:item.size});
@@ -193,6 +195,22 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     const def=widgetCatalog.find(i=>i.kind===kind);
     if(!def)return {ok:false,message:'该小组件暂不可用'};
     return addItem({id:crypto.randomUUID(),type:'widget',kind,title:def.title,config:{...(def.createDefaultConfig?.()||def.defaultConfig)},size:size||def.defaultSize||{w:2,h:2}},targetId);
+  };
+  const importAICard=(pkg,targetId=page.id)=>{
+    try {
+      validateAICardPackage(pkg);
+      const target=pages.find(entry=>entry.id===targetId);
+      const item={id:crypto.randomUUID(),type:'widget',kind:'ai-card',title:pkg.catalog.title,config:{aiCardPackage:pkg,aiCardStorage:{}},size:importedAICardSize(pkg)};
+      const result=addBoardItemToPage(target,item,{columns,showLabels,sourceColumns:targetId===page.id?sourceColumns:undefined});
+      if(!result.ok)return result;
+      // Confirm persistence before reporting a successful import. Existing board
+      // metadata and other pages remain intact when a large JSON hits quota.
+      const saved=JSON.parse(localStorage.getItem(BOARD_STORAGE)||'{}');
+      localStorage.setItem(BOARD_STORAGE,JSON.stringify({...saved,pages:pages.map(entry=>entry.id===targetId?result.page:entry)}));
+      onPageChange(result.page);setError('');setNotice(`已将${pkg.catalog.title}添加到${target.name}`);
+      if(targetId===page.id)setSelected(item.id);
+      return {ok:true};
+    }catch(reason){return {ok:false,message:reason?.name==='QuotaExceededError'?'本地存储空间不足，请精简卡片文件或移除不需要的内容。':reason.message||'导入失败，请重试。'};}
   };
   const saveItem=value=>{
     if(editor==='new'){
@@ -392,31 +410,35 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     </div>,toolbarHost)}
     <span className="board-status" role="status">{notice}</span>
     {error&&<p className="board-error" role="alert">{error}</p>}
-    {menu&&createPortal(<div ref={menuRef} className="board-context-menu home-context-menu" role="menu" aria-label={menuItem?menuItem.type==='widget'?'小组件菜单':'快捷方式菜单':'首页页面菜单'} onPointerOver={hoverMenuRow} onFocusCapture={e=>{if(e.target.parentElement===menuRef.current&&menu.view&&e.target.dataset.settingKey!==menu.view)closeSubmenu();}} onContextMenu={e=>{e.preventDefault();e.stopPropagation();}} style={{left:menu.x,top:menu.y}} onKeyDown={e=>{if(e.key==='Escape'||(e.key==='ArrowLeft'&&Boolean(menu.view))){e.preventDefault();e.stopPropagation();if(menu.view)closeSubmenu(true);else{setMenu(null);restoreMenuFocus();}}else if(e.key==='Tab'){e.preventDefault();setMenu(null);restoreMenuFocus();}else if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();e.stopPropagation();const buttons=[...e.currentTarget.querySelectorAll(':scope > button:not(:disabled)')];const index=buttons.indexOf(document.activeElement);const next=e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowDown'?1:buttons.length-1))%buttons.length;buttons[next]?.focus();}}}>
+    {menu&&createPortal(<div ref={menuRef} className="board-context-menu home-context-menu" role="menu" aria-label={menuItem?menuItem.type==='widget'?'小组件菜单':'快捷方式菜单':'看板菜单'} onPointerOver={hoverMenuRow} onFocusCapture={e=>{if(e.target.parentElement===menuRef.current&&menu.view&&e.target.dataset.settingKey!==menu.view)closeSubmenu();}} onContextMenu={e=>{e.preventDefault();e.stopPropagation();}} style={{left:menu.x,top:menu.y}} onKeyDown={e=>{if(e.key==='Escape'||(e.key==='ArrowLeft'&&Boolean(menu.view))){e.preventDefault();e.stopPropagation();if(menu.view)closeSubmenu(true);else{setMenu(null);restoreMenuFocus();}}else if(e.key==='Tab'){e.preventDefault();setMenu(null);restoreMenuFocus();}else if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)){e.preventDefault();e.stopPropagation();const buttons=[...e.currentTarget.querySelectorAll(':scope > button:not(:disabled)')];const index=buttons.indexOf(document.activeElement);const next=e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowDown'?1:buttons.length-1))%buttons.length;buttons[next]?.focus();}}}>
       {menuItem?<>
         <button role="menuitem" onClick={()=>{setEditor(menuItem);setMenu(null);}}><SquarePen size={16} aria-hidden="true"/>编辑{menuItem.type==='widget'?'小组件':'快捷方式'}</button>
         {menuItem.type==='shortcut'&&<button type="button" role="menuitem" data-setting-key="itemSize" aria-haspopup="menu" aria-expanded={menu.view==='itemSize'} onClick={()=>changeMenuView('itemSize',true)} onKeyDown={e=>{if(e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();changeMenuView('itemSize',true);}}}><Scaling size={16} aria-hidden="true"/><span>快捷方式大小</span><span className="home-menu-trailing" aria-hidden="true"><span>{SHORTCUT_SIZE_PRESETS.find(size=>size.w===normalizeShortcutSize(menuItem.size).w)?.label}</span><ChevronRight size={14}/></span></button>}
         <div role="separator"/>
         <button role="menuitem" onClick={()=>duplicate(menuItem)}><CopyPlus size={16} aria-hidden="true"/>复制</button>
-        <button type="button" role="menuitem" data-setting-key="transfer" aria-haspopup="menu" aria-expanded={menu.view==='transfer'} disabled={pages.length<2} onClick={()=>changeMenuView('transfer',true)} onKeyDown={e=>{if(e.key==='ArrowRight'&&pages.length>1){e.preventDefault();e.stopPropagation();changeMenuView('transfer',true);}}}><FileInput size={16} aria-hidden="true"/><span>移动到页面</span><span className="home-menu-trailing" aria-hidden="true"><ChevronRight size={14}/></span></button>
+        <button type="button" role="menuitem" data-setting-key="transfer" aria-haspopup="menu" aria-expanded={menu.view==='transfer'} disabled={pages.length<2} onClick={()=>changeMenuView('transfer',true)} onKeyDown={e=>{if(e.key==='ArrowRight'&&pages.length>1){e.preventDefault();e.stopPropagation();changeMenuView('transfer',true);}}}><FileInput size={16} aria-hidden="true"/><span>移动到看板</span><span className="home-menu-trailing" aria-hidden="true"><ChevronRight size={14}/></span></button>
         <div role="separator"/>
         <button role="menuitem" className="is-danger" onClick={()=>removeFromTile(menuItem)}><Trash2 size={16} aria-hidden="true"/>删除</button>
       </>:<>
-        <button role="menuitem" onClick={()=>{setLibrary(true);setMenu(null);}}><Plus size={16} aria-hidden="true"/>添加快捷方式或小组件</button>
+        <button type="button" role="menuitem" data-setting-key="add" aria-haspopup="menu" aria-expanded={menu.view==='add'} onClick={()=>changeMenuView('add',true)} onKeyDown={e=>{if(e.key==='ArrowRight'){e.preventDefault();e.stopPropagation();changeMenuView('add',true);}}}><Plus size={16} aria-hidden="true"/><span>添加</span><span className="home-menu-trailing" aria-hidden="true"><ChevronRight size={14}/></span></button>
         <button role="menuitem" onClick={()=>startEditing()}><ListChecks size={16} aria-hidden="true"/>批量编辑</button>
       </>}
-      {menuItem&&menu.view&&<ContextSubmenu key={menu.view} parentRef={menuRef} anchorKey={menu.view} label={menu.view==='itemSize'?'快捷方式大小':'移动到页面'} focusOnOpen={menu.keyboardSubmenu} onBack={()=>closeSubmenu(true)} onDismiss={()=>{setMenu(null);restoreMenuFocus();}}>
+      {!menuItem&&menu.view==='add'&&<ContextSubmenu parentRef={menuRef} anchorKey="add" label="添加" focusOnOpen={menu.keyboardSubmenu} onBack={()=>closeSubmenu(true)} onDismiss={()=>{setMenu(null);restoreMenuFocus();}}>
+        <button type="button" role="menuitem" disabled={!onAddPage||pages.length>=20} title={pages.length>=20?'最多可添加 20 个看板':undefined} onClick={()=>{setMenu(null);onAddPage?.();}}><FilePlus2 size={16} aria-hidden="true"/>添加看板</button>
+        <button type="button" role="menuitem" onClick={()=>{setLibrary(true);setMenu(null);}}><LayoutGrid size={16} aria-hidden="true"/>添加组件</button>
+      </ContextSubmenu>}
+      {menuItem&&menu.view&&<ContextSubmenu key={menu.view} parentRef={menuRef} anchorKey={menu.view} label={menu.view==='itemSize'?'快捷方式大小':'移动到看板'} focusOnOpen={menu.keyboardSubmenu} onBack={()=>closeSubmenu(true)} onDismiss={()=>{setMenu(null);restoreMenuFocus();}}>
         {menu.view==='itemSize'?SHORTCUT_SIZE_PRESETS.map(size=><button key={size.id} type="button" role="menuitemradio" aria-checked={normalizeShortcutSize(menuItem.size).w===size.w} onClick={()=>{resize(menuItem,size);setMenu(null);restoreMenuFocus();}}><span className="home-menu-check-slot" aria-hidden="true">{normalizeShortcutSize(menuItem.size).w===size.w&&<Check size={16}/>}</span>{size.label}（1×{size.w}）</button>):pages.filter(entry=>entry.id!==page.id).map(entry=><button type="button" role="menuitem" key={entry.id} onClick={()=>transfer(menuItem,entry.id)}><PanelTop size={16} aria-hidden="true"/>移动到{entry.name}</button>)}
       </ContextSubmenu>}
     </div>,getHomeRoot())}
-    {library&&<BoardLibrary homeAnchorRef={rootRef} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} catalog={widgetCatalog.map(def=>({...def,preview:<WidgetCard kind={def.kind} item={{config:def.defaultConfig}} preview/>}))} pages={pages} currentPageId={page.id} onAdd={addWidget} onShortcut={(value,targetId)=>addItem({...value,id:crypto.randomUUID(),type:'shortcut',key:'custom',service:value.label},targetId)} onGenerateWidget={onGenerateWidget} onClose={()=>setLibrary(false)}/>}
+    {library&&<BoardLibrary homeAnchorRef={rootRef} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} catalog={widgetCatalog.map(def=>({...def,preview:<WidgetCard kind={def.kind} item={{config:def.defaultConfig}} appearanceTheme={appearanceTheme} preview/>}))} pages={pages} currentPageId={page.id} onAdd={addWidget} onShortcut={(value,targetId)=>addItem({...value,id:crypto.randomUUID(),type:'shortcut',key:'custom',service:value.label},targetId)} onGenerateWidget={onGenerateWidget} onImport={importAICard} onClose={()=>setLibrary(false)}/>}
     {editor&&editor.type!=='group'&&<BoardItemDialog item={editor==='new'?null:editor} appearanceTheme={appearanceTheme} onSave={saveItem} onClose={()=>{setEditor(null);setEditorTargetId(null);restoreMenuFocus();}}/>}
     {editor?.type==='group'&&<GroupNameDialog name={page.name} onClose={()=>setEditor(null)} onSave={name=>{onRenameGroup(name);setEditor(null);}}/>}
-    {confirm&&<BoardConfirm title={`删除页面“${page.name}”？`} description={`将移除本页的 ${page.items.length} 个项目，之后可撤销。`} onConfirm={()=>{onDeleteGroup();setConfirm(null);}} onClose={()=>setConfirm(null)}/>}
+    {confirm&&<BoardConfirm title={`删除看板“${page.name}”？`} description={`将移除此看板中的 ${page.items.length} 个项目，之后可撤销。`} onConfirm={()=>{onDeleteGroup();setConfirm(null);}} onClose={()=>setConfirm(null)}/>}
   </div>;
 }
 function GroupNameDialog({name,onSave,onClose}){
   const ref=useRef(null);const[value,setValue]=useState(name);
   useLayoutEffect(()=>{ref.current.showModal();ref.current.querySelector('input').select();},[]);
-  return <dialog ref={ref} className="board-group-dialog" onCancel={e=>{e.preventDefault();onClose();}}><form onSubmit={e=>{e.preventDefault();if(value.trim())onSave(value.trim());}}><h2>重命名页面</h2><label>页面名称<input aria-label="页面名称" value={value} onChange={e=>setValue(e.target.value)} maxLength={24} required/></label><div><button type="button" onClick={onClose}>取消</button><button type="submit">保存</button></div></form></dialog>;
+  return <dialog ref={ref} className="board-group-dialog" onCancel={e=>{e.preventDefault();onClose();}}><form onSubmit={e=>{e.preventDefault();if(value.trim())onSave(value.trim());}}><h2>重命名看板</h2><label>看板名称<input aria-label="看板名称" value={value} onChange={e=>setValue(e.target.value)} maxLength={24} required/></label><div><button type="button" onClick={onClose}>取消</button><button type="submit">保存</button></div></form></dialog>;
 }

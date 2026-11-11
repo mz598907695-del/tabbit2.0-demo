@@ -1,12 +1,12 @@
 import { getHomeRoot } from "./home-host";
 import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Cog, ListChecks, Palette, Plus } from "./icons";
+import { ChevronRight, Cog, FilePlus2, LayoutGrid, ListChecks, Palette, Plus } from "./icons";
 import PageMenuPreferences, { pagePreferenceLabel } from './PageMenuPreferences';
 import ContextSubmenu from './ContextSubmenu';
 import './context-menu.css';
 
-export default function PageContextMenu({ ref, enabled, canEdit, preferences, onPreferenceChange, onAdd, onEdit, onPageSettings, onThemeSettings, onOpenChange }) {
+export default function PageContextMenu({ ref, enabled, canEdit, canAddPage = true, preferences, onPreferenceChange, onAdd, onAddPage, onEdit, onPageSettings, onThemeSettings, onOpenChange }) {
   const [menu, setMenu] = useState(null);
   const menuRef = useRef(null);
   const triggerRef = useRef(null);
@@ -38,8 +38,8 @@ export default function PageContextMenu({ ref, enabled, canEdit, preferences, on
     const context = event => { if (!event.defaultPrevented) open(event); };
     const keyboard = event => {
       if (event.key !== 'ContextMenu' && !(event.shiftKey && event.key === 'F10')) return;
-      // The board and page dots keep their item-specific keyboard menus.
-      if (event.target.closest?.('.board-grid, [data-page-id], .home-context-menu')) return;
+      // Item-specific keyboard menus handle their own triggers.
+      if (event.target.closest?.('.board-grid, [data-page-id], [data-navigation-pin], .bkm-app, .home-context-menu')) return;
       open(event);
     };
     document.addEventListener('contextmenu', context);
@@ -92,7 +92,7 @@ export default function PageContextMenu({ ref, enabled, canEdit, preferences, on
     const row = event.target.closest('button');
     if (row?.parentElement === menuRef.current) changeView(row.disabled ? null : row.dataset.settingKey || null);
   };
-  return createPortal(<div ref={menuRef} popover="manual" className="page-context-menu home-context-menu" role="menu" aria-label="首页页面菜单" onPointerOver={hoverRow}
+  return createPortal(<div ref={menuRef} popover="manual" className="page-context-menu home-context-menu" role="menu" aria-label="看板菜单" onPointerOver={hoverRow}
     onFocusCapture={event => { if (event.target.parentElement === menuRef.current && menu.view && event.target.dataset.settingKey !== menu.view) closeSubmenu(); }}
     onContextMenu={event => { event.preventDefault(); event.stopPropagation(); }}
     onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()}
@@ -108,15 +108,20 @@ export default function PageContextMenu({ ref, enabled, canEdit, preferences, on
         buttons[next]?.focus();
       }
     }}>
-    <button type="button" role="menuitem" onClick={() => act(onAdd)}><Plus size={16} aria-hidden="true" />添加快捷方式或小组件</button>
+    <button type="button" role="menuitem" data-setting-key="add" aria-haspopup="menu" aria-expanded={menu.view === 'add'} onClick={() => changeView('add', true)} onKeyDown={event => {
+      if (event.key === 'ArrowRight') { event.preventDefault(); event.stopPropagation(); changeView('add', true); }
+    }}><Plus size={16} aria-hidden="true" /><span>添加</span><span className="home-menu-trailing" aria-hidden="true"><ChevronRight size={14}/></span></button>
     <button type="button" role="menuitem" disabled={!canEdit} onClick={() => act(onEdit)}><ListChecks size={16} aria-hidden="true" />批量编辑</button>
     <div role="separator" />
     <PageMenuPreferences preferences={preferences} activeView={menu.view} onView={changeView} onChange={(key, value) => act(() => onPreferenceChange(key, value))} />
     <div role="separator" />
-    <button type="button" role="menuitem" onClick={() => act(onPageSettings)}><Cog size={16} aria-hidden="true" />页面设置</button>
+    <button type="button" role="menuitem" onClick={() => act(onPageSettings)}><Cog size={16} aria-hidden="true" />看板设置</button>
     <button type="button" role="menuitem" onClick={() => act(onThemeSettings)}><Palette size={16} aria-hidden="true" />主题设置</button>
-    {menu.view && <ContextSubmenu key={menu.view} parentRef={menuRef} anchorKey={menu.view} label={pagePreferenceLabel(menu.view)} focusOnOpen={menu.keyboardSubmenu} onBack={() => closeSubmenu(true)} onDismiss={() => close(true)}>
-      <PageMenuPreferences preferences={preferences} view={menu.view} onChange={(key, value) => act(() => onPreferenceChange(key, value))} />
+    {menu.view && <ContextSubmenu key={menu.view} parentRef={menuRef} anchorKey={menu.view} label={menu.view === 'add' ? '添加' : pagePreferenceLabel(menu.view)} focusOnOpen={menu.keyboardSubmenu} onBack={() => closeSubmenu(true)} onDismiss={() => close(true)}>
+      {menu.view === 'add' ? <>
+        <button type="button" role="menuitem" disabled={!canAddPage || !onAddPage} title={!canAddPage ? '最多可添加 20 个看板' : undefined} onClick={() => act(onAddPage)}><FilePlus2 size={16} aria-hidden="true"/>添加看板</button>
+        <button type="button" role="menuitem" onClick={() => act(onAdd)}><LayoutGrid size={16} aria-hidden="true"/>添加组件</button>
+      </> : <PageMenuPreferences preferences={preferences} view={menu.view} onChange={(key, value) => act(() => onPreferenceChange(key, value))} />}
     </ContextSubmenu>}
   </div>, menu.host);
 }

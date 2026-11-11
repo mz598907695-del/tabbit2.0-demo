@@ -103,8 +103,7 @@
   pointer-events: none;
 }
 :scope[data-theme] .board-card {
-  scale: var(--home-card-hover-scale, 1);
-  transition: scale 280ms var(--nine-motion-easing-standard), box-shadow 300ms var(--nine-motion-easing-standard);
+  transition: box-shadow 300ms var(--nine-motion-easing-standard);
 }
 :scope[data-theme] .board-card::after {
   border: var(--home-card-outline);
@@ -117,13 +116,6 @@
 @media (hover: hover) {
   :scope[data-theme] .home .workspace-board .board-item:not(.is-dragging):hover .board-card {
     box-shadow: var(--home-surface-elevation);
-  }
-}
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  /* Scale the material and artwork together; labels, layout and gesture
-     translation stay still. Editing and page transitions keep neutral scale. */
-  :scope[data-theme] .home .workspace-board:not(.is-editing):not([data-page-swiping]) > .board-grid > .board-item:not(.is-dragging):not(.is-resizing):hover {
-    --home-card-hover-scale: 1.06;
   }
 }
 :scope[data-theme] .home .workspace-board .board-item.is-dragging .board-card { box-shadow: none; }

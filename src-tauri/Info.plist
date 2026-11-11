@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>在你开启音频可视化时读取系统播放声音，将实时音量和频谱显示为点阵；不保存或上传音频。</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>仅在你选择麦克风作为可视化来源时，读取声音并生成实时点阵；不保存或上传音频。</string>
+</dict></plist>
