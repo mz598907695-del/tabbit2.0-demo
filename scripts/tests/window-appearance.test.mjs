@@ -23,7 +23,7 @@ function storage(initial={}) {
   return {getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value))};
 }
 
-test('fresh packaged defaults retain the curated gallery theme and system color preference',()=>{
+test('fresh packaged defaults retain the captured color theme and system color preference',()=>{
   const load=modules(),store=storage();
   load(resolve('src/demoDefaults.ts')).initializeDemoDefaults(store,true);
   const api=load(resolve('src/windowAppearance.ts'));
@@ -31,9 +31,9 @@ test('fresh packaged defaults retain the curated gallery theme and system color 
   assert.equal(api.resolveWindowAppearance(api.readWindowAppearance(store),true),'dark');
   assert.equal(api.resolveWindowAppearance(api.readWindowAppearance(store),false),'light');
   const preferences=JSON.parse(store.getItem('personalized-home-2-0-preferences'));
-  assert.equal(load(resolve('src/themeSelection.ts')).resolveThemeSource(preferences.theme,preferences.themeSource),'gallery');
-  assert.match(preferences.theme,/^wallpaper-/);
-  assert.ok(['light','dark'].includes(preferences.appearance));
+  assert.equal(load(resolve('src/themeSelection.ts')).resolveThemeSource(preferences.theme,preferences.themeSource),'color');
+  assert.equal(preferences.theme,'dark');
+  assert.equal(preferences.appearance,'dark');
 });
 
 test('packaged initialization preserves an existing explicit appearance',()=>{

@@ -1,6 +1,8 @@
 import { useLayoutEffect, useState } from 'react';
 import { waitForWallpaperMedia } from './wallpaper-video.js';
 
+export const WALLPAPER_FADE_DURATION_MS = 1000;
+
 /** Keep the previous scene mounted while a manually selected wallpaper decodes.
  * Space gestures own the same layers/progress and take priority over this fade. */
 export function useWallpaperSelectionTransition(scene, spaceId, gestureTransition) {
@@ -10,8 +12,13 @@ export function useWallpaperSelectionTransition(scene, spaceId, gestureTransitio
     const progress = Number(document.documentElement.style.getPropertyValue('--space-wallpaper-progress')) || 0;
     const from = selection.transition && progress < .5 ? selection.transition.from : selection.scene;
     const mediaChanged = from.id !== scene.id || from.url !== scene.url;
+    const appearanceChanged = Boolean(from.appearance && scene.appearance && from.appearance !== scene.appearance);
+    const outgoing = appearanceChanged ? {
+      id:`selection-base-${scene.appearance}`, url:'', color:scene.baseColor,
+      appearance:scene.appearance, blurred:false,
+    } : from;
     setSelection({ scene, spaceId, transition:!gestureTransition && mediaChanged
-      && (from.url || scene.url) ? { kind:'selection', from, to:scene } : null });
+      && (from.url || scene.url) ? { kind:'selection', from:outgoing, to:scene } : null });
   }
 
   useLayoutEffect(() => {
@@ -29,11 +36,11 @@ export function useWallpaperSelectionTransition(scene, spaceId, gestureTransitio
         const media = [...document.querySelectorAll(`[data-wallpaper-id="${CSS.escape(transition.to.id)}"]`)];
         await Promise.allSettled(media.map(waitForWallpaperMedia));
         if (cancelled) return;
-        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 360;
+        const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : WALLPAPER_FADE_DURATION_MS;
         const began = performance.now();
         const tick = now => {
           if (cancelled) return;
-          const fraction = duration ? Math.min(1, (now - began) / duration) : 1;
+          const fraction = duration ? Math.max(0, Math.min(1, (now - began) / duration)) : 1;
           apply(1 - (1 - fraction) ** 3);
           if (fraction < 1) frame = requestAnimationFrame(tick);
           else setSelection(current => current === selection ? { ...current, transition:null } : current);

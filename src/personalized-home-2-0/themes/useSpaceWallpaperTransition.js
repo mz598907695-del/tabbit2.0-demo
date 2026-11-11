@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { SPACE_GESTURE_EVENT } from '../../spaceTransition';
 import { WINDOW_WALLPAPER_EVENT } from '../../windowWallpaper';
 import { getExampleWallpaper } from './exampleWallpapers';
-import { getThemeBackground } from './appearance';
+import { getThemeBackground, officialBackgrounds } from './appearance';
 import { useWallpaperSelectionTransition } from './useWallpaperSelectionTransition';
 
 // These themes color the native glass; their page stays translucent. A solid
@@ -21,7 +21,8 @@ export function useSpaceWallpaperTransition(theme, wallpaper, wallpapers, appear
   const frame = useRef(0);
   const selectionTransition = useWallpaperSelectionTransition({ id:theme, url:wallpaper?.url || '',
     mimeType:wallpaper?.mimeType, posterUrl:wallpaper?.posterUrl, blurred,
-    color:glassBackgroundThemes.has(theme) ? 'transparent' : getThemeBackground(theme, appearance), appearance }, spaceId, transition);
+    color:glassBackgroundThemes.has(theme) ? 'transparent' : getThemeBackground(theme, appearance),
+    baseColor:officialBackgrounds[appearance === 'dark' ? 'dark' : 'light'], appearance }, spaceId, transition);
   const backgroundTransition = transition || selectionTransition;
 
   useEffect(() => {

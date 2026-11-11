@@ -70,7 +70,8 @@ export function App() {
     return readWindowAppearance();
   });
   const effectiveAppearance = preferences.themeSource === 'gallery' ? preferences.appearance : windowAppearance;
-  const [appearanceTheme, setAppearanceTheme] = useState(() => resolveWindowAppearance(effectiveAppearance));
+  const targetAppearanceTheme = resolveWindowAppearance(effectiveAppearance);
+  const [appearanceTheme, setAppearanceTheme] = useState(() => targetAppearanceTheme);
   useLayoutEffect(() => {
     // Commit the image and its analyzed appearance together, before paint.
     localStorage.setItem(WINDOW_APPEARANCE_KEY, effectiveAppearance);
@@ -101,7 +102,13 @@ export function App() {
       const theme = event.detail?.theme;
       if (typeof theme === 'string') {
         const themeSource = resolveThemeSource(theme, event.detail.themeSource);
-        setPreferences(current => current.theme === theme && current.themeSource === themeSource ? current : ({ ...current, theme, themeSource, appearance:getThemeSelectionAppearance(theme,current.appearance) }));
+        setPreferences(current => {
+          const savedAppearance = event.detail?.appearance;
+          const appearance = themeSource === 'gallery' && ['light', 'dark'].includes(savedAppearance)
+            ? savedAppearance : getThemeSelectionAppearance(theme, current.appearance);
+          return current.theme === theme && current.themeSource === themeSource && current.appearance === appearance
+            ? current : { ...current, theme, themeSource, appearance };
+        });
         // Stored space appearance can predate the current image/threshold.
         // Gallery appearance is owned by image analysis and must not be reset
         // by a later settings sync for the same theme.
@@ -122,12 +129,13 @@ export function App() {
   const selectedWallpaper = getExampleWallpaper(preferences.theme)
     || wallpaperLibrary.wallpapers.find((item) => item.id === preferences.theme);
   const wallpaperTransition = useSpaceWallpaperTransition(preferences.theme, selectedWallpaper,
-    wallpaperLibrary.wallpapers, document.documentElement.dataset.mode, preferences.wallpaperBlur, spaceId);
-  // A manually selected video can spend a few frames waiting for its first
-  // drawable frame. Keep the source material appearance during that handoff so
-  // dark translucent surfaces never sample the still-visible light wallpaper.
+    wallpaperLibrary.wallpapers, targetAppearanceTheme, preferences.wallpaperBlur, spaceId);
+  // When a manual selection crosses appearances, enter the destination UI
+  // immediately. Its neutral base sits behind the new wallpaper while media
+  // becomes drawable and fades in, so old light/dark artwork never conflicts
+  // with the destination surfaces.
   const surfaceAppearanceTheme = wallpaperTransition?.kind === 'selection'
-    ? wallpaperTransition.from.appearance || appearanceTheme : appearanceTheme;
+    ? wallpaperTransition.to.appearance || appearanceTheme : appearanceTheme;
   const [composerOpen, setComposerOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const [themePanelPresent, setThemePanelPresent] = useState(false);

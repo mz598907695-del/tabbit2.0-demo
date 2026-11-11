@@ -3628,7 +3628,7 @@ dependencies = [
 
 [[package]]
 name = "tabbit-2-demo"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "block2",
  "objc2",
