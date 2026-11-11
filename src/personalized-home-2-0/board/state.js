@@ -385,10 +385,13 @@ export const sizePresets = [
   {w:2,h:2,label:'标准'}, {w:2,h:3,label:'高卡'}, {w:4,h:2,label:'宽卡'}, {w:4,h:3,label:'大卡'},
 ];
 
-/** Preserve compact breakpoints; wider boards fit 15 icons at 1100px with 25px gaps. */
+/** Preserve compact breakpoints while adding columns as the board widens.
+ * A preferred column count is the standard-width baseline, not a ceiling:
+ * otherwise wide mode stretches every grid cell and silently enlarges cards.
+ */
 export function boardColumns(width = 700, labels = true, preferredColumns) {
   const measured=Number.isFinite(width)?Math.max(0,width):700;
-  if(preferredColumns===DEFAULT_WIDGET_BOARD_COLUMNS)return Math.max(3,Math.min(preferredColumns,Math.floor((measured+14)/64)));
+  if(preferredColumns===DEFAULT_WIDGET_BOARD_COLUMNS)return Math.max(3,Math.min(MAX_BOARD_COLUMNS,Math.floor((measured+14)/64)));
   if (!labels) return Math.max(3, Math.min(MAX_BOARD_COLUMNS, Math.round((measured-50)/66)+1));
   return measured<=700
     ? Math.max(3,Math.min(9,Math.floor(measured/72)))
@@ -477,13 +480,13 @@ export function projectPage(page,columns,_strategy='gap',_labels=true,mode='free
   // Responsive projections are calculated without overwriting other layouts.
   return layoutItems(baseItems,columns,mode==='sections'?'sections':'compact');
 }
-export function savePositions(page,key,placed) {
+export function savePositions(page,key,placed,{compact=true}={}) {
   const parsed=parseLayoutKey(key);
   if(!parsed)return page;
   const [,mode,columnCount]=parsed;
   // Drag previews are already packed: this is idempotent for their geometry.
   // Other edits still compact here; cached widths share the latest reading order.
-  const compacted=mode==='free'?compactBoardItems(placed,Number(columnCount)):placed;
+  const compacted=mode==='free'&&compact?compactBoardItems(placed,Number(columnCount)):placed;
   const positions=Object.fromEntries(compacted.map(item=>[item.id,{x:item.x,y:item.y}]));
   const items=migratedItems(page).map(item=>{
     const tile=page.curatedLayoutVersion&&placed.find(tile=>tile.id===item.id);

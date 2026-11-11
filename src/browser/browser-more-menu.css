@@ -1,0 +1,18 @@
+.browser-more-menu-position { position: fixed; z-index: 1300; }
+.browser-more-menu.dropdown-panel { gap: 8px; width: 100%; max-height: inherit; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+.browser-more-group { display: flex; flex: 0 0 auto; flex-direction: column; gap: 2px; }
+.browser-more-group > button { display: flex; align-items: center; justify-content: space-between; gap: 4px; width: 100%; height: 28px; min-height: 28px; padding: 0 8px; border-radius: 10px; color: var(--nine-color-text-title); font-size: var(--nine-font-size-13); font-weight: 400; line-height: var(--nine-font-line-height-13); text-align: left; transition: background-color var(--nine-motion-duration-fast) var(--nine-motion-easing-standard); }
+.browser-more-group > button:hover, .browser-more-group > button:focus-visible { outline: none; background: var(--nine-color-fill-layer-strong); }
+.browser-more-menu svg { flex: 0 0 14px; width: 14px; height: 14px; }
+.browser-more-account { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 4px 8px 0; }
+.browser-more-user { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--nine-color-text-title); }
+.browser-more-user img { flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.browser-more-user strong { overflow: hidden; font-size: var(--nine-font-size-14); font-weight: 500; line-height: var(--nine-font-line-height-14); text-overflow: ellipsis; white-space: nowrap; }
+.browser-more-plan { flex: 0 0 auto; padding: 1px 6px; border-radius: var(--nine-radius-full); color: var(--nine-color-text-tertiary); background: var(--nine-color-fill-layer-muted); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
+.browser-more-shortcut { flex: 0 0 auto; margin-left: auto; color: var(--nine-color-text-quaternary); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); white-space: nowrap; }
+.browser-more-group > button .menu-end { flex: 0 0 14px; width: 14px; height: 14px; margin-left: auto; color: var(--nine-color-text-quaternary); }
+.browser-more-zoom { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 28px; padding: 0 4px 0 8px; color: var(--nine-color-text-title); font-size: var(--nine-font-size-13); line-height: var(--nine-font-line-height-13); }
+.browser-more-zoom-controls { display: flex; align-items: center; gap: 4px; }
+.browser-more-zoom-controls button { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; padding: 0; border-radius: 8px; background: var(--nine-color-fill-layer-muted); color: var(--nine-color-text-title); }
+.browser-more-zoom-controls button:hover { background: var(--nine-color-fill-layer-strong); }
+.browser-more-zoom-controls output { min-width: 38px; color: var(--nine-color-text-secondary); font-size: var(--nine-font-size-13); line-height: var(--nine-font-line-height-13); text-align: center; }

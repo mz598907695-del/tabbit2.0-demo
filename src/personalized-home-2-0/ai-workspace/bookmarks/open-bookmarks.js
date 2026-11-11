@@ -1,10 +1,11 @@
-// Open the destination only after the browser has created a separate tab.
+import { BOOKMARKS_TAB_ID, INTERNAL_TAB_EVENT } from '../../../browser/tabs-data';
+
+// Ask the current Tabbit window to create and select an application tab.
+export function openBookmarkPage() {
+  window.dispatchEvent(new CustomEvent(INTERNAL_TAB_EVENT, { detail: { id: BOOKMARKS_TAB_ID, title: '收藏管理' } }));
+}
+
 export function openBookmarkTab(event) {
-  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  const href = event.currentTarget.href;
-  const tab = window.open('about:blank', '_blank');
-  if (!tab) return;
   event.preventDefault();
-  tab.opener = null;
-  tab.location.href = href;
+  openBookmarkPage();
 }

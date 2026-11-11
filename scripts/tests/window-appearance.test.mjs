@@ -31,9 +31,10 @@ test('fresh packaged defaults retain the captured color theme and system color p
   assert.equal(api.resolveWindowAppearance(api.readWindowAppearance(store),true),'dark');
   assert.equal(api.resolveWindowAppearance(api.readWindowAppearance(store),false),'light');
   const preferences=JSON.parse(store.getItem('personalized-home-2-0-preferences'));
+  const captured=JSON.parse(JSON.parse(readFileSync(resolve('src/demo-defaults.json'),'utf8')).storage['personalized-home-2-0-preferences']);
   assert.equal(load(resolve('src/themeSelection.ts')).resolveThemeSource(preferences.theme,preferences.themeSource),'color');
-  assert.equal(preferences.theme,'dark');
-  assert.equal(preferences.appearance,'dark');
+  assert.equal(preferences.theme,captured.theme);
+  assert.equal(preferences.appearance,captured.appearance);
 });
 
 test('packaged initialization preserves an existing explicit appearance',()=>{

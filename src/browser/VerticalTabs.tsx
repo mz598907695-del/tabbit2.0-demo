@@ -1,6 +1,6 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { IconFont, TabFavicon } from './BrowserIcons';
-import { SPACE_TABS, spaceTabLayouts, initialSpaceTabs, isTabGroup, type DemoGroup } from './tabs-data';
+import { INTERNAL_TAB_EVENT, SPACE_TABS, spaceTabLayouts, initialSpaceTabs, internalTabTitle, isTabGroup, type DemoGroup } from './tabs-data';
 
 function groupLineColor(color:string) {
   const token = /^var\(--color-([a-z]+)-\d+\)$/.exec(color);
@@ -21,7 +21,7 @@ export const VerticalTabPreview = memo(function VerticalTabPreview({ spaceId, ac
   const seed = SPACE_TABS[spaceId];
   const layout = spaceTabLayouts.get(spaceId) ?? { tabs:initialSpaceTabs(spaceId), groups:seed.groups };
   const titles = Object.fromEntries([...seed.loose, ...Object.values(layout.groups).flatMap(group => group.tabs)].map(tab => [tab.id, tab.title]));
-  const row = (id:string) => <div key={id} className={`vertical-tab ${activeTab === id ? "active" : ""}`}><span className="tab-content"><TabFavicon id={id}/><span className="tab-title">{titles[id] ?? "New Tab"}</span></span></div>;
+  const row = (id:string) => <div key={id} className={`vertical-tab ${activeTab === id ? "active" : ""}`}><span className="tab-content"><TabFavicon id={id}/><span className="tab-title">{internalTabTitle(id) ?? titles[id] ?? "New Tab"}</span></span></div>;
   return <div className="vertical-tabs-region"><div className="vertical-tab-viewport"><div className="vertical-preview-list group-list">{layout.tabs.map(id => {
     if (!isTabGroup(id)) return row(id);
     const group = layout.groups[id];
@@ -33,7 +33,7 @@ export const VerticalTabPreview = memo(function VerticalTabPreview({ spaceId, ac
   })}</div></div><button className="sidebar-new-tab" tabIndex={-1}><IconFont name="jiahao"/>新标签页</button></div>;
 });
 
-export const VerticalSidebar = memo(function VerticalSidebar({ activeTab, onTab, spaceId, collapsed }: { activeTab:string; onTab:(spaceId:number,id:string)=>void; spaceId:number; collapsed:boolean }) {
+export const VerticalSidebar = memo(function VerticalSidebar({ activeTab, onTab, spaceId, collapsed, active }: { activeTab:string; onTab:(spaceId:number,id:string)=>void; spaceId:number; collapsed:boolean; active:boolean }) {
   const seed = SPACE_TABS[spaceId];
   const [layouts, setLayouts] = useState(() => new Map<number, { tabs:string[]; groups:Record<string, DemoGroup> }>());
   const layout = layouts.get(spaceId) ?? spaceTabLayouts.get(spaceId) ?? { tabs:initialSpaceTabs(spaceId), groups:seed.groups };
@@ -119,11 +119,23 @@ export const VerticalSidebar = memo(function VerticalSidebar({ activeTab, onTab,
   }, [tabs, tabGroups, query, collapsed, activeTab]);
 
   const titles = useMemo(() => Object.fromEntries([...seed.loose, ...Object.values(tabGroups).flatMap(group => group.tabs)].map(tab => [tab.id, tab.title])), [seed, tabGroups]);
-  const titleFor = (id:string) => titles[id] ?? "New Tab";
+  const titleFor = (id:string) => internalTabTitle(id) ?? titles[id] ?? "New Tab";
   useLayoutEffect(() => { spaceTabLayouts.set(spaceId, { tabs, groups:tabGroups }); }, [tabs, tabGroups, spaceId]);
   function toggle(id:string) { setTabGroups(current => ({ ...current, [id]:{ ...current[id], expanded:!current[id].expanded } })); }
   const selectTab = (id:string) => onTab(spaceId, id);
   function addTab() { const id = crypto.randomUUID(); pendingNewTab.current = id; setTabs(current => [...current, id]); selectTab(id); window.dispatchEvent(new Event('tabbit-new-session')); }
+  useEffect(() => {
+    if (!active) return;
+    const openInternalTab = (event: Event) => {
+      const { id } = (event as CustomEvent<{ id:string }>).detail;
+      if (!id) return;
+      pendingNewTab.current = id;
+      setTabs(current => current.includes(id) ? current : [...current, id]);
+      selectTab(id);
+    };
+    window.addEventListener(INTERNAL_TAB_EVENT, openInternalTab);
+    return () => window.removeEventListener(INTERNAL_TAB_EVENT, openInternalTab);
+  }, [active, spaceId]);
 
   function addGroupTab(groupId:string) {
     const id = crypto.randomUUID();

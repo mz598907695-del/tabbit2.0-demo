@@ -14,7 +14,7 @@ export const CONNECTOR_EXAMPLES = [
   { id:'filesystem-mcp', title:'文件系统 MCP', mark:'FS', color:'#a27940', category:'文件管理', connectionType:'mcp', description:'围绕本地文件与目录整理资料，辅助检索和阅读。', capabilities:['浏览授权目录','检索文件内容','整理文件资料'], usageCount:4300, createdAt:0 },
   { id:'browser-mcp', title:'浏览器 MCP', mark:'WEB', color:'#448b91', category:'网页工具', connectionType:'mcp', description:'将网页内容与浏览操作带入任务，辅助收集信息。', capabilities:['查看网页内容','整理网页信息','辅助页面操作'], usageCount:5100, createdAt:-1 },
   { id:'database-mcp', title:'数据库 MCP', mark:'DB', color:'#7672b8', category:'数据分析', connectionType:'mcp', description:'围绕数据表与查询结果，探索数据并整理分析线索。', capabilities:['查看数据表结构','查询授权数据','整理分析结果'], usageCount:3700, createdAt:-2 },
-].map(item => ({ connectionType:'connector', ...item }));
+].map((item, index) => ({ connectionType:'connector', officialIcon:String(index % 14 + 1), ...item }));
 export const CONNECTOR_STORAGE_KEY = 'personalized-home-2-0-my-connectors';
 export function readConnectorIds() {
   try {

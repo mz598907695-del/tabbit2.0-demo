@@ -19,7 +19,7 @@ import './composer.css';
 import './task-mount.css';
 import './composer-scroll.css';
 
-const INLINE_PANEL_LABELS = { add: '添加参考内容', ideas: '妙招', model: '选择模型' };
+const INLINE_PANEL_LABELS = { add: '添加参考内容' };
 
 export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVoice, onOverlayChange, externalOverlayOpen = false, initialSkill = null, initialQuery = '', initialDraft = null, simple = false }, ref) {
   const id = useId();
@@ -393,7 +393,7 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
           <button ref={node => { triggers.current.project = node; }} type="button" className={`tb-task-mount-button tb-task-project${overlay === 'project' ? ' is-open' : ''}`} aria-label={selectedProject ? `选择项目：${selectedProject.name}` : '选择项目'} title={selectedProject?.name || '选择项目'} aria-haspopup="dialog" aria-expanded={overlay === 'project'} aria-controls={overlay === 'project' ? `${id}-project` : undefined} onClick={() => toggleOverlay('project')}><Folder size={14} /><span>{selectedProject?.name || '选择项目'}</span></button>
         </div>
         <div className="tb-task-mount-end">
-          {!simple && localTask && <button ref={node => { triggers.current.approval = node; }} type="button" className={`tb-local-task-trigger${overlay === 'approval' ? ' is-open' : ''}${approvalPolicy === 'full' ? ' is-full-access' : ''}`} aria-label={`审批策略：${selectedApproval.name}`} aria-haspopup="menu" aria-expanded={overlay === 'approval'} aria-controls={overlay === 'approval' ? `${id}-approval` : undefined} onClick={() => toggleOverlay('approval')}><selectedApproval.Icon size={16} aria-hidden="true" /><span>{selectedApproval.name}</span><ChevronDown className="tb-local-task-chevron" size={14} aria-hidden="true" /></button>}
+          {!simple && localTask && <button ref={node => { triggers.current.approval = node; }} type="button" className={`tb-local-task-trigger${overlay === 'approval' ? ' is-open' : ''}${approvalPolicy === 'full' ? ' is-full-access' : ''}`} aria-label={`审批策略：${selectedApproval.name}`} aria-haspopup="menu" aria-expanded={overlay === 'approval'} aria-controls={overlay === 'approval' ? `${id}-approval` : undefined} onClick={() => toggleOverlay('approval')}><selectedApproval.Icon size={14} aria-hidden="true" /><span>{selectedApproval.name}</span><ChevronDown className="tb-local-task-chevron" size={12} aria-hidden="true" /></button>}
           <button ref={node => { triggers.current.runtime = node; }} type="button" className={`tb-task-runtime${overlay === 'runtime' ? ' is-open' : ''}`} aria-label={`运行位置：${runLocation === 'cloud' ? '云端' : '本地'}`} title={runLocation === 'cloud' ? '在云端运行' : '在你的计算机上运行'} aria-haspopup="menu" aria-expanded={overlay === 'runtime'} aria-controls={overlay === 'runtime' ? `${id}-runtime` : undefined} onClick={() => toggleOverlay('runtime')}>{runLocation === 'cloud' ? <Cloud size={14} aria-hidden="true" /> : <Laptop size={14} aria-hidden="true" />}<span>{runLocation === 'cloud' ? '云端' : '本地'}</span><ChevronDown className="tb-task-runtime-chevron" size={12} aria-hidden="true" /></button>
         </div>
       </div>
@@ -446,7 +446,7 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
           <button ref={node => { triggers.current.add = node; }} type="button" className={`tb-composer-icon tb-composer-plus${overlay === 'add' ? ' is-open' : ''}`} aria-label="添加参考内容" aria-haspopup="dialog" aria-expanded={overlay === 'add'} aria-controls={overlay === 'add' ? `${id}-add` : undefined} onClick={() => toggleOverlay('add')}><Plus size={18} /></button>
           {!simple && <>
           <div className="tb-composer-modes" data-dock-secondary inert={dockControlsHidden} aria-hidden={dockControlsHidden} role="group" aria-label="搜索模式">{['对话', '任务'].map(value => <button type="button" key={value} {...(value === '任务' ? taskShockwave : {})} aria-pressed={mode === value} aria-controls={value === '任务' ? `${id}-mount` : undefined} onClick={() => changeMode(value)}>{value}</button>)}</div>
-          <button ref={node => { triggers.current.ideas = node; }} type="button" data-dock-secondary inert={dockControlsHidden} aria-hidden={dockControlsHidden} className={`tb-composer-icon tb-composer-ideas${overlay === 'ideas' ? ' is-open' : ''}`} aria-label="妙招" title="妙招" aria-haspopup="dialog" aria-expanded={overlay === 'ideas'} aria-controls={overlay === 'ideas' ? `${id}-ideas` : undefined} onClick={() => toggleOverlay('ideas')}><Lightbulb size={18} aria-hidden="true" /></button>
+          <button ref={node => { triggers.current.ideas = node; }} type="button" data-dock-secondary inert={dockControlsHidden} aria-hidden={dockControlsHidden} className={`tb-composer-icon tb-composer-ideas${overlay === 'ideas' ? ' is-open' : ''}`} aria-label="妙招" title="妙招" aria-haspopup="menu" aria-expanded={overlay === 'ideas'} aria-controls={overlay === 'ideas' ? `${id}-ideas` : undefined} onClick={() => toggleOverlay('ideas')}><Lightbulb size={18} aria-hidden="true" /></button>
           </>}
         </div>
         <div className="tb-composer-end">
@@ -469,6 +469,17 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
       </ComposerInlinePanel>}
     </ComposerExpansion>
     </div>
+
+    {overlay === 'model' && <ComposerPopover anchor={triggers.current.model} kind="model" id={`${id}-model`} label="选择模型" width={280} maxHeight={430} onClose={closePopover}>
+      <ComposerModelMenu selection={modelSelection}
+        onSelect={name => { setModelSelection(current => toggleReplyModel(current, name)); if (!modelSelection.multiple) closePopover(); }}
+        onModeChange={multiple => setModelSelection(current => setReplyModelMode(current, multiple))}/>
+    </ComposerPopover>}
+    {overlay === 'ideas' && <ComposerPopover anchor={triggers.current.ideas} kind="ideas" id={`${id}-ideas`} label="妙招" width={280} maxHeight={430} onClose={closePopover}>
+      <ComposerIdeasMenu
+        onSelect={(prompt, nextMode) => { setSkill(null); if (nextMode) setMode(nextMode); fillPrompt(prompt); }}
+        onManage={() => { setOverlay(null); setCommandEditor('manage'); }}/>
+    </ComposerPopover>}
 
     {taskMode && ['project', 'runtime'].includes(overlay) && <TaskMountMenus key={overlay} kind={overlay} anchor={triggers.current[overlay]} id={`${id}-${overlay}`} Popover={ComposerPopover} onClose={closePopover}
       projects={projects} onCreateProject={createProject} selectedProjectId={selectedProjectId} onSelectProject={selectProject}

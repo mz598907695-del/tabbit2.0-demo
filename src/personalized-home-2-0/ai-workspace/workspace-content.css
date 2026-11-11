@@ -4,11 +4,11 @@
 .aiw-content *, .aiw-content-dialog * { box-sizing: border-box; }
 
 /* Output pages have three layout sections: title, tools, and results. */
-.aiw-content-files > .aiw-content-primary { display:flex; flex-direction:column; gap:16px; }
-.aiw-content-files > .aiw-content-primary > .aiwp-page-header { display:contents; }
-.aiw-content-files .aiwp-heading { margin:0; }
-.aiw-content-files .aiwp-toolbar { margin:0; }
-.aiw-content-files .aiw-content-browser { min-width:0; }
+:is(.aiw-content-files,.aiw-content-shares) > .aiw-content-primary { display:flex; flex-direction:column; gap:16px; }
+:is(.aiw-content-files,.aiw-content-shares) > .aiw-content-primary > .aiwp-page-header { display:contents; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-heading { margin:0; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-toolbar { margin:0; }
+:is(.aiw-content-files,.aiw-content-shares) .aiw-content-browser { min-width:0; }
 
 .aiw-content button,.aiw-content input,.aiw-content select,.aiw-content textarea,.aiw-content-dialog button,.aiw-content-dialog input,.aiw-content-dialog select,.aiw-content-dialog textarea { font: inherit; color: inherit; }
 .aiw-content button,.aiw-content-dialog button { cursor: pointer; }

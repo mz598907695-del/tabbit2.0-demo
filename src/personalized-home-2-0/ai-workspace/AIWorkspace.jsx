@@ -17,6 +17,7 @@ import WorkspaceNotificationsPopover from './WorkspaceNotificationsPopover';
 import { updateWorkspaceChat, deleteWorkspaceChats } from './workspace-chat-actions';
 import { WorkspaceNavigationSlot } from './workspace-secondary-context';
 import { WallpaperTransitionBackground } from '../HomeBackground';
+import { openBookmarkPage } from './bookmarks/open-bookmarks';
 
 
 const WorkspaceBookmarksPage = lazy(() => import('./bookmarks/WorkspaceBookmarksPage'));
@@ -161,6 +162,12 @@ export default function AIWorkspace({ children, wallpaper, reflectionWallpaper =
   function navigate(next, nextFilter, trigger) {
     onNavigatePage?.();
     ({ page: next, filter: nextFilter } = resolveWorkspaceRoute(next, nextFilter, workspaceData));
+    if (next === 'bookmarks') {
+      openBookmarkPage();
+      setModal(null);
+      closeNotifications(false);
+      return;
+    }
     if (next === 'notifications') {
       if (notificationOpen) { closeNotifications(true); return; }
       const anchor = trigger || navHostRef.current?.querySelector('[data-notification-trigger]') || document.activeElement;
@@ -217,6 +224,21 @@ export default function AIWorkspace({ children, wallpaper, reflectionWallpaper =
     window.addEventListener('tabbit-new-session', startSession);
     return () => window.removeEventListener('tabbit-new-session', startSession);
   }, [onNewChat]);
+  useEffect(() => {
+    const openWorkspace = event => {
+      const nextPage = event.detail?.page;
+      if (!destinations.some(([id]) => id === nextPage) || nextPage === 'home' || nextPage === 'overview') return;
+      setContentPage(nextPage);
+      setContentVisited(true);
+      setNavigationKey(key => key + 1);
+      setPage(nextPage);
+      setFilter(event.detail?.filter);
+      setModal(null);
+      setNotificationOpen(false);
+    };
+    window.addEventListener('tabbit-open-ai-workspace', openWorkspace);
+    return () => window.removeEventListener('tabbit-open-ai-workspace', openWorkspace);
+  }, []);
   function closeSidebar() { window.clearTimeout(responsiveMotionTimer.current); cancelAnimationFrame(responsiveMotionFrame.current); autoCollapsedSidebar.current = false; openRef.current = false; restoreLauncherFocus.current = true; setOpen(false); setModal(null); setNotificationOpen(false); }
   useEffect(() => {
     if (open || !restoreLauncherFocus.current) return;
@@ -261,7 +283,7 @@ export default function AIWorkspace({ children, wallpaper, reflectionWallpaper =
   return <WorkspaceSettingsContext.Provider value={{ variant, onVariant: changeVariant, onCompare: () => setModal('compare') }}><div ref={shellRef} className={`aiw-shell ${open ? 'is-open' : ''} ${sidebarOverlay ? 'is-sidebar-overlay' : ''} ${activeContent ? 'has-content' : ''} ${(wallpaper || wallpaperTransition) && !activeContent ? 'has-home-wallpaper' : ''}`} data-variant={variant} inert={disabled} aria-hidden={disabled || undefined} style={{ visibility: disabled ? 'hidden' : undefined }}>
     {/* One media plane spans the homepage and internal sidebar. */}
     {!activeContent && <WallpaperTransitionBackground wallpaper={wallpaper} blurred={wallpaperBlur} transition={wallpaperTransition}/>}
-    <div className="aiw-nav-host" ref={navHostRef} inert={!open || disabled} aria-hidden={!open || undefined} role={navigationOverlay && open ? 'dialog' : undefined} aria-modal={navigationOverlay && open || undefined} aria-label="AI 导航" onKeyDown={navKeyDown}><WorkspaceNavigation onUpdateChat={updateChat} onDeleteChats={deleteChats} active={open && !disabled && !modal} variant={variant} page={page === 'conversation' ? 'chats' : page} activeConversationId={page === 'conversation' ? conversationId : undefined} data={workspaceData} activeFilter={activeFilter} onNavigate={navigate} onClose={closeSidebar} onSearch={openSearch} onNewChat={newChat} /></div>
+    <div className="aiw-nav-host" ref={navHostRef} inert={!open || disabled} aria-hidden={!open || undefined} role={navigationOverlay && open ? 'dialog' : undefined} aria-modal={navigationOverlay && open || undefined} aria-label="AI 导航" onContextMenu={event => { event.preventDefault(); event.stopPropagation(); }} onKeyDown={navKeyDown}><WorkspaceNavigation onUpdateChat={updateChat} onDeleteChats={deleteChats} active={open && !disabled && !modal} variant={variant} page={page === 'conversation' ? 'chats' : page} activeConversationId={page === 'conversation' ? conversationId : undefined} data={workspaceData} activeFilter={activeFilter} onNavigate={navigate} onClose={closeSidebar} onSearch={openSearch} onNewChat={newChat} /></div>
     {open && !navigationOverlay && variant === 1 && <SidebarResizeHandle key={SIDEBAR_WIDTH_DEFAULT}/>}
     {navigationOverlay && open && <button className="aiw-nav-backdrop" aria-label="关闭导航抽屉" tabIndex={-1} onClick={closeSidebar}/>} 
     <WorkspaceNavigationSlot.Provider value={navigationSlot}><div className="aiw-stage">

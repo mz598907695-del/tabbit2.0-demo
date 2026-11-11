@@ -1,10 +1,11 @@
 import { useVisibilityMotion } from './useVisibilityMotion';
 import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
-import { TextCursorInput, Plus, Controls, Trash2, X, FilePlus2, LayoutGrid } from "./icons";
+import { TextCursorInput, Plus, Controls, Trash2, X } from "./icons";
 import { BoardConfirm } from "./board/BoardDialogs";
 import { isPageGestureClick, pageDragPosition, pageEdgeVelocity, pagePreviewOffset } from "./page-reorder";
 import "./page-indicator.css";
 import "./context-menu.css";
+import "../styles/dropdown.css";
 
 const defaultPages = [{ name: "工作" }, { name: "常用" }, { name: "灵感" }];
 
@@ -720,7 +721,7 @@ export function PageIndicator({
 
       {addMenuOpen && <div ref={addMenuRef} className="page-indicator-add-menu"
         onPointerEnter={() => window.clearTimeout(addMenuTimer.current)} onPointerLeave={leaveAddMenu}>
-        <div id={addMenuId} className="home-context-menu" role="menu" aria-label="添加菜单" onKeyDown={event => {
+        <div id={addMenuId} className="dropdown-panel page-indicator-add-dropdown" role="menu" aria-label="添加菜单" onKeyDown={event => {
           if (event.key === 'Tab') { closeAddMenu(); addButtonRef.current?.focus(); return; }
           if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
           event.preventDefault();
@@ -730,12 +731,12 @@ export function PageIndicator({
           const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : (index + (event.key === 'ArrowDown' ? 1 : buttons.length - 1)) % buttons.length;
           buttons[next]?.focus();
         }}>
-          {onAddPage && <button type="button" role="menuitem" disabled={pages.length >= 20} title={pages.length >= 20 ? '最多可添加 20 个看板' : undefined} onClick={beginAddPage}><FilePlus2 size={16} aria-hidden="true" />添加看板</button>}
+          {onAddPage && <button type="button" role="menuitem" disabled={pages.length >= 20} title={pages.length >= 20 ? '最多可添加 20 个看板' : undefined} onClick={beginAddPage}><span className="dropdown-item-content"><span className="iconfont icon-jiahao" aria-hidden="true" />添加看板</span></button>}
           {onAdd && <button type="button" role="menuitem" onClick={() => {
             closeAddMenu();
             addButtonRef.current?.focus({ preventScroll: true });
             onAdd();
-          }}><LayoutGrid size={16} aria-hidden="true" />添加组件</button>}
+          }}><span className="dropdown-item-content"><span className="iconfont icon-jianchakongzhiban" aria-hidden="true" />添加组件</span></button>}
         </div>
       </div>}
 

@@ -81,12 +81,13 @@ export const officialWallpaperIds = new Set(officialWallpapers.map(item => item.
 export const bundledWallpaperIds = new Set([...bundledWallpapers, ...retiredOfficialWallpapers].map(item => item.id));
 export const isOfficialWallpaperTheme = id => officialWallpaperIds.has(id);
 
-// Release builds keep large MP4 files outside the embedded frontend archive so
-// WebKit can request byte ranges. Development keeps Vite's existing URLs.
+// Release builds keep wallpaper media outside the embedded frontend archive.
+// MP4s need byte ranges, while previews use the same resource origin so WebKit
+// does not have to resolve gallery images through the frontend protocol.
 export async function prepareOfficialWallpaperMedia() {
   if (import.meta.env.DEV || !isTauri()) return;
-  const videos = [...bundledWallpapers, ...retiredOfficialWallpapers]
-    .filter(item => item.mimeType.startsWith('video/'));
+  const wallpapers = [...bundledWallpapers, ...retiredOfficialWallpapers];
+  const videos = wallpapers.filter(item => item.mimeType.startsWith('video/'));
   const resolved = await Promise.all(videos.map(async item => {
     const source = new URL(item.url, window.location.origin);
     const file = source.pathname.slice(source.pathname.lastIndexOf('/') + 1);
@@ -94,4 +95,14 @@ export async function prepareOfficialWallpaperMedia() {
     return [item, `${convertFileSrc(path)}${source.search}`];
   }));
   for (const [item, url] of resolved) item.url = url;
+  const previews = await Promise.all(wallpapers.map(async item => {
+    const source = new URL(item.preview, window.location.origin);
+    const file = source.pathname.slice(source.pathname.lastIndexOf('/') + 1);
+    const path = await resolveResource(`wallpapers/official/previews/${file}`);
+    return [item, convertFileSrc(path)];
+  }));
+  for (const [item, url] of previews) {
+    item.preview = url;
+    if (item.posterUrl) item.posterUrl = url;
+  }
 }

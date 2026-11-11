@@ -218,7 +218,7 @@
 .tb-composer-error { margin: 0; color: var(--nine-color-danger-text); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
 
 /* Shared dropdown anatomy from MasterGo 54:04453 / 54:04474. */
-.tb-dropdown-search { display: flex; flex: 0 0 auto; align-items: center; gap: var(--nine-space-xs); min-height: 36px; margin: var(--nine-space-xxs) var(--nine-space-xxs) calc(var(--spacing-base) * 1.5); padding: 0 var(--nine-space-xs); border: 0; border-radius: 10px; background: transparent; box-shadow: inset 0 0 0 1px var(--nine-color-border-alpha-regular); color: var(--nine-color-text-disabled); }
+.tb-dropdown-search { display: flex; flex: 0 0 32px; align-items: center; gap: var(--nine-space-xs); height: 32px; min-height: 32px; margin: 0; padding: 0 var(--nine-space-xs); border: 0; border-radius: 10px; background: transparent; box-shadow: inset 0 0 0 1px var(--nine-color-border-alpha-regular); color: var(--nine-color-text-disabled); }
 .tb-dropdown-search:focus-within { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .4); }
 :scope[data-theme='dark'] .tb-dropdown-search:focus-within { box-shadow:inset 0 0 0 1px rgba(255,255,255,.4); }
 .tb-dropdown-search > svg { flex: 0 0 16px; width: 16px; height: 16px; }

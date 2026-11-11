@@ -21,11 +21,24 @@ import WindowToolbar, { BookmarksRow } from './browser/BrowserToolbar';
 import SpaceMenu from './browser/SpaceMenu';
 import HorizontalTabs from './browser/HorizontalTabs';
 import { VerticalSidebar, VerticalTabPreview } from './browser/VerticalTabs';
-import { SPACE_TABS, spaceTabLayouts, sampleSpace, initialSpaceTab, isTabGroup } from './browser/tabs-data';
+import { BOOKMARKS_TAB_ID, SPACE_TABS, spaceTabLayouts, sampleSpace, initialSpaceTab, isTabGroup } from './browser/tabs-data';
 import type { Mode } from './browser/types';
+import WorkspaceBookmarksPage from './personalized-home-2-0/ai-workspace/bookmarks/WorkspaceBookmarksPage';
 
 const NewTabPage = memo(function NewTabPage({ hostActive }: { hostActive:boolean }) {
   return <PersonalizedHome hostActive={hostActive}/>;
+});
+
+const InternalBookmarksPage = memo(function InternalBookmarksPage() {
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.mode || 'light');
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const sync = () => setTheme(root.dataset.mode || 'light');
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes:true, attributeFilter:['data-mode'] });
+    return () => observer.disconnect();
+  }, []);
+  return <section className="personalized-home bookmark-internal-page" data-theme={theme}><WorkspaceBookmarksPage embedded/></section>;
 });
 
 function BrowserContent({ children, isNewTab }: { children:React.ReactNode; isNewTab:boolean }) {
@@ -93,6 +106,11 @@ function App() {
   const isNewTab = !activeTab || activeTab === "new" || activeTab.endsWith(":new") || /^[a-f0-9]{8}-/i.test(activeTab);
   const setActiveTab = (id: string) => setActiveTabs((current) => ({ ...current, [selectedSpace]: id }));
   const setVerticalActiveTab = useCallback((spaceId:number, id:string) => setActiveTabs((current) => ({ ...current, [spaceId]:id })), []);
+  useEffect(() => {
+    const openWorkspace = () => setActiveTabs(current => ({ ...current, [selectedSpace]:"new" }));
+    window.addEventListener("tabbit-open-ai-workspace", openWorkspace);
+    return () => window.removeEventListener("tabbit-open-ai-workspace", openWorkspace);
+  }, [selectedSpace]);
   const [menuOpen, setMenuOpen] = useState(false);
   const showSpaceMenu = () => setMenuOpen((open) => !open);
   useEffect(() => {
@@ -132,7 +150,7 @@ function App() {
       <section className="group-page">
         <h1><span className="collapsed-group-dot" style={{ background:savedGroup?.color ?? seedGroup?.color }}/>{savedGroup?.label ?? seedGroup?.label}</h1>
       </section>
-    ) : <section className="website-demo-page"/>}
+    ) : activeTab === BOOKMARKS_TAB_ID ? <InternalBookmarksPage/> : <section className="website-demo-page"/>}
   </BrowserContent>;
 
   const verticalControls = <div className="vertical-topbar-controls">
@@ -177,7 +195,7 @@ function App() {
                 <div className="vertical-sidebar-stack">
                   {visibleSpaceIds.map(id => (
                     <div key={id} className="vertical-space-sidebar-layer" hidden={id !== selectedSpace} inert={id !== selectedSpace}>
-                      <VerticalSidebar spaceId={id} activeTab={activeTabs[id] ?? initialSpaceTab(id)} onTab={setVerticalActiveTab} collapsed={verticalCollapsed}/>
+                      <VerticalSidebar spaceId={id} activeTab={activeTabs[id] ?? initialSpaceTab(id)} onTab={setVerticalActiveTab} collapsed={verticalCollapsed} active={id === selectedSpace}/>
                     </div>
                   ))}
                 </div>

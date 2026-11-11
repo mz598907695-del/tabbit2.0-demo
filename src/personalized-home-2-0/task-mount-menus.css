@@ -1,5 +1,6 @@
 @scope (.personalized-home) {
 .tb-project-picker { min-width: 0; }
+.tb-project-picker:has(> .tb-dropdown-search) { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
 .tb-project-count { font-variant-numeric: tabular-nums; font-size: 11px; }
 .tb-project-recents { padding-block: 2px; }
 .tb-mount-project-options { display: flex; flex-direction: column; gap: 2px; max-height: 192px; overflow-y: auto; overscroll-behavior: contain; }
@@ -40,6 +41,7 @@
 .tb-mount-runtime-copy strong { font-size: 14px; font-weight: 400; line-height: 24px; }
 .tb-mount-runtime-copy small { color: var(--muted, #858a92); font-size: 12px; line-height: 18px; }
 .tb-composer-menu-row.tb-mount-runtime-choice > svg { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 4px; color: var(--muted, #858a92); }
+.tb-composer-menu-row.tb-mount-runtime-choice > .tb-mount-choice-check { color:var(--accent, var(--nine-color-action-primary)); }
 :scope[data-theme='dark'] .tb-mount-project-create input[aria-invalid='true'] { border-color: #f08c8c; }
 :scope[data-theme='dark'] .tb-project-text-button.is-destructive { color: #f08c8c; }
 @media (hover: hover) {

@@ -1,5 +1,5 @@
 /* Shared foundation for all dropdown panels. Business classes only place/size them. */
-.dropdown-panel, .dropdown-surface {
+.dropdown-panel, .dropdown-surface, .home-context-menu {
   --dropdown-radius: 12px;
   --dropdown-padding: 4px;
   display: flex;
@@ -14,19 +14,19 @@
   background: var(--nine-color-fill-floating);
   backdrop-filter: blur(30px) saturate(100%);
   -webkit-backdrop-filter: blur(30px) saturate(100%);
-  box-shadow: 0px 0px 0px 0.5px rgba(0, 0, 0, 0.1), 0px 4px 12px 0px rgba(0, 0, 0, 0.06), 0px -1px 2px 0px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.15), 0 8px 16px 0 rgba(0, 0, 0, 0.16), 0 -1px 2px 0 rgba(0, 0, 0, 0.04);
   animation: dropdown-appear var(--nine-motion-duration-fast) var(--nine-motion-easing-standard);
   -webkit-user-select: none;
   user-select: none;
 }
-[data-mode="dark"] :is(.dropdown-panel, .dropdown-surface) {
+[data-mode="dark"] :is(.dropdown-panel, .dropdown-surface, .home-context-menu) {
   background:rgba(40,40,40,.85);
   box-shadow:0 0 0 .5px rgba(255,255,255,.2) inset,0 4px 12px 0 rgba(0,0,0,.3),0 -1px 2px 0 rgba(0,0,0,.3);
   outline:1px solid rgba(0,0,0,.5);
   outline-offset:0;
 }
-.dropdown-panel > * { flex-shrink: 0; }
-.dropdown-heading {
+.dropdown-panel > *, .home-context-menu > * { flex-shrink: 0; }
+.dropdown-heading, .home-menu-heading {
   min-height: 24px;
   margin: 0;
   padding: 4px 8px 0;
@@ -35,7 +35,7 @@
   font-weight: 400;
   line-height: var(--nine-font-line-height-12);
 }
-.dropdown-panel > button, .aiw-content .dropdown-panel > button {
+.dropdown-panel > button, .aiw-content .dropdown-panel > button, .home-context-menu > :is(button,a[role="menuitem"]) {
   display: flex; align-items: center; justify-content: space-between; gap: 4px;
   width: 100%; height: 32px; min-height: 32px; padding: 0 8px;
   border: 0; border-radius: 10px;
@@ -44,19 +44,22 @@
   text-align: left;
   transition: background-color var(--nine-motion-duration-fast) var(--nine-motion-easing-standard);
 }
-.dropdown-panel > button:hover, .dropdown-panel > button:focus-visible { outline: none; background: var(--nine-color-fill-layer-strong); }
+.home-context-menu > :is(button,a[role="menuitem"]) { justify-content:flex-start; gap:8px; }
+.dropdown-panel > button:hover, .dropdown-panel > button:focus-visible,
+.home-context-menu > :is(button,a[role="menuitem"]):is(:hover,:focus-visible,[aria-expanded="true"]) { outline:none; background:var(--nine-color-fill-layer-strong); }
 .dropdown-panel > button:has(> .dropdown-shortcut) { padding-right: 5px; }
 .dropdown-item-content { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; }
 .dropdown-item-content > .iconfont { flex: 0 0 16px; width: 16px; font-size: 16px; }
 .dropdown-item-content > img { flex: 0 0 16px; width: 16px; height: 16px; }
 .dropdown-item-trailing { display: flex; align-items: center; flex: 0 0 auto; }
+:is(.dropdown-panel,.home-context-menu) > [aria-checked="true"] :is(.dropdown-item-trailing,.home-menu-trailing,.home-menu-check-slot) { color:var(--accent,var(--nine-color-action-primary)); }
 .dropdown-panel > button .menu-end { margin-left: auto; color: var(--nine-color-text-quaternary); font-size: 16px; }
-.dropdown-panel > button.danger { color: var(--nine-color-danger); }
+.dropdown-panel > button.danger, .home-context-menu > :is(button,a[role="menuitem"]).is-danger { color:var(--nine-color-danger); }
 .dropdown-divider-container { width: 100%; padding: 2px 8px; }
 .dropdown-divider { width: 100%; height: 0.5px; background: var(--nine-color-border-alpha-regular); }
 .dropdown-shortcut { display: flex; align-items: center; flex: 0 0 auto; gap: 4px; margin-left: auto; }
 .dropdown-shortcut kbd { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; padding: 0; border-radius: 6px; color: var(--nine-color-text-tertiary); background: var(--nine-color-fill-layer-muted); box-shadow: inset 0 0 0 .5px var(--nine-color-border-alpha-subtle), 0px 1px 0px 0px rgba(153,153,153,.2); font: 500 12px/1 var(--app-font-family); }
 @keyframes dropdown-appear { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
-@media (prefers-reduced-motion: reduce) { .dropdown-panel { animation: none; } }
+@media (prefers-reduced-motion: reduce) { :is(.dropdown-panel,.dropdown-surface,.home-context-menu) { animation:none; } }
 .embedded-menu-root { width: 230px; }
 .embedded-space-menu .space-menu { position: relative; inset: auto; width: 230px; max-height: none; overflow: visible; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; outline:none; border-radius: 0; animation: none; }

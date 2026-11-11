@@ -51,7 +51,6 @@
   --home-surface-elevation: none;
   --home-card-outline: 0;
   --home-card-resting-shadow: none;
-  --tile-hover-shadow: none;
 }
 /* Paint the light outline above the separate background plane. An inset
    shadow on the parent is underneath its positioned background child. */
@@ -115,7 +114,7 @@
 }
 @media (hover: hover) {
   :scope[data-theme] .home .workspace-board .board-item:not(.is-dragging):hover .board-card {
-    box-shadow: var(--home-surface-elevation);
+    box-shadow: var(--tile-hover-shadow);
   }
 }
 :scope[data-theme] .home .workspace-board .board-item.is-dragging .board-card { box-shadow: none; }

@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ArrowDownUp, ArrowRight, Check, ChevronLeft, ChevronRight, ListFilter, Plus, Search } from '../icons';
+import { ArrowRight, Check, ChevronLeft, ChevronRight, Lightbulb, ListFilter, OutputSort, Plus, Search } from '../icons';
 import { UserRound } from 'lucide-react';
 import DropdownPanel from '../../DropdownPanel';
 import OfficialSkills from './OfficialSkills';
@@ -36,6 +36,7 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
   function toggleConnector(id) { setAddedConnectors(current => current.includes(id) ? current.filter(value => value !== id) : [...current, id]); }
   useEffect(() => {
     if (!sortOpen) return;
+    sortRef.current?.querySelector('[aria-checked="true"]')?.focus();
     const outside = event => { if (!sortRef.current?.contains(event.target)) setSortOpen(false); };
     document.addEventListener('pointerdown', outside);
     return () => document.removeEventListener('pointerdown', outside);
@@ -173,7 +174,7 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
       </div></header>
       <div className="aiws-toolbar">
         <div className="aiws-toolbar-navigation">
-        <SegmentedControl className="aiws-resource-switch" label="内容类型" value={resource} controlsId="aiws-panel" onChange={switchResource} options={[{value:'skills',label:'妙招'},{value:'connectors',label:'连接器'}]}/>
+        <SegmentedControl className="aiws-resource-switch" label="内容类型" value={resource} controlsId="aiws-panel" onChange={switchResource} options={[{value:'skills',label:'妙招',Icon:Lightbulb},{value:'connectors',label:'连接器',iconClass:'icon-badiaodianyuanchatou'}]}/>
         {!isConnector && <><span className="aiws-toolbar-divider" aria-hidden="true"/>
         <div className="aiws-segments" role="tablist" aria-label={`${resourceLabel}范围`} onKeyDown={arrowKeys}>{[['discover','发现','zhinanzhen'],['mine','我的','ren']].map(([value,label,icon]) => <button key={value} role="tab" id={`aiws-scope-${value}`} aria-controls="aiws-panel" aria-selected={scope===value} tabIndex={scope===value?0:-1} onClick={() => switchScope(value)}><span className={`iconfont icon-${icon}`} aria-hidden="true"/><span className="aiws-tab-label">{label}</span></button>)}</div></>}
         </div>
@@ -185,9 +186,14 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
           {!isConnector && <div className="aiws-filter" ref={filterRef}><button ref={filterButton} className="aiwp-icon-button" aria-label="筛选妙招类型" title="筛选妙招类型" aria-haspopup="true" aria-expanded={filterOpen} aria-pressed={ui.kind!=='all'} onClick={() => { setFilterOpen(!filterOpen); setSortOpen(false); }}><ListFilter size={16}/></button>
             {filterOpen && <DropdownPanel className="aiws-filter-popover" label="类型筛选" onClose={() => {setFilterOpen(false);filterButton.current?.focus();}}><h2 className="dropdown-heading">类型</h2>{SKILL_TYPES.map(([value,label]) => <button key={value} aria-pressed={ui.kind===value} onClick={() => {setUI({kind:value});setFilterOpen(false);filterButton.current?.focus();}}><span>{label}</span><span className="dropdown-item-trailing" aria-hidden="true">{ui.kind===value && <Check size={16}/>}</span></button>)}</DropdownPanel>}
           </div>}
-          <div className="aiws-filter" ref={sortRef}>
-            <button ref={sortButton} type="button" className="aiwp-icon-button" aria-label={`排序：${sort === 'hot' ? '最热' : '最新'}`} title={`排序：${sort === 'hot' ? '最热' : '最新'}`} aria-haspopup="true" aria-expanded={sortOpen} onClick={() => { setSortOpen(!sortOpen); setFilterOpen(false); }}><ArrowDownUp size={16}/></button>
-            {sortOpen && <DropdownPanel className="aiws-filter-popover" label="排序方式" onClose={() => {setSortOpen(false);sortButton.current?.focus();}}>{[['latest','最新'],['hot','最热']].map(([value,label]) => <button type="button" key={value} aria-pressed={sort === value} onClick={() => { setUI({skillSort:value}); setSortOpen(false); sortButton.current?.focus(); }}><span>{label}</span><span className="dropdown-item-trailing" aria-hidden="true">{sort === value && <Check size={16}/>}</span></button>)}</DropdownPanel>}
+          <div className="aiwp-sort-control" ref={sortRef} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setSortOpen(false); }} onKeyDown={event => { if (event.key === 'Escape' && sortOpen) { event.stopPropagation(); setSortOpen(false); sortButton.current?.focus(); } }}>
+            <button ref={sortButton} type="button" className="aiwp-icon-button" aria-label={`妙招排序方式`} title={`排序：${sort === 'hot' ? '最热' : '最新'}`} aria-haspopup="menu" aria-expanded={sortOpen} aria-pressed={sort !== 'latest'} onClick={() => { setSortOpen(!sortOpen); setFilterOpen(false); }}><OutputSort size={16}/></button>
+            {sortOpen && <div className="aiwp-sort-menu dropdown-panel" role="menu" aria-label="妙招排序" onKeyDown={event => {
+              const buttons = [...event.currentTarget.querySelectorAll('button')];
+              const index = buttons.indexOf(document.activeElement);
+              const next = event.key === 'ArrowDown' ? (index + 1) % buttons.length : event.key === 'ArrowUp' ? (index - 1 + buttons.length) % buttons.length : event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : undefined;
+              if (next !== undefined) { event.preventDefault(); buttons[next].focus(); }
+            }}><h2 className="dropdown-heading">排序</h2>{[['latest','最新'],['hot','最热']].map(([value,label]) => <button type="button" key={value} role="menuitemradio" aria-checked={sort === value} onClick={() => { setUI({skillSort:value}); setSortOpen(false); sortButton.current?.focus(); }}><span>{label}</span><span className="dropdown-item-trailing">{sort === value && <Check size={16}/>}</span></button>)}</div>}
           </div>
         </div>
       </div>

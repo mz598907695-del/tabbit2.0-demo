@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import DropdownPanel from '../DropdownPanel';
 import { IconFont, TabFavicon } from './BrowserIcons';
 import { SpaceContainer } from './SpaceMenu';
-import { BRAND_GROUP_ID, GROUP_DIVIDER_SPACE, SPACE_TABS, spaceTabLayouts, initialSpaceTabs, isTabGroup, type DemoGroup } from './tabs-data';
+import { BRAND_GROUP_ID, GROUP_DIVIDER_SPACE, INTERNAL_TAB_EVENT, SPACE_TABS, spaceTabLayouts, initialSpaceTabs, internalTabTitle, isTabGroup, type DemoGroup } from './tabs-data';
+import { Check } from '../personalized-home-2-0/icons';
 
 function CollapsedBrandContent({ expanded = false, onToggle, label = "品牌资源", color = "var(--color-orange-4)" }: { expanded?: boolean; onToggle?: () => void; label?: string; color?: string }) {
   const arrow = <IconFont name="jiantou-v-xiangyou"/>;
@@ -58,7 +59,7 @@ function HorizontalTabContents({ selectedTab, setSelectedTab, spaceId, active }:
   const brandTabs = useMemo(() => Object.values(tabGroups).flatMap((group) => group.tabs), [tabGroups]);
   const updateGroup = (id: string, update: (group: DemoGroup) => DemoGroup) => setTabGroups((current) => ({ ...current, [id]: update(current[id]) }));
   const tabTitles = useRef<Record<string, string>>(Object.fromEntries([...Object.values(seed.groups).flatMap((group) => group.tabs), ...seed.loose].map((tab) => [tab.id, tab.title])));
-  const titleFor = (id: string) => tabTitles.current[id] ?? "New Tab";
+  const titleFor = (id: string) => internalTabTitle(id) ?? tabTitles.current[id] ?? "New Tab";
   const [groupDropTarget, setGroupDropTarget] = useState(false);
   const [attachmentGroup, setAttachmentGroup] = useState<string | null>(null);
   const [groupAttachment, setGroupAttachment] = useState({ left: 0, right: 0 });
@@ -301,6 +302,20 @@ function HorizontalTabContents({ selectedTab, setSelectedTab, spaceId, active }:
     setSelectedTab(id);
     window.dispatchEvent(new Event('tabbit-new-session'));
   };
+  useEffect(() => {
+    if (!active) return;
+    const openInternalTab = (event: Event) => {
+      const { id, title } = (event as CustomEvent<{ id:string; title:string }>).detail;
+      if (!id) return;
+      tabTitles.current[id] = title || internalTabTitle(id) || "New Tab";
+      setClosingLayout(false);
+      setTabs((current) => current.includes(id) ? current : [...current, id]);
+      setEnteringTabs((current) => current.has(id) ? current : new Set(current).add(id));
+      setSelectedTab(id);
+    };
+    window.addEventListener(INTERNAL_TAB_EVENT, openInternalTab);
+    return () => window.removeEventListener(INTERNAL_TAB_EVENT, openInternalTab);
+  }, [active, setSelectedTab]);
   const closeTab = (id: string) => {
     if (isTabGroup(id)) {
       const firstTab = tabGroups[id]?.tabs[0];
@@ -384,7 +399,7 @@ function HorizontalTabContents({ selectedTab, setSelectedTab, spaceId, active }:
       </div>
       <button className="add-tab" aria-label="新标签页" onClick={addTab}><IconFont name="jiahao"/></button>
     </div><button className="window-chevron" aria-label="所有标签页" aria-expanded={listOpen} onClick={() => setListOpen((open) => !open)}><IconFont name="jiantou-v-xiangxia"/></button>
-    {listOpen && <><div className="tab-list-dismiss" onClick={() => setListOpen(false)}/><DropdownPanel className="tab-list-panel" label="所有标签页" onClose={() => setListOpen(false)}><div className="tab-list-heading">所有标签页 <span>{normalTabs.length}</span></div>{normalTabs.map((id, index) => <button key={id} className={selectedTab === id ? "selected" : ""} onClick={() => { setSelectedTab(id); setListOpen(false); }}><TabFavicon id={id} className="tab-list-icon"/><span>{titleFor(id)}</span><span className="tab-list-number">{index + 1}</span>{selectedTab === id && <span>✓</span>}</button>)}</DropdownPanel></>}
+    {listOpen && <><div className="tab-list-dismiss" onClick={() => setListOpen(false)}/><DropdownPanel className="tab-list-panel" label="所有标签页" onClose={() => setListOpen(false)}><div className="tab-list-heading dropdown-heading">所有标签页 <span>{normalTabs.length}</span></div>{normalTabs.map((id, index) => <button key={id} className={selectedTab === id ? "selected" : ""} onClick={() => { setSelectedTab(id); setListOpen(false); }}><span className="dropdown-item-content"><TabFavicon id={id} className="tab-list-icon"/><span>{titleFor(id)}</span></span><span className="tab-list-number">{index + 1}</span><span className="dropdown-item-trailing">{selectedTab === id && <Check size={16}/>}</span></button>)}</DropdownPanel></>}
     {dragPreview && <div className={`tab-drag-preview ${draggedTab && isTabGroup(draggedTab) ? "group-drag-preview" : ""}`} style={dragPreview} aria-hidden="true">{draggedTab && isTabGroup(draggedTab) ? <CollapsedBrandContent label={tabGroups[draggedTab].label} color={tabGroups[draggedTab].color}/> : <><TabFavicon id={draggedTab ?? ""}/><span>{titleFor(draggedTab ?? "")}</span></>}</div>}
   </>;
 }

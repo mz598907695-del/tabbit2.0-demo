@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { X } from '../../icons';
 import { CircleHelp } from 'lucide-react';
+import '../../../styles/dropdown.css';
 
 export default function BookmarkHelp() {
   const panelRef = useRef(null), triggerRef = useRef(null);
@@ -16,7 +17,7 @@ export default function BookmarkHelp() {
   }
   return <>
     <button ref={triggerRef} className="bkm-icon bkm-help-trigger" aria-label="操作帮助" title="操作帮助" aria-haspopup="dialog" aria-controls="bookmark-help" onClick={toggle}><CircleHelp size={16}/></button>
-    <div ref={panelRef} id="bookmark-help" className="bkm-help-panel" popover="auto" role="dialog" aria-label="收藏操作帮助" onKeyDown={event => {
+    <div ref={panelRef} id="bookmark-help" className="bkm-help-panel dropdown-surface" popover="auto" role="dialog" aria-label="收藏操作帮助" onKeyDown={event => {
       if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
     }}>
       <div className="bkm-help-heading"><h3>操作帮助</h3><button className="bkm-icon" aria-label="关闭操作帮助" onClick={close}><X size={15}/></button></div>

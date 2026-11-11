@@ -8,7 +8,7 @@ const PANEL_HEIGHT = 460;
 const GAP = 8;
 const EDGE = 12;
 
-export default function WorkspaceNotificationsPopover({ anchor, initialEntry, onClose }) {
+export default function WorkspaceNotificationsPopover({ anchor, align = 'left', initialEntry, onClose }) {
   const panelRef = useRef(null);
   const [geometry, setGeometry] = useState(null);
   const position = useCallback(() => {
@@ -23,7 +23,8 @@ export default function WorkspaceNotificationsPopover({ anchor, initialEntry, on
     const side = viewBottom - EDGE - bounds.bottom - GAP >= height ? 'bottom' : 'top';
     const preferredTop = side === 'bottom' ? bounds.bottom + GAP : bounds.top - height - GAP;
     const top = Math.max(viewTop + EDGE, Math.min(viewBottom - EDGE - height, preferredTop));
-    const left = Math.max(viewLeft + EDGE, Math.min(viewRight - EDGE - width, bounds.left));
+    const preferredLeft = align === 'right' ? bounds.right - width : bounds.left;
+    const left = Math.max(viewLeft + EDGE, Math.min(viewRight - EDGE - width, preferredLeft));
     // Native popovers are in the top layer: fixed coordinates remain viewport-relative.
     // Older engines use the portal's containing block as a fallback.
     const containing = panel.showPopover && panel.matches(':popover-open') ? null : panel.offsetParent;
@@ -32,7 +33,7 @@ export default function WorkspaceNotificationsPopover({ anchor, initialEntry, on
     const y = top - (box ? box.top + containing.clientTop - containing.scrollTop : 0);
     setGeometry(current => current && current.left === x && current.top === y && current.width === width && current.height === height && current.side === side
       ? current : { left:x, top:y, width, height, side });
-  }, [anchor, onClose]);
+  }, [align, anchor, onClose]);
 
   useLayoutEffect(() => {
     const panel = panelRef.current;

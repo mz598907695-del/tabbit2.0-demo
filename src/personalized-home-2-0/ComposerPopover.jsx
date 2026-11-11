@@ -11,6 +11,7 @@ function focusBesideTrigger(trigger, direction) {
 
 export default function ComposerPopover({ anchor, kind, id, label, width, maxHeight, onClose, children, closing = false }) {
   const layerRef = useRef(null);
+  const naturalHeightRef = useRef(0);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   const [geometry, setGeometry] = useState(null);
@@ -21,10 +22,11 @@ export default function ComposerPopover({ anchor, kind, id, label, width, maxHei
     if (!layer || !anchor?.isConnected) return;
     const viewport = window.visualViewport;
     const dialogBounds = anchor.closest('dialog')?.getBoundingClientRect();
-    const viewLeft = Math.max(viewport?.offsetLeft || 0, dialogBounds?.left || 0);
-    const viewTop = Math.max(viewport?.offsetTop || 0, dialogBounds?.top || 0);
-    const viewRight = Math.min((viewport?.offsetLeft || 0) + (viewport?.width || window.innerWidth), dialogBounds?.right ?? Infinity);
-    const viewBottom = Math.min((viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight), dialogBounds?.bottom ?? Infinity);
+    const contentBounds = anchor.closest('.browser-content-row')?.getBoundingClientRect();
+    const viewLeft = Math.max(viewport?.offsetLeft || 0, dialogBounds?.left || 0, contentBounds?.left || 0);
+    const viewTop = Math.max(viewport?.offsetTop || 0, dialogBounds?.top || 0, contentBounds?.top || 0);
+    const viewRight = Math.min((viewport?.offsetLeft || 0) + (viewport?.width || window.innerWidth), dialogBounds?.right ?? Infinity, contentBounds?.right ?? Infinity);
+    const viewBottom = Math.min((viewport?.offsetTop || 0) + (viewport?.height || window.innerHeight), dialogBounds?.bottom ?? Infinity, contentBounds?.bottom ?? Infinity);
     const viewWidth = viewRight - viewLeft;
     const viewHeight = viewBottom - viewTop;
     const triggerBounds = anchor.getBoundingClientRect();
@@ -32,12 +34,19 @@ export default function ComposerPopover({ anchor, kind, id, label, width, maxHei
     const layerWidth = Math.min(width, Math.max(0, viewWidth - 24));
     const above = Math.max(0, bounds.top - viewTop - 20);
     const below = Math.max(0, viewTop + viewHeight - bounds.bottom - 20);
-    const desiredHeight = Math.min(maxHeight, layer.scrollHeight + 2);
-    // Prefer below only when the full menu fits; otherwise flip above instead
-    // of opening a clipped menu that happens to have a few rows of room.
-    const side = below >= desiredHeight ? 'bottom' : 'top';
+    // Keep placement decisions based on the menu's unconstrained height. Once
+    // the menu is clamped, its flex layout can report the clamped scrollHeight;
+    // feeding that value back into placement makes a boundary-sized viewport
+    // alternate forever between opening above and below the trigger.
+    naturalHeightRef.current = Math.max(naturalHeightRef.current, layer.scrollHeight + 2);
+    const desiredHeight = Math.min(maxHeight, naturalHeightRef.current);
+    // Prefer opening below whenever it can still provide a useful menu. Tall
+    // menus scroll internally; only flip above when the space below is too
+    // shallow to keep the search/header and a few choices usable.
+    const minimumUsableHeight = Math.min(desiredHeight, 180);
+    const side = below >= minimumUsableHeight ? 'bottom' : 'top';
     const height = Math.min(maxHeight, Math.max(0, viewHeight - 24), side === 'bottom' ? below : above);
-    const left = Math.min(viewLeft + viewWidth - layerWidth - 12, Math.max(viewLeft + 12, ['runtime', 'approval'].includes(kind) ? bounds.right - layerWidth : bounds.left));
+    const left = Math.min(viewLeft + viewWidth - layerWidth - 12, Math.max(viewLeft + 12, ['model', 'runtime', 'approval'].includes(kind) ? bounds.right - layerWidth : bounds.left));
     const shownHeight = Math.min(desiredHeight, height);
     const preferredTop = side === 'bottom' ? bounds.bottom + 8 : bounds.top - shownHeight - 8;
     const top = Math.min(viewTop + viewHeight - shownHeight - 12, Math.max(viewTop + 12, preferredTop));

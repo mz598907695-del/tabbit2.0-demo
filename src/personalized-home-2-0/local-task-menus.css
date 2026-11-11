@@ -1,24 +1,9 @@
 @scope (.personalized-home) {
-.tb-composer-menu-row.tb-local-task-choice { flex-shrink: 0; align-items: flex-start; gap: 8px; min-height: 54px; padding: 6px 8px; border-radius: 8px; }
-.tb-local-task-choice + .tb-local-task-choice { margin-top: 2px; }
-.tb-composer-popover .tb-composer-menu-row.tb-local-task-choice > .tb-local-task-symbol { display: grid; flex: 0 0 16px; place-items: center; width: 16px; height: 16px; margin-top: 4px; color: var(--muted, #858a92); }
-.tb-local-task-symbol > svg { width: 16px; height: 16px; }
-.tb-composer-popover .tb-composer-menu-row.tb-local-task-choice > .tb-local-task-copy { display: flex; flex-direction: column; gap: 0; overflow: hidden; white-space: normal; }
-.tb-local-task-copy strong { overflow: hidden; color: var(--text, #202124); font-size: 14px; font-weight: 400; line-height: 24px; text-overflow: ellipsis; white-space: nowrap; }
-.tb-local-task-copy small { color: var(--muted, #858a92); font-size: 12px; line-height: 18px; overflow-wrap: anywhere; }
-.tb-local-task-choice[aria-checked='true'] { background: var(--hover, #f4f4f5); }
-.tb-composer-popover .tb-local-task-choice[aria-checked='true'] > .tb-local-task-symbol { color: var(--text, #202124); }
-.tb-local-task-choice .tb-local-task-check { flex: 0 0 16px; width: 16px; height: 16px; margin-top: 4px; color: var(--text, #202124); visibility: hidden; }
-.tb-local-task-choice .tb-local-task-check[data-selected='true'] { visibility: visible; }
-
 .tb-local-task-trigger.is-full-access,
-.tb-composer-approval-menu .is-full-access { --full-access-color: #d14343; }
-:scope[data-theme='dark'] .tb-local-task-trigger.is-full-access,
-:scope[data-theme='dark'] .tb-composer-approval-menu .is-full-access { --full-access-color: #f18383; }
+.tb-composer-approval-menu .is-full-access { --full-access-color: var(--color-red-5); }
 .tb-task-mount .tb-local-task-trigger.is-full-access,
 .tb-local-task-trigger.is-full-access > .tb-local-task-chevron,
-.tb-composer-approval-menu .tb-local-task-choice.is-full-access > .tb-local-task-symbol,
-.tb-composer-approval-menu .is-full-access .tb-local-task-copy strong,
-.tb-composer-approval-menu .is-full-access .tb-local-task-check { color: var(--full-access-color); }
+.tb-composer-approval-menu .tb-local-task-choice.is-full-access > svg:first-child,
+.tb-composer-approval-menu .is-full-access .tb-mount-runtime-copy strong { color: var(--full-access-color); }
 
 }

@@ -8,7 +8,7 @@ import { useVisibilityMotion } from '../useVisibilityMotion';
 import { getHomeRoot } from "../home-host";
 import { createPortal } from 'react-dom';
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Plus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, FilePlus2, LayoutGrid, PanelTop, Check, Undo2, Redo2 } from "../icons";
+import { Plus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, PanelTop, Check, Undo2, Redo2 } from "../icons";
 import WidgetCard, { widgetCatalog } from './WidgetCards';
 import BoardItem from './BoardItem';
 import { boardItemName as itemName } from './BoardItemContent';
@@ -19,12 +19,66 @@ import { boardAlignmentOffset, boardDragPosition, boardResizeMaxWidth } from './
 import { normalizeWidgetSize } from './widget-size';
 import { normalizeShortcutSize, SHORTCUT_SIZE_PRESETS } from './shortcut-size';
 import useBatchEditJiggle from './useBatchEditJiggle';
-import { addBoardItemToPage, updateBoardMeasurement, boardReadingOrder, gridProfile, layoutKey, projectPage, savePositions, patchBoardWidgetConfig } from './state';
+import { addBoardItemToPage, boardColumns, updateBoardMeasurement, boardReadingOrder, gridProfile, layoutKey, projectPage, savePositions, patchBoardWidgetConfig } from './state';
 import './workspace-board.css';
 import '../context-menu.css';
 
 const normalizeItemSize=(item,size,options)=>item.type==='shortcut'
   ? normalizeShortcutSize(size) : normalizeWidgetSize(size,options);
+
+const widgetDefaults = new Map(widgetCatalog.map(item => [item.kind, item.defaultSize || { w:2, h:2 }]));
+
+function organizeBoardItems(items, columns) {
+  const ordered=[...items].sort((a,b)=>a.y-b.y||a.x-b.x);
+  const shortcuts=ordered.filter(item=>item.type==='shortcut');
+  const arranged=[];
+  let y=0,index=0;
+  const shortcutRowCount=shortcuts.length?Math.max(1,Math.ceil(shortcuts.length/columns)):0;
+  const shortcutBaseCount=shortcutRowCount?Math.floor(shortcuts.length/shortcutRowCount):0;
+  const shortcutExtra=shortcutRowCount?shortcuts.length%shortcutRowCount:0;
+  for(let rowIndex=0;rowIndex<shortcutRowCount;rowIndex++){
+    const count=shortcutBaseCount+(rowIndex<shortcutExtra?1:0);
+    const row=shortcuts.slice(index,index+count);index+=count;
+    const baseWidth=Math.floor(columns/count);
+    let remaining=columns-baseWidth*count,x=0;
+    for(const item of row){
+      const addition=remaining>0?1:0;remaining-=addition;
+      const width=baseWidth+addition;
+      arranged.push({...item,x,y,w:width,h:1});x+=width;
+    }
+    y++;
+  }
+  const widgets=ordered.filter(item=>item.type==='widget').map(item=>{
+    const preferred=widgetDefaults.get(item.kind)||item.size||{w:2,h:2};
+    return {...item,w:Math.min(columns,Math.max(2,preferred.w)),h:Math.max(2,Math.min(4,preferred.h))};
+  });
+  if(!widgets.length)return arranged;
+  const idealPerRow=Math.max(1,Math.round(columns/4));
+  const minPerFullRow=Math.max(1,Math.ceil(columns/6));
+  const maxPerRow=Math.max(minPerFullRow,Math.floor(columns/3));
+  let rowCount=Math.max(1,Math.round(widgets.length/idealPerRow));
+  while(Math.ceil(widgets.length/rowCount)>maxPerRow)rowCount++;
+  while(rowCount>1&&Math.floor(widgets.length/rowCount)<minPerFullRow)rowCount--;
+  const baseCount=Math.floor(widgets.length/rowCount), extra=widgets.length%rowCount;
+  index=0;
+  for(let rowIndex=0;rowIndex<rowCount;rowIndex++){
+    const count=baseCount+(rowIndex<extra?1:0);
+    const row=widgets.slice(index,index+count);index+=count;
+    const height=Math.max(...row.map(item=>item.h));
+    const baseWidth=Math.floor(columns/count);
+    let remaining=columns-baseWidth*count;
+    for(const item of row){
+      const addition=remaining>0?1:0;
+      const width=baseWidth+addition;
+      remaining-=addition;
+      item.w=width;
+    }
+    let x=0;
+    for(const item of row){arranged.push({...item,x,y,h:height});x+=item.w;}
+    y+=height;
+  }
+  return arranged;
+}
 
 export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitializeLayoutOrder,onRenameGroup,onDeleteGroup,onTransfer,onPageContextMenu,onAddPage,showLabels,appearanceTheme,shortcutSize='medium',shortcutShape='circle',showEmptyHint=true,visible=true,active=true,onEditingChange,onGenerateWidget,editing=false,onEditModeChange,overlayBlocked=false,undo,redo,canUndo=false,canRedo=false}){
   const setEditing=value=>onEditModeChange?.(value);
@@ -137,10 +191,10 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
       node.style.top=`${Math.max(8,Math.min(menu.y,window.innerHeight-bounds.height-8))}px`;
     };
     reposition();
-    node.querySelector(':scope > button:not(:disabled)')?.focus({preventScroll:true});
+    if(menu.keyboard)node.querySelector(':scope > button:not(:disabled)')?.focus({preventScroll:true});
     window.addEventListener('resize',reposition);
     return()=>window.removeEventListener('resize',reposition);
-  },[Boolean(menu),menu?.id,menu?.x,menu?.y]);
+  },[Boolean(menu),menu?.id,menu?.x,menu?.y,menu?.keyboard]);
   useEffect(()=>{
     const onKey=e=>{
       if(!visible||!active||overlayBlocked)return;
@@ -219,6 +273,25 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     }
     else {onPageChange({...page,items:page.items.map(i=>i.id===editor.id?{...i,...value,service:value.label||i.service}:i)});setNotice('修改已保存');}
     setEditor(null);setEditorTargetId(null);restoreMenuFocus();return {ok:true};
+  };
+  const organizeLayout=(widthMode='standard')=>{
+    if(!page.items.length){setNotice('当前看板还没有可整理的内容');return;}
+    cancelDrag();setSelected(null);setMenu(null);setEditing(false);
+    // The settings sidebar can temporarily narrow the live board. Build against
+    // the requested closed-panel canvas so wide mode receives its full grid.
+    const viewport=Math.max(320,rootRef.current?.ownerDocument?.defaultView?.innerWidth||width);
+    const targetWidth=Math.min(widthMode==='wide'?1100:760,viewport-48);
+    const targetColumns=boardColumns(targetWidth,showLabels,page.preferredColumns);
+    const source=targetColumns===columns?display:projectPage(page,targetColumns,strategy,showLabels,mode,columns);
+    const arranged=organizeBoardItems(source,targetColumns);
+    const geometry=new Map(arranged.map(item=>[item.id,item]));
+    const items=page.items.map(item=>{
+      const tile=geometry.get(item.id);
+      return tile?{...item,size:{w:tile.w,h:tile.h}}:item;
+    });
+    const targetKey=layoutKey(strategy,showLabels,mode,targetColumns);
+    const next=savePositions({...page,items,layouts:{}},targetKey,arranged,{compact:false});
+    onPageChange(next);setNotice('已按内容自动整理，可以撤销');
   };
   const remove=item=>{
     const rest=placed.filter(i=>i.id!==item.id);
@@ -350,7 +423,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     const trigger=event.currentTarget instanceof HTMLElement?event.currentTarget:gridRef.current;
     menuTriggerRef.current=trigger.matches('a,button,[tabindex]')?trigger:trigger.querySelector('.shortcut')||trigger;
     const x=event.clientX||anchor.left, y=event.clientY||anchor.bottom;
-    setMenu({id:item?.id||null,x,y});
+    setMenu({id:item?.id||null,x,y,keyboard:event.type==='keydown'||(!event.clientX&&!event.clientY)});
   };
   const menuItem=page.items.find(i=>i.id===menu?.id);
   const changeMenuView=(view,keyboardSubmenu=false)=>setMenu(current=>!current||(current.view===view&&current.keyboardSubmenu===keyboardSubmenu)?current:{...current,view,keyboardSubmenu});
@@ -377,6 +450,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     stopEditing:finishEditing,
     renameGroup:()=>setEditor({type:'group',title:page.name}),
     deleteGroup:()=>{if(pages.length>1)setConfirm('group');},
+    organizeLayout,
   }));
   return <div ref={rootRef} hidden={!boardPresent} inert={!visible} aria-hidden={!visible || undefined} data-strategy={strategy} className={`workspace-board ${editing?'is-editing':''} ${showLabels?'':'labels-hidden'}`}>
     <div ref={pageMotion.outgoingRef} className="board-page-outgoing" aria-hidden="true" inert />
@@ -424,8 +498,8 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
         <button role="menuitem" onClick={()=>startEditing()}><ListChecks size={16} aria-hidden="true"/>批量编辑</button>
       </>}
       {!menuItem&&menu.view==='add'&&<ContextSubmenu parentRef={menuRef} anchorKey="add" label="添加" focusOnOpen={menu.keyboardSubmenu} onBack={()=>closeSubmenu(true)} onDismiss={()=>{setMenu(null);restoreMenuFocus();}}>
-        <button type="button" role="menuitem" disabled={!onAddPage||pages.length>=20} title={pages.length>=20?'最多可添加 20 个看板':undefined} onClick={()=>{setMenu(null);onAddPage?.();}}><FilePlus2 size={16} aria-hidden="true"/>添加看板</button>
-        <button type="button" role="menuitem" onClick={()=>{setLibrary(true);setMenu(null);}}><LayoutGrid size={16} aria-hidden="true"/>添加组件</button>
+        <button type="button" role="menuitem" disabled={!onAddPage||pages.length>=20} title={pages.length>=20?'最多可添加 20 个看板':undefined} onClick={()=>{setMenu(null);onAddPage?.();}}><span className="iconfont icon-jiahao" aria-hidden="true"/>添加看板</button>
+        <button type="button" role="menuitem" onClick={()=>{setLibrary(true);setMenu(null);}}><span className="iconfont icon-jianchakongzhiban" aria-hidden="true"/>添加组件</button>
       </ContextSubmenu>}
       {menuItem&&menu.view&&<ContextSubmenu key={menu.view} parentRef={menuRef} anchorKey={menu.view} label={menu.view==='itemSize'?'快捷方式大小':'移动到看板'} focusOnOpen={menu.keyboardSubmenu} onBack={()=>closeSubmenu(true)} onDismiss={()=>{setMenu(null);restoreMenuFocus();}}>
         {menu.view==='itemSize'?SHORTCUT_SIZE_PRESETS.map(size=><button key={size.id} type="button" role="menuitemradio" aria-checked={normalizeShortcutSize(menuItem.size).w===size.w} onClick={()=>{resize(menuItem,size);setMenu(null);restoreMenuFocus();}}><span className="home-menu-check-slot" aria-hidden="true">{normalizeShortcutSize(menuItem.size).w===size.w&&<Check size={16}/>}</span>{size.label}（1×{size.w}）</button>):pages.filter(entry=>entry.id!==page.id).map(entry=><button type="button" role="menuitem" key={entry.id} onClick={()=>transfer(menuItem,entry.id)}><PanelTop size={16} aria-hidden="true"/>移动到{entry.name}</button>)}

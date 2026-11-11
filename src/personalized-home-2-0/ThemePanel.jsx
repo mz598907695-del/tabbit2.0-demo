@@ -47,6 +47,7 @@ export function ThemePanel({
   onLargeTabRadius,
   pageWidth = 'standard',
   onPageWidth,
+  onAutoArrange,
   selectedAppIcon = 0,
   onAppIcon,
   onDefaultBrowserUnlock,
@@ -342,6 +343,11 @@ export function ThemePanel({
                 <input type="checkbox" checked={Boolean(showShortcuts)} onChange={event => onShortcuts?.(event.target.checked)} aria-label="显示快捷方式与小组件" />
                 <span className="overlay-toggle-track" aria-hidden="true" />
               </label>
+              <div className="overlay-layout-divider" aria-hidden="true" />
+              <div className="overlay-setting-row overlay-layout-action-row">
+                <span className="overlay-setting-label">一键整理卡片</span>
+                <button type="button" className="overlay-layout-text-action" disabled={!showShortcuts} onClick={onAutoArrange}>整理</button>
+              </div>
               <div className="overlay-layout-divider" aria-hidden="true" />
               <label className="overlay-setting-row overlay-toggle-row">
                 <span className="overlay-setting-label">活动卡片</span>

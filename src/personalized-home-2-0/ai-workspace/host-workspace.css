@@ -29,6 +29,7 @@
 .aiw-shell .aiw-launcher { color:var(--nine-color-text-title); }
 .session-nav-icon { display:inline-flex; align-items:center; justify-content:center; }
 .session-nav-icon svg { width:18px; height:18px; }
+.session-nav-icon > .iconfont { display:inline-grid; place-items:center; width:1em; height:1em; line-height:1; }
 .aiwc-icon>svg { width:18px; height:18px; }
 .aiwc-small-icon>svg { width:14px; height:14px; }
 /* Keep the sidebar mounted so the same motion can run in both directions. */

@@ -11,7 +11,10 @@
 }
 .tb-task-mount-controls { display: flex; align-items: center; gap: var(--nine-space-sm); min-width: 0; }
 .tb-task-mount-end { display: flex; flex: 0 0 auto; align-items: center; gap: var(--nine-space-xxs); }
-.tb-task-mount-end .tb-local-task-trigger { height: 24px; gap: 4px; padding-inline: 6px; font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); touch-action: manipulation; }
+.tb-task-mount-end .tb-local-task-trigger { height: 24px; gap: 4px; padding-inline: 6px; color:var(--nine-color-text-tertiary); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); touch-action: manipulation; }
+.tb-task-mount-end .tb-local-task-trigger > svg { flex-shrink:0; width:14px; height:14px; }
+.tb-task-mount-end .tb-local-task-trigger > .tb-local-task-chevron { width:12px; height:12px; transition:transform 160ms ease; }
+.tb-task-mount-end .tb-local-task-trigger[aria-expanded="true"] > .tb-local-task-chevron { transform:rotate(180deg); }
 .tb-task-mount-button {
   display: flex;
   align-items: center;
@@ -60,7 +63,7 @@
 /* The enclosing composer frame owns the backing material. */
 @media (hover: hover) {
   .tb-task-mount button:hover { background: rgb(from var(--nine-color-fill-layer-strong) r g b / 5%); color: var(--nine-color-text-title); }
-  .tb-task-runtime:hover { background: var(--nine-color-fill-layer-strong); }
+  :is(.tb-task-runtime, .tb-task-mount-end .tb-local-task-trigger):hover { background: var(--nine-color-fill-layer-strong); }
 }
 @container composer-controls (max-width: 430px) {
   .tb-task-mount { gap: var(--nine-space-xxs); }

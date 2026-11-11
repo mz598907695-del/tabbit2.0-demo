@@ -4,6 +4,9 @@ import { tabAddressFor } from '../tabAddresses';
 import profileAvatar from '../assets/profile-avatar.png';
 import { SpaceContext } from './SpaceContext';
 import { IconFont, SiteFavicon } from './BrowserIcons';
+import BrowserIdeasMenu from './BrowserIdeasMenu';
+import BrowserMoreMenu from './BrowserMoreMenu';
+import ProfileMenu from './ProfileMenu';
 
 const bookmarks: { label: string; folder?: boolean; site?: string }[] = [
   { label: "美团", folder: true }, { label: "个人收藏", folder: true },
@@ -15,6 +18,12 @@ export default function WindowToolbar({ isNewTab, tabId, leading, showBookmarks 
   const { selectedSpace } = useContext(SpaceContext);
   const addressKey = `${selectedSpace}:${tabId}`;
   const inputRef = useRef<HTMLInputElement>(null);
+  const profileButtonRef = useRef<HTMLButtonElement>(null);
+  const moreButtonRef = useRef<HTMLButtonElement>(null);
+  const ideasButtonRef = useRef<HTMLButtonElement>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [ideasOpen, setIdeasOpen] = useState(false);
 
   const addressDrag = useRef<{x:number; y:number} | null>(null);
   const addressWasDragged = useRef(false);
@@ -60,12 +69,15 @@ export default function WindowToolbar({ isNewTab, tabId, leading, showBookmarks 
       <div className="toolbar-actions address-actions-right" data-tauri-drag-region>
         <div className="toolbar-primary" data-tauri-drag-region>
           <button className="toolbar-icon-button" aria-label="应用"><IconFont name="xingzhuang_zhengfangxing_sanjiaoxing_yua"/></button>
-          <button className="toolbar-icon-button" aria-label="个人资料"><img className="toolbar-avatar" src={profileAvatar} alt="" draggable={false}/></button>
-          <button className="toolbar-icon-button" aria-label="更多"><IconFont name="dian_shenglvehao"/></button>
+          <button ref={profileButtonRef} className="toolbar-icon-button" aria-label="个人资料" aria-haspopup="dialog" aria-expanded={profileOpen} onClick={() => { setMoreOpen(false); setIdeasOpen(false); setProfileOpen(open => !open); }}><img className="toolbar-avatar" src={profileAvatar} alt="" draggable={false}/></button>
+          <button ref={moreButtonRef} className="toolbar-icon-button" aria-label="更多" aria-haspopup="menu" aria-expanded={moreOpen} onClick={() => { setProfileOpen(false); setIdeasOpen(false); setMoreOpen(open => !open); }}><IconFont name="dian_shenglvehao"/></button>
         </div>
-        <button className="toolbar-icon-button" aria-label="灵感"><IconFont name="dengpao_xiangfa"/></button>
+        <button ref={ideasButtonRef} className="toolbar-icon-button" aria-label="妙招" aria-haspopup="dialog" aria-expanded={ideasOpen} onClick={() => { setProfileOpen(false); setMoreOpen(false); setIdeasOpen(open => !open); }}><IconFont name="dengpao_xiangfa"/></button>
         <button className="chat-button"><span className="chat-button-icon" aria-hidden="true"/><span>Chat</span></button>
       </div>
+      {profileOpen && profileButtonRef.current && <ProfileMenu anchor={profileButtonRef.current} onClose={() => setProfileOpen(false)}/>}
+      {moreOpen && moreButtonRef.current && <BrowserMoreMenu anchor={moreButtonRef.current} onClose={() => setMoreOpen(false)}/>}
+      {ideasOpen && ideasButtonRef.current && <BrowserIdeasMenu anchor={ideasButtonRef.current} onClose={() => setIdeasOpen(false)}/>}
     </div>
     {showBookmarks && <BookmarksRow/>}
   </>;

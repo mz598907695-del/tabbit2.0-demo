@@ -3,11 +3,11 @@
 .aiwp-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; min-height:32px; margin-bottom:16px; }
 .aiwp-heading-copy { min-width:0; flex:none; }
 
-.aiw-content-files .aiwp-heading-copy { display:flex; flex-direction:column; flex:1; min-width:0; gap:4px; }
-.aiw-content-files .aiwp-heading h1 { font-size:var(--nine-font-size-24); line-height:var(--nine-font-line-height-24); font-weight:500; color:var(--nine-color-text-title); }
-.aiw-content-files .aiwp-heading-description { font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:400; color:var(--nine-color-text-tertiary); }
-.aiw-content-files .aiwp-heading-actions { flex:none; }
-.aiw-content-files .aiwp-primary { border-radius:10px; padding:4px 12px; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-heading-copy { display:flex; flex-direction:column; flex:1; min-width:0; gap:4px; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-heading h1 { font-size:var(--nine-font-size-24); line-height:var(--nine-font-line-height-24); font-weight:500; color:var(--nine-color-text-title); }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-heading-description { font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:400; color:var(--nine-color-text-tertiary); }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-heading-actions { flex:none; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-primary { border-radius:10px; padding:4px 12px; }
 
 .aiwp-heading h1 { font-size:24px; font-weight:500; line-height:32px; color:var(--aiwp-heading-color,var(--text)); white-space:nowrap; }
 .aiwp-heading-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; min-width:0; }
@@ -66,19 +66,20 @@
 }
 
 
-.aiw-content-files .aiwp-tabs { gap:4px; padding:0; margin:0; }
-.aiw-content-files .aiwp-tabs button { gap:4px; padding:4px 16px; border-radius:999px; font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:400; color:var(--nine-color-text-tertiary); }
-.aiw-content-files .aiwp-tabs button > svg { flex:none; width:16px; height:16px; }
-.aiw-content-files .aiwp-tabs button[aria-selected="true"] { background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-title); font-weight:500; }
-.aiw-content-files .aiwp-tabs button:hover { background:var(--nine-color-fill-layer-strong); }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-tabs { gap:4px; padding:0; margin:0; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-tabs button { gap:4px; padding:4px 16px; border-radius:999px; font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:400; color:var(--nine-color-text-tertiary); }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-tabs button > svg { flex:none; width:16px; height:16px; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-tabs button > .iconfont { display:inline-grid; place-items:center; flex:none; width:16px; height:16px; font-size:16px; line-height:16px; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-tabs button[aria-selected="true"] { background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-title); font-weight:500; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-tabs button:hover { background:var(--nine-color-fill-layer-strong); }
 
-.aiw-content-files .aiwp-toolbar-actions { gap:8px; }
+.aiw-content-files .aiwp-toolbar-actions,.aiw-content-shares .aiwp-toolbar-actions { gap:8px; }
 .aiw-content-files .aiwp-toolbar-divider { flex:none; width:.5px; height:16px; background:var(--nine-color-border-alpha-subtle); }
 .aiw-content-files .aiwp-views { gap:4px; margin:0; padding:0; }
 .aiw-content-files .aiwp-views .aiwp-icon-button { width:32px; height:32px; border-radius:999px; }
 .aiw-content-files .aiwp-views .aiwp-icon-button > svg { width:16px; height:16px; }
 
-.aiw-content-files .aiwp-sort-control > .aiwp-icon-button { width:32px; height:32px; border-radius:999px; }
-.aiw-content-files .aiwp-sort-control > .aiwp-icon-button > svg { width:16px; height:16px; }
-.aiw-content-files .aiwp-sort-control > .aiwp-icon-button:is(:hover,[aria-expanded="true"]) { background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-title); }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-sort-control > .aiwp-icon-button { width:32px; height:32px; border-radius:999px; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-sort-control > .aiwp-icon-button > svg { width:16px; height:16px; }
+:is(.aiw-content-files,.aiw-content-shares) .aiwp-sort-control > .aiwp-icon-button:is(:hover,[aria-expanded="true"]) { background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-title); }
 }

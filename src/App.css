@@ -164,11 +164,11 @@ svg { width: 17px; height: 17px; stroke-width: 1.9; }
 .window-chevron:hover { background: var(--color-fill-a3); }
 .tab-list-dismiss { position: fixed; inset: 40px 0 0; z-index: 19; }
 .tab-list-panel { position: absolute; top: 46px; right: 6px; z-index: 20; width: 280px; max-height: min(480px, calc(100vh - 64px)); overflow-y: auto; }
-.tab-list-heading { display: flex; justify-content: space-between; padding: 8px; font-size: 12px; color: var(--color-text-4); }
-.tab-list-panel > button { display: flex; align-items: center; gap: 8px; width: 100%; height: 36px; padding: 8px; border-radius: 8px; text-align: left; font-size: 12px; }
-.tab-list-panel > button:hover, .tab-list-panel > button.selected { background: var(--color-fill-a3); }
+.tab-list-heading { display:flex; justify-content:space-between; }
+.tab-list-panel > button.selected { background:var(--nine-color-fill-layer-strong); }
+.tab-list-panel > button.selected .dropdown-item-trailing { color:var(--accent,var(--nine-color-action-primary)); }
 .tab-list-panel :is(img,.tab-list-icon) { width: 16px; height: 16px; flex:0 0 16px; }
-.tab-list-number { margin-left: auto; color: var(--color-text-5); }
+.tab-list-number { margin-left:auto; color:var(--nine-color-text-quaternary); font-size:var(--nine-font-size-12); }
 .horizontal-group { display: flex; align-items: center; min-width: 0; gap: 5px; }
 .horizontal-group.open { padding: 1px; border-radius: var(--tab-radius); background: rgba(255,255,255,.22); }
 .group-chip { display: flex; align-items: center; gap: 6px; height: 30px; max-width: 132px; padding: 0 9px; white-space: nowrap; border: 1px solid rgba(80,90,110,.08); border-radius: var(--tab-radius); background: rgba(255,255,255,.3); font-size: 12px; font-weight: 500; }
@@ -199,6 +199,7 @@ html[data-mode="dark"] img[data-site="nio"] { content:url('/site-icons/nio-dark.
 html[data-mode="dark"] img[data-site="dji"] { content:url('/site-icons/dji-dark.png?v=414b06bf01be'); }
 html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pinterest-dark.png?v=c7b46dff682a'); }
 .new-tab-page-icon { display:block; background:var(--nine-color-text-title); -webkit-mask:url('./assets/new-tab.svg') center / contain no-repeat; mask:url('./assets/new-tab.svg') center / contain no-repeat; }
+.bookmark-tab-icon { color:var(--nine-color-text-title); }
 .tab-title { overflow: hidden; text-overflow: ellipsis; font-size: var(--font-size-12); }
 .horizontal-tab.active .tab-title, .brand-group-heading.active .tab-title { font-weight: 500; color: var(--color-text-1); }
 .group-page { min-height: 0; padding: 32px; }
@@ -218,6 +219,7 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
    intended translucent content tint. */
 .content-container.is-new-tab { border-radius: 0; background: transparent; box-shadow: none; -webkit-backdrop-filter:none; backdrop-filter:none; }
 .persistent-new-tab,.persistent-browser-page { flex:1; min-width:0; min-height:0; }
+.bookmark-internal-page { width:100%; height:100%; min-width:0; min-height:0; }
 .persistent-new-tab:not([hidden]) { display:flex; }
 .persistent-browser-page:not([hidden]) { display:flex; flex-direction:column; }
 .persistent-new-tab[hidden],.persistent-browser-page[hidden] { display:none; }

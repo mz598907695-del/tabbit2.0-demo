@@ -213,7 +213,7 @@ export default function TaskMountMenus({ kind, anchor, id, Popover, onClose, pro
         { value: 'local', name: '在你的计算机上', description: '此任务仅保留在这台电脑上', Icon: Laptop },
         { value: 'cloud', name: '在云端', description: '可在任意设备上使用，并能访问你的电脑', Icon: Cloud },
       ].map(({ value, name, description, Icon }) => <button key={value} type="button" className="tb-composer-menu-row tb-mount-runtime-choice" role="menuitemradio" aria-checked={runLocation === value} data-composer-menu-item onClick={() => { onRunLocationChange(value); onClose(); }}>
-        <Icon size={16} aria-hidden="true" /><span className="tb-mount-runtime-copy"><strong>{name}</strong><small>{description}</small></span>{runLocation === value && <Check size={16} aria-hidden="true" />}
+        <Icon size={16} aria-hidden="true" /><span className="tb-mount-runtime-copy"><strong>{name}</strong><small>{description}</small></span>{runLocation === value && <Check className="tb-mount-choice-check" size={16} strokeWidth={2.5} aria-hidden="true" />}
       </button>)}
     </>}
   </Popover>;

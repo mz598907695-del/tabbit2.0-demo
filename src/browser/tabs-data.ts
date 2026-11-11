@@ -1,5 +1,8 @@
 // Seed tab data and session layouts shared by horizontal/vertical navigation.
 export const BRAND_GROUP_ID = "group:brand";
+export const INTERNAL_TAB_EVENT = "tabbit-open-internal-tab";
+export const BOOKMARKS_TAB_ID = "internal:bookmarks";
+export const internalTabTitle = (id: string) => id === BOOKMARKS_TAB_ID ? "收藏管理" : undefined;
 export const GROUP_DIVIDER_SPACE = 10.5;
 export type DemoGroup = { label: string; color: string; expanded: boolean; tabs: { id: string; title: string }[] };
 const DEMO_GROUPS: Record<string, DemoGroup> = {

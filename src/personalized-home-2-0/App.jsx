@@ -72,6 +72,14 @@ export function App({ hostActive = true } = {}) {
   const effectiveAppearance = preferences.themeSource === 'gallery' ? preferences.appearance : windowAppearance;
   const targetAppearanceTheme = resolveWindowAppearance(effectiveAppearance);
   const [appearanceTheme, setAppearanceTheme] = useState(() => targetAppearanceTheme);
+  function selectWindowAppearance(appearance) {
+    if (preferences.themeSource !== 'color') return;
+    // Keep the React-owned content theme in the same update as the selected
+    // window appearance. The root token mode is committed in the layout
+    // effect below, so neither layer can paint one frame ahead of the other.
+    setAppearanceTheme(resolveWindowAppearance(appearance));
+    setWindowAppearance(appearance);
+  }
   useLayoutEffect(() => {
     // Commit the image and its analyzed appearance together, before paint.
     localStorage.setItem(WINDOW_APPEARANCE_KEY, effectiveAppearance);
@@ -165,6 +173,18 @@ export function App({ hostActive = true } = {}) {
   const aiComposerRef = useRef(null);
   const boardRef = useRef(null);
   const pageIndicatorRef = useRef(null);
+  useEffect(() => {
+    const openWorkspace = () => {
+      setWidgetAI(false);
+      setDialog(null);
+      setThemeOpen(false);
+      setPageManagerOpen(false);
+      boardRef.current?.dismissOverlays();
+      setBoardEditing(false);
+    };
+    window.addEventListener('tabbit-open-ai-workspace', openWorkspace);
+    return () => window.removeEventListener('tabbit-open-ai-workspace', openWorkspace);
+  }, []);
   function setShortcutPage(update) {
     const next = typeof update === 'function' ? update(shortcutPage) : update;
     if (next !== shortcutPage) boardRef.current?.preparePageTransition(next > shortcutPage ? 1 : -1);
@@ -496,7 +516,7 @@ export function App({ hostActive = true } = {}) {
             onTheme={selectTheme}
             appearance={effectiveAppearance}
             resolvedAppearance={appearanceTheme}
-            onAppearance={value => { if (preferences.themeSource === 'color') setWindowAppearance(value); }}
+            onAppearance={selectWindowAppearance}
             spaceColor={spaceColor}
             onSpaceColor={selectSpaceColor}
             frameTint={frameTint}
@@ -509,6 +529,7 @@ export function App({ hostActive = true } = {}) {
             onLargeTabRadius={(value) => updatePreference("largeTabRadius", value)}
             pageWidth={preferences.pageWidth}
             onPageWidth={value => updatePreference("pageWidth", value)}
+            onAutoArrange={() => boardRef.current?.organizeLayout(preferences.pageWidth)}
             selectedAppIcon={selectedAppIcon}
             onAppIcon={setSelectedAppIcon}
             onDefaultBrowserUnlock={() => promotionAction(promotions.find(item => item.kind === 'default-browser'))}
@@ -538,6 +559,9 @@ export function App({ hostActive = true } = {}) {
       className={`home${oceanActive ? " has-ocean-theme" : ""}`}
       aria-label="个性化首页 2.0"
       data-background-theme={preferences.theme}
+      data-theme-source={preferences.themeSource}
+      data-surface-theme-kind={preferences.themeSource === 'gallery' ? 'wallpaper' : spaceColor.toLowerCase() === baseGlassSettings.color.toLowerCase() ? 'default' : 'color'}
+      data-surface-theme-color={controlColorPreset?.color || undefined}
       data-shortcuts-visible={preferences.shortcuts ? "true" : "false"}
       data-shortcut-shape={preferences.shortcutShape}
       data-artwork-background={Boolean(illustratedTheme || selectedWallpaper || oceanActive) || undefined}

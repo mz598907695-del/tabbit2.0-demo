@@ -1,7 +1,7 @@
 import { getHomeRoot } from "./home-host";
 import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ChevronRight, Cog, FilePlus2, LayoutGrid, ListChecks, Palette, Plus } from "./icons";
+import { ChevronRight, Controls, ListChecks, Palette, Plus } from "./icons";
 import PageMenuPreferences, { pagePreferenceLabel } from './PageMenuPreferences';
 import ContextSubmenu from './ContextSubmenu';
 import './context-menu.css';
@@ -28,7 +28,7 @@ export default function PageContextMenu({ ref, enabled, canEdit, canAddPage = tr
     // A menu inside a modal must belong to that dialog to remain interactive.
     // Popover puts it above the dialog without clipping or changing its layout.
     const host = target.closest('dialog[open]') || getHomeRoot();
-    setMenu({ host, x: keyboard ? rect.left + 8 : event.clientX, y: keyboard ? rect.bottom : event.clientY });
+    setMenu({ host, x: keyboard ? rect.left + 8 : event.clientX, y: keyboard ? rect.bottom : event.clientY, keyboard });
   }
 
   useImperativeHandle(ref, () => ({ open, close }));
@@ -62,7 +62,7 @@ export default function PageContextMenu({ ref, enabled, canEdit, canAddPage = tr
     const bounds = node.getBoundingClientRect();
     node.style.left = `${Math.max(8, Math.min(menu.x, innerWidth - bounds.width - 8))}px`;
     node.style.top = `${Math.max(8, Math.min(menu.y, innerHeight - bounds.height - 8))}px`;
-    node.querySelector(':scope > button:not(:disabled)')?.focus({ preventScroll: true });
+    if (menu.keyboard) node.querySelector(':scope > button:not(:disabled)')?.focus({ preventScroll: true });
     const outside = event => { if (!node.contains(event.target)) close(); };
     const scroll = event => { if (!node.contains(event.target)) close(); };
     const dismiss = () => close();
@@ -77,7 +77,7 @@ export default function PageContextMenu({ ref, enabled, canEdit, canAddPage = tr
       window.removeEventListener('blur', dismiss);
       if (node.matches(':popover-open')) node.hidePopover();
     };
-  }, [Boolean(menu), menu?.x, menu?.y, menu?.host]);
+  }, [Boolean(menu), menu?.x, menu?.y, menu?.host, menu?.keyboard]);
 
   if (!menu) return null;
   const act = action => { close(); action?.(); };
@@ -115,12 +115,12 @@ export default function PageContextMenu({ ref, enabled, canEdit, canAddPage = tr
     <div role="separator" />
     <PageMenuPreferences preferences={preferences} activeView={menu.view} onView={changeView} onChange={(key, value) => act(() => onPreferenceChange(key, value))} />
     <div role="separator" />
-    <button type="button" role="menuitem" onClick={() => act(onPageSettings)}><Cog size={16} aria-hidden="true" />看板设置</button>
+    <button type="button" role="menuitem" onClick={() => act(onPageSettings)}><Controls size={16} aria-hidden="true" />看板设置</button>
     <button type="button" role="menuitem" onClick={() => act(onThemeSettings)}><Palette size={16} aria-hidden="true" />主题设置</button>
     {menu.view && <ContextSubmenu key={menu.view} parentRef={menuRef} anchorKey={menu.view} label={menu.view === 'add' ? '添加' : pagePreferenceLabel(menu.view)} focusOnOpen={menu.keyboardSubmenu} onBack={() => closeSubmenu(true)} onDismiss={() => close(true)}>
       {menu.view === 'add' ? <>
-        <button type="button" role="menuitem" disabled={!canAddPage || !onAddPage} title={!canAddPage ? '最多可添加 20 个看板' : undefined} onClick={() => act(onAddPage)}><FilePlus2 size={16} aria-hidden="true"/>添加看板</button>
-        <button type="button" role="menuitem" onClick={() => act(onAdd)}><LayoutGrid size={16} aria-hidden="true"/>添加组件</button>
+        <button type="button" role="menuitem" disabled={!canAddPage || !onAddPage} title={!canAddPage ? '最多可添加 20 个看板' : undefined} onClick={() => act(onAddPage)}><span className="iconfont icon-jiahao" aria-hidden="true"/>添加看板</button>
+        <button type="button" role="menuitem" onClick={() => act(onAdd)}><span className="iconfont icon-jianchakongzhiban" aria-hidden="true"/>添加组件</button>
       </> : <PageMenuPreferences preferences={preferences} view={menu.view} onChange={(key, value) => act(() => onPreferenceChange(key, value))} />}
     </ContextSubmenu>}
   </div>, menu.host);

@@ -1,6 +1,7 @@
 import { siteIconFor, tabIconFor, tabSites } from '../favicons';
 import newTabIcon from '../assets/new-tab.svg';
 import organizeTabsIcon from '../assets/organize-tabs.svg';
+import { BOOKMARKS_TAB_ID } from './tabs-data';
 
 export function IconFont({ name, className = "" }: { name: string; className?: string }) {
   return <span className={`iconfont icon-${name} ${className}`} aria-hidden="true" />;
@@ -16,6 +17,7 @@ export function TokenIcon({ src, className = "" }: { src: string; className?: st
 }
 
 export function TabFavicon({ id, className = "tab-icon" }: { id: string; className?: string }) {
+  if (id === BOOKMARKS_TAB_ID) return <span className={`${className} solid-star-icon bookmark-tab-icon`} aria-hidden="true"/>;
   const src = tabIconFor(id);
   const site = tabSites[id];
   return src === newTabIcon

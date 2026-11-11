@@ -20,6 +20,7 @@
 .icon-jiantou-v-xiangyou::before { content: "\e011"; }
 .icon-jiantou_fenxiang_shangchuan::before { content: "\e041"; }
 .icon-jiahao::before { content: "\e033"; }
+.icon-jianchakongzhiban::before { content: "\e47a"; }
 .icon-zhinanzhen::before { content: "\e503"; }
 .icon-ren::before { content: "\e036"; }
 .icon-cha-x::before { content: "\e03e"; }
@@ -48,7 +49,19 @@
 .icon-dian_shenglvehao::before { content: "\e11c"; }
 .icon-dengpao_xiangfa::before { content: "\e2a8"; }
 .icon-wenjianjia_dangan_guanbi::before { content: "\e076"; }
+.icon-gongxiang_yuan::before { content: "\e075"; }
+.icon-badiaodianyuanchatou::before { content: "\e320"; }
 .icon-wenjianjia_3::before { content: "\e428"; }
 .icon-diqiu::before { content: "\e534"; }
+.icon-tupian_shuiping_xiangdi::before { content: "\e200"; }
+
+.solid-star-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  background: currentColor;
+  clip-path: polygon(50% 3%, 61.5% 36.5%, 97% 36.5%, 68.5% 57.5%, 79.5% 92%, 50% 71%, 20.5% 92%, 31.5% 57.5%, 3% 36.5%, 38.5% 36.5%);
+}
 
 .icon-sousuo::before { content:"\e008"; }
