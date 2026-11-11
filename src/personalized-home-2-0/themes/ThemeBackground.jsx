@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
+import { isPageActive, subscribePageActivity } from '../../pageActivity.js';
 import { ArtRenderer, getSceneView } from "./ArtRenderer.js";
 import "./themes.css";
 
@@ -137,7 +138,7 @@ function createBackground(canvas, host, preview) {
   let frame = 0;
   let previousTime = 0;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const frozen = () => !ready || inactive || contextLost || reducedMotion.matches || document.hidden || disposed;
+  const frozen = () => !ready || inactive || contextLost || reducedMotion.matches || !isPageActive(document) || disposed;
 
   function stop() {
     if (frame) window.cancelAnimationFrame(frame);
@@ -362,7 +363,7 @@ function createBackground(canvas, host, preview) {
   canvas.addEventListener("webglcontextlost", handleContextLost);
   canvas.addEventListener("webglcontextrestored", handleContextRestored);
   reducedMotion.addEventListener("change", syncPlayback);
-  document.addEventListener("visibilitychange", syncPlayback);
+  const releaseActivity = subscribePageActivity(syncPlayback, document);
   window.addEventListener("resize", resize);
   observer.observe(host);
   try { renderer = new ArtRenderer(canvas); } catch (error) { fail(error); }
@@ -445,7 +446,7 @@ function createBackground(canvas, host, preview) {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       canvas.removeEventListener("webglcontextrestored", handleContextRestored);
       reducedMotion.removeEventListener("change", syncPlayback);
-      document.removeEventListener("visibilitychange", syncPlayback);
+      releaseActivity();
       window.removeEventListener("resize", resize);
       renderer?.dispose();
       renderer = null;

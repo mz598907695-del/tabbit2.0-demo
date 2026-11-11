@@ -1,3 +1,4 @@
+import WorkspaceListDivider from './WorkspaceListDivider';
 import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { OutputDownload, OutputShare, FileText, Folder, Globe, Image, MessageCircleReply, Paperclip, PanelsTopLeft, Sparkles, Table2 } from '../icons';
 import { createPortal } from 'react-dom';
@@ -109,10 +110,10 @@ export function WorkspaceFiles({ items, ui, onOpen, selectedId, chats, onNavigat
         </button>
         <FileActions item={item} chats={chats} onNavigate={onNavigate} onNotice={onNotice} onShare={onShare}/>
       </article>)}</div>
-      : <div className="aiwf-table-scroll"><table className="aiwf-table"><colgroup><col/><col className="aiwf-type-column"/><col className="aiwf-date-column"/><col className="aiwf-actions-column"/></colgroup><thead><tr><th scope="col">名称</th><th scope="col">类型</th><th scope="col">创建时间</th><th scope="col">操作</th></tr><tr className="aiwf-divider-row" aria-hidden="true"><td colSpan={4}><div className="aiwf-list-divider"/></td></tr></thead><tbody>
+      : <div className="aiwf-table-scroll"><table className="aiwf-table"><colgroup><col/><col className="aiwf-type-column"/><col className="aiwf-date-column"/><col className="aiwf-actions-column"/></colgroup><thead><tr><th scope="col">名称</th><th scope="col">类型</th><th scope="col">创建时间</th><th scope="col">操作</th></tr><WorkspaceListDivider columns={4}/></thead><tbody>
         {orderedItems.map((item, index) => <React.Fragment key={item.id}><tr className={selectedId === item.id ? 'is-previewed' : ''}>
         <td><button className="aiwf-file-name" aria-label={`预览 ${item.title}`} title={item.title} onClick={() => onOpen(item)}><span className="aiwf-list-thumbnail"><FileThumbnail item={item}/></span><span className="aiwf-list-title">{item.title}</span></button></td>
         <td>{TYPE_LABELS[item.type] || '其他'}</td><td><time>{formatWorkspaceOutputDate(item) || '—'}</time></td><td><FileActions item={item} chats={chats} onNavigate={onNavigate} onNotice={onNotice} onShare={onShare}/></td>
-      </tr>{index < orderedItems.length - 1 && <tr className="aiwf-divider-row" aria-hidden="true"><td colSpan={4}><div className="aiwf-list-divider"/></td></tr>}</React.Fragment>)}</tbody></table></div>}
+      </tr>{index < orderedItems.length - 1 && <WorkspaceListDivider columns={4}/>}</React.Fragment>)}</tbody></table></div>}
   </div>;
 }

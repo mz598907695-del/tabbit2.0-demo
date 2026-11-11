@@ -6,6 +6,7 @@ import { AlarmClock, Start, Pause } from '../icons';
 
 const OUTPUT_FILTER_ICONS = { all: OutputFolder, web: OutputGlobe, doc: OutputDocument, image: Image, table: OutputTable, other: Paperclip, card: OutputCollection, board: OutputAppWindow };
 const TASK_FILTER_ICONS = { all:AlarmClock, active:Start, paused:Pause };
+const USAGE_FILTER_ICONS = { membership:'celiangyiqi', coupons:'piao_ruchangquan-2', orders:'fapiao_wenben' };
 const SORT_OPTIONS = [['recent', '最近添加'], ['oldest', '最早添加'], ['name', '名称排序']];
 const scrollBehavior = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
 
@@ -90,17 +91,17 @@ export default function WorkspacePageHeader({ page, title, action, onAction, tab
         </div> : searchable && <button ref={searchToggleRef} className="aiwp-icon-button aiwp-search-toggle" aria-label={`搜索${title}`} title={`搜索${title}`} aria-expanded={false} aria-pressed={Boolean(ui.query)} aria-controls={`aiwp-${page}-search`} onClick={() => { setSearchOpen(true); requestAnimationFrame(() => searchRef.current?.focus()); }}><Search size={16}/></button>;
   return <div ref={headerRef} className={`aiwp-page-header has-inline-search ${expanded ? 'is-searching' : ''}`}>
     <header className="aiwp-heading">
-      <div className="aiwp-heading-copy"><h1>{title}</h1>{page === 'files' && <p className="aiwp-heading-description">对话里的资料与生成的内容，都在这里。</p>}{page === 'tasks' && <p className="aiwp-heading-description">安排重复的事，管理每一次执行。</p>}</div>
+      <div className="aiwp-heading-copy"><h1>{title}</h1>{page === 'files' && <p className="aiwp-heading-description">对话里的资料与生成的内容，都在这里。</p>}{page === 'tasks' && <p className="aiwp-heading-description">安排重复的事，管理每一次执行。</p>}{page === 'usage' && <p className="aiwp-heading-description">查看当前会员权益、周期用量和最近一周消耗明细</p>}</div>
       <div className="aiwp-heading-actions">
         {!['files','tasks'].includes(page) && searchControl}
         {secondaryActions}
-        <button className="aiwp-primary" onClick={onAction}>{action}</button>
+        {page !== 'usage' && <button className="aiwp-primary" onClick={onAction}>{action}</button>}
       </div>
     </header>
     <div className="aiwp-toolbar">
       <div className="aiwp-tab-rail" data-left={edges.left} data-right={edges.right}>
         <div className="aiwp-tabs" ref={tabsRef} role="tablist" aria-label={`${title}分类`} onScroll={measureEdges}>
-          {tabs.map(([value, label], index) => <button key={value} role="tab" id={tabId(value)} aria-selected={ui.filter === value} tabIndex={ui.filter === value ? 0 : -1} aria-controls={resultsId} onClick={() => setUI({ filter: value })} onKeyDown={event => moveTab(event, index)}>{page === 'files' && OUTPUT_FILTER_ICONS[value] && React.createElement(OUTPUT_FILTER_ICONS[value], { size:16, "aria-hidden":true })}{page === 'tasks' && TASK_FILTER_ICONS[value] && React.createElement(TASK_FILTER_ICONS[value], { size:16, 'aria-hidden':true })}{label}{counts && <span className="aiwp-tab-count">{counts[value]}</span>}</button>)}
+          {tabs.map(([value, label], index) => <button key={value} role="tab" id={tabId(value)} aria-selected={ui.filter === value} tabIndex={ui.filter === value ? 0 : -1} aria-controls={resultsId} onClick={() => setUI({ filter: value })} onKeyDown={event => moveTab(event, index)}>{page === 'files' && OUTPUT_FILTER_ICONS[value] && React.createElement(OUTPUT_FILTER_ICONS[value], { size:16, "aria-hidden":true })}{page === 'tasks' && TASK_FILTER_ICONS[value] && React.createElement(TASK_FILTER_ICONS[value], { size:16, 'aria-hidden':true })}{page === 'usage' && USAGE_FILTER_ICONS[value] && <span className={`iconfont icon-${USAGE_FILTER_ICONS[value]}`} aria-hidden="true"/>}{label}{counts && <span className="aiwp-tab-count">{counts[value]}</span>}</button>)}
         </div>
         {edges.left && <button className="aiwp-tab-arrow is-left" aria-label="向左查看更多分类" onClick={() => tabsRef.current.scrollBy({ left: -Math.max(120, tabsRef.current.clientWidth * .7), behavior: scrollBehavior() })}><ChevronLeft size={16}/></button>}
         {edges.right && <button className="aiwp-tab-arrow is-right" aria-label="向右查看更多分类" onClick={() => tabsRef.current.scrollBy({ left: Math.max(120, tabsRef.current.clientWidth * .7), behavior: scrollBehavior() })}><ChevronRight size={16}/></button>}

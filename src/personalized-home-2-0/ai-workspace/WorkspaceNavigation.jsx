@@ -30,7 +30,7 @@ const CONTEXT = {
 function NavItem({ id, page, onNavigate, label, Icon, meta, quiet = false, filter, selected = false }) {
   const module = MODULES[id];
   const ItemIcon = Icon || module?.Icon;
-  return <button type="button" className={`aiwn-item ${quiet ? 'is-quiet' : ''}`} aria-current={selected || (page === id && !filter) ? 'page' : undefined} onClick={() => onNavigate(id, filter)}>
+  return <button type="button" className={`aiwn-item ${quiet ? 'is-quiet' : ''}`} aria-current={selected || (page === id && !filter) ? 'page' : undefined} onClick={event => onNavigate(id, filter, event.currentTarget)}>
     {ItemIcon && <ItemIcon size={16} strokeWidth={1.7} />}<span>{label || module?.label}</span>{meta && <small>{meta}</small>}
   </button>;
 }
@@ -38,7 +38,7 @@ function SearchButton({ onSearch, compact = false }) {
   return <button type="button" className={`aiwn-search ${compact ? 'is-compact' : ''}`} onClick={onSearch}><Search size={16}/><span>{compact ? '搜索' : '搜索全部内容'}</span></button>;
 }
 function Header({ title, page, onClose, onNavigate, notification = false, unreadCount = 0 }) {
-  return <header className="aiwn-header"><button type="button" className="aiwn-title" onClick={() => onNavigate('home')} title="返回首页">{title}</button><div className="aiwn-header-actions">{notification && <button type="button" className="aiwn-icon aiwn-notification" aria-label="通知" aria-current={page === 'notifications' ? 'page' : undefined} onClick={() => onNavigate('notifications')}><Bell size={17}/>{unreadCount > 0 && <i/>}</button>}<button type="button" className="aiwn-icon" aria-label="收起 AI 侧边栏" onClick={onClose}><PanelLeftClose size={17}/></button></div></header>;
+  return <header className="aiwn-header"><button type="button" className="aiwn-title" onClick={() => onNavigate('home')} title="返回首页">{title}</button><div className="aiwn-header-actions">{notification && <button type="button" className="aiwn-icon aiwn-notification" aria-label="通知" aria-current={page === 'notifications' ? 'page' : undefined} data-notification-trigger onClick={event => onNavigate('notifications', undefined, event.currentTarget)}><Bell size={17}/>{unreadCount > 0 && <i/>}</button>}<button type="button" className="aiwn-icon" aria-label="收起 AI 侧边栏" onClick={onClose}><PanelLeftClose size={17}/></button></div></header>;
 }
 function Section({ title, action, onAction, children, className = '' }) {
   return <section className={`aiwn-section ${className}`}><div className="aiwn-section-heading">{onAction ? <button type="button" onClick={onAction}>{title}<ChevronRight size={12}/></button> : <span>{title}</span>}{action}</div>{children}</section>;
@@ -123,7 +123,7 @@ function DirectoryBranch({ id, page, activeFilter, onNavigate, initialOpen = fal
       }}><ChevronRight size={14}/></button>
     </div>
     <div id={childrenId} className="aiwn-directory-children" hidden={!expanded}>
-      {categories.map(([filter, name]) => <button type="button" key={filter} aria-current={page === id && currentFilter === filter ? 'page' : undefined} onClick={() => onNavigate(id, filter)}><span>{name}</span></button>)}
+      {categories.map(([filter, name]) => <button type="button" key={filter} aria-current={page === id && currentFilter === filter ? 'page' : undefined} onClick={event => onNavigate(id, filter, event.currentTarget)}><span>{name}</span></button>)}
     </div>
   </div>;
 }

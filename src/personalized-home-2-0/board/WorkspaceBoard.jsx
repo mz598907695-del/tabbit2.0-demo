@@ -38,7 +38,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
   const suppressedClickRef=useRef(null), dragHandlersRef=useRef(null), holdTimerRef=useRef(null), dragPaintRef=useRef(null);
   const [measurement,setMeasurement]=useState({width:700,columns:9,ready:false});
   const gridRef=useRef(null), rootRef=useRef(null), dragRef=useRef(null), busyRef=useRef(onEditingChange), menuRef=useRef(null), menuTriggerRef=useRef(null);
-  const boardPresent = useVisibilityMotion(rootRef, visible, -20);
+  const boardPresent = useVisibilityMotion(rootRef, visible, -20, { fade: false });
   const pageMotion = useBoardPageMotion(gridRef, page.id, visible && active && !editing, pages);
   const {width,columns,sourceColumns}=measurement;
   const strategy='gap';

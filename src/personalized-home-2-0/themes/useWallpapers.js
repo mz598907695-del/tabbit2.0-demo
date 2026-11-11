@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { deleteWallpaper, getWallpaperErrorMessage, readWallpapers, refreshWallpaperVideoPoster, saveWallpaper } from './wallpapers.js';
-import { officialWallpaperIds } from './officialWallpapers';
+import { bundledWallpaperIds } from './officialWallpapers';
 
 export function useWallpapers() {
   const [wallpapers, setWallpapers] = useState([]);
@@ -51,9 +51,9 @@ export function useWallpapers() {
     readyRef.current = false;
     setReady(false);
     setLoading(true);
-    readWallpapers({ excludeIds: officialWallpaperIds }).then(records => {
+    readWallpapers({ excludeIds: bundledWallpaperIds }).then(records => {
       if (!mounted.current || lifecycle.current !== generation) return;
-      // Promoted images resolve from bundled official assets; only new uploads
+      // Official and community themes resolve from bundled assets; only new uploads
       // belong to 我的. Keep the original device records as migration backups.
       const items = records.map(toDisplayItem);
       setWallpapers(items);

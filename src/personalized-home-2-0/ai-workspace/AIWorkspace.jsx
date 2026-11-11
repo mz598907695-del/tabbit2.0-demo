@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Home, Search, X, ArrowUpRight, MessageSquare, Folder, Lightbulb, CalendarClock, LayoutGrid, Star, Share2, Bell, Gauge, Check, ArrowRight } from '../icons';
 import WorkspaceNavigation from './WorkspaceNavigation';
 import WorkspaceContent from './WorkspaceContent';
@@ -13,7 +13,7 @@ import SidebarToggleIcon from './SidebarToggleIcon';
 import SidebarResizeHandle from './SidebarResizeHandle';
 import { SIDEBAR_WIDTH_DEFAULT } from './sidebar-width';
 import { WorkspaceSettingsContext } from './WorkspaceSchemeSettings';
-import WorkspaceNotifications from './WorkspaceNotifications';
+import WorkspaceNotificationsPopover from './WorkspaceNotificationsPopover';
 import { updateWorkspaceChat, deleteWorkspaceChats } from './workspace-chat-actions';
 import { WorkspaceNavigationSlot } from './workspace-secondary-context';
 import { WallpaperTransitionBackground } from '../HomeBackground';
@@ -34,7 +34,7 @@ function readVariant() {
   try { stored = localStorage.getItem('personalized-home-2-0-ai-workspace-variant'); } catch { /* session-only fallback */ }
   return resolveWorkspaceVariant(fromUrl, stored);
 }
-export default function AIWorkspace({ children, wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNewChat, disabled = false }) {
+export default function AIWorkspace({ children, wallpaper, reflectionWallpaper = wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNewChat, disabled = false }) {
   const [open, setOpen] = useState(false);
   const [variant, setVariant] = useState(readVariant);
   const [page, setPage] = useState(() => new URLSearchParams(window.location.search).get('preview') === 'ai-sidebar' && variant === 8 ? 'overview' : 'home');
@@ -48,6 +48,8 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
   const [filter, setFilter] = useState(undefined);
   const [modal, setModal] = useState(null);
   const [notificationEntry, setNotificationEntry] = useState(undefined);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationAnchor, setNotificationAnchor] = useState(null);
   const [query, setQuery] = useState('');
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 650px)').matches);
   const [sidebarOverlay, setSidebarOverlay] = useState(false);
@@ -67,8 +69,8 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
   const activeModule = activeContent && page !== 'overview' && page !== 'conversation';
   const activeConversation = page === 'conversation' ? workspaceData.chats.find(item => item.id === conversationId) : null;
   const navigationOverlay = compact || sidebarOverlay;
-  useEffect(() => { onActivityChange?.(!disabled && Boolean(activeContent || modal || (navigationOverlay && open))); }, [activeContent, modal, navigationOverlay, open, disabled, onActivityChange]);
-  useEffect(() => { if (disabled) setModal(null); }, [disabled]);
+  useEffect(() => { onActivityChange?.(!disabled && Boolean(activeContent || modal || notificationOpen || (navigationOverlay && open))); }, [activeContent, modal, notificationOpen, navigationOverlay, open, disabled, onActivityChange]);
+  useEffect(() => { if (disabled) { setModal(null); setNotificationOpen(false); } }, [disabled]);
   useEffect(() => { if (pageHostRef.current) pageHostRef.current.scrollTop = 0; }, [page]);
   useEffect(() => {
     const media = window.matchMedia('(max-width: 650px)');
@@ -154,9 +156,14 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
       });
     };
   }, [modal]);
-  function navigate(next, nextFilter) {
+  function navigate(next, nextFilter, trigger) {
     ({ page: next, filter: nextFilter } = resolveWorkspaceRoute(next, nextFilter, workspaceData));
-    if (next === 'notifications') { setNotificationEntry(nextFilter); setModal('notifications'); return; }
+    if (next === 'notifications') {
+      if (notificationOpen) { closeNotifications(true); return; }
+      const anchor = trigger || navHostRef.current?.querySelector('[data-notification-trigger]') || document.activeElement;
+      setNotificationEntry(nextFilter); setNotificationAnchor(anchor); setModal(null); setNotificationOpen(true); return;
+    }
+    closeNotifications(false);
     const conversation = next === 'chats' && workspaceData.chats.find(item => nextFilter === `detail:${item.id}` || nextFilter === item.title);
     if (conversation) {
       setConversationId(conversation.id); setPage('conversation'); setModal(null);
@@ -165,6 +172,10 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
     if (next !== 'home' && next !== 'overview') { setContentPage(next); setContentVisited(true); }
     setNavigationKey(key=>key+1); setPage(next); setFilter(nextFilter); setModal(null);
   }
+  const closeNotifications = useCallback(restoreFocus => {
+    setNotificationOpen(false);
+    if (restoreFocus) requestAnimationFrame(() => notificationAnchor?.isConnected && notificationAnchor.focus?.({ preventScroll:true }));
+  },[notificationAnchor]);
   function changeVariant(next) {
     setVariant(next);
     const url = new URL(window.location.href);
@@ -190,16 +201,20 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
       openRef.current = false;
       restoreLauncherFocus.current = false;
       setOpen(false);
-      setSidebarOverlay(false);
+      // Reset the session without discarding the current responsive mode.
+      // The resize observer will not fire again when the width stays unchanged.
+      const width = shellRef.current?.clientWidth;
+      if (width > 0) setSidebarOverlay(width < AI_WORKSPACE_CONTENT_COLLAPSE_WIDTH);
       setPage('home');
       setFilter(undefined);
       setModal(null);
+      setNotificationOpen(false);
       onNewChat?.('');
     };
     window.addEventListener('tabbit-new-session', startSession);
     return () => window.removeEventListener('tabbit-new-session', startSession);
   }, [onNewChat]);
-  function closeSidebar() { window.clearTimeout(responsiveMotionTimer.current); cancelAnimationFrame(responsiveMotionFrame.current); autoCollapsedSidebar.current = false; openRef.current = false; restoreLauncherFocus.current = true; setOpen(false); setModal(null); }
+  function closeSidebar() { window.clearTimeout(responsiveMotionTimer.current); cancelAnimationFrame(responsiveMotionFrame.current); autoCollapsedSidebar.current = false; openRef.current = false; restoreLauncherFocus.current = true; setOpen(false); setModal(null); setNotificationOpen(false); }
   useEffect(() => {
     if (open || !restoreLauncherFocus.current) return;
     const motion = navHostRef.current && getComputedStyle(navHostRef.current).getPropertyValue('--aiw-sidebar-motion');
@@ -219,13 +234,6 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
     return () => { window.clearTimeout(timer); cancelAnimationFrame(frame); };
   }, [open]);
   function openSearch() { setQuery(''); setModal('search'); }
-  function dialogKeyDown(event) {
-    if (modal !== 'notifications' || event.key !== 'Tab') return;
-    const controls = [...event.currentTarget.querySelectorAll('button:not(:disabled):not([tabindex="-1"]),input:not(:disabled),a[href],[tabindex="0"]')].filter(node => node.getClientRects().length);
-    const first = controls[0], last = controls[controls.length - 1];
-    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-  }
   function navKeyDown(event) {
     if (event.key === 'Escape' && !modal) { event.preventDefault(); closeSidebar(); }
     if (!navigationOverlay || event.key !== 'Tab') return;
@@ -255,7 +263,7 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
     {navigationOverlay && open && <button className="aiw-nav-backdrop" aria-label="关闭导航抽屉" tabIndex={-1} onClick={closeSidebar}/>} 
     <WorkspaceNavigationSlot.Provider value={navigationSlot}><div className="aiw-stage">
       <div className="aiw-home" hidden={activeContent} inert={activeContent || Boolean(modal) || (navigationOverlay && open)} aria-hidden={activeContent || undefined}>{children}</div>
-      {contentVisited && <div className="aiw-page-host" ref={pageHostRef} hidden={!activeModule} inert={!activeModule || (navigationOverlay && open)}><WorkspaceContent active={!disabled && activeModule} page={contentPage} variant={variant} initialFilter={filter} navigationKey={navigationKey} data={workspaceData} setData={setWorkspaceData} onFilterChange={setActiveFilter} onNavigate={navigate} onNewChat={newChat}/></div>}
+      {contentVisited && <div className="aiw-page-host" ref={pageHostRef} hidden={!activeModule} inert={!activeModule || (navigationOverlay && open)}><WorkspaceContent wallpaper={reflectionWallpaper} active={!disabled && activeModule} page={contentPage} variant={variant} initialFilter={filter} navigationKey={navigationKey} data={workspaceData} setData={setWorkspaceData} onFilterChange={setActiveFilter} onNavigate={navigate} onNewChat={newChat}/></div>}
       <div className="aiw-page-host aiw-overview-host" hidden={page !== 'overview'} inert={page !== 'overview' || (navigationOverlay && open)}><WorkspaceOverview data={workspaceData} onNavigate={navigate} onNewChat={newChat}/></div>
       {conversationId && <WorkspaceConversation conversations={workspaceData.chats} conversationId={conversationId} active={!disabled && page === 'conversation'} blocked={Boolean(modal) || (navigationOverlay && open)}/>} 
       <header className="aiw-stage-topbar" aria-label="导航和功能区">
@@ -264,9 +272,10 @@ export default function AIWorkspace({ children, wallpaper, wallpaperTransition, 
         <div ref={setNavigationSlot} className="aiw-secondary-slot" inert={Boolean(modal) || (navigationOverlay && open)}/>
       </header>
     </div></WorkspaceNavigationSlot.Provider>
-    {modal && <dialog ref={dialogRef} className={`aiw-dialog aiw-${modal}-dialog`} aria-labelledby="aiw-dialog-title" onKeyDown={dialogKeyDown} onCancel={event => { event.preventDefault(); setModal(null); }} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)setModal(null);}}}>
-      <div className="aiw-dialog-heading"><h2 id="aiw-dialog-title">{modal === 'notifications' ? '通知' : modal === 'search' ? '搜索全部内容' : '选择适合你的工作方式'}</h2><button className="aiw-icon-button" aria-label={modal === 'notifications' ? '关闭通知' : '关闭窗口'} onClick={()=>setModal(null)}><X size={18}/></button></div>
-      {modal === 'notifications' ? <WorkspaceNotifications data={workspaceData} setData={setWorkspaceData} initialEntry={notificationEntry} onNavigate={navigate}/> : modal === 'search' ? <>
+    {notificationOpen && <WorkspaceNotificationsPopover anchor={notificationAnchor} initialEntry={notificationEntry} onClose={closeNotifications}/>}
+    {modal && <dialog ref={dialogRef} className={`aiw-dialog aiw-${modal}-dialog`} aria-labelledby="aiw-dialog-title" onCancel={event => { event.preventDefault(); setModal(null); }} onClick={event=>{if(event.target===event.currentTarget){const rect=event.currentTarget.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)setModal(null);}}}>
+      <div className="aiw-dialog-heading"><h2 id="aiw-dialog-title">{modal === 'search' ? '搜索全部内容' : '选择适合你的工作方式'}</h2><button className="aiw-icon-button" aria-label="关闭窗口" onClick={()=>setModal(null)}><X size={18}/></button></div>
+      {modal === 'search' ? <>
         <label className="aiw-global-search"><Search size={19}/><input aria-label="搜索全部内容" autoFocus placeholder="搜索对话、AI 输出物、妙招或功能…" value={query} onChange={event=>setQuery(event.target.value)}/><kbd>Esc</kbd></label>
         <p className="aiw-search-caption">{query ? `${searchResults.length} 条结果` : '功能入口与示例内容'}</p>
         <div className="aiw-search-results">{searchResults.map((item,i)=><button key={`${item.id}-${i}`} onClick={()=>navigate(item.id, item.filter)}><item.Icon size={18}/><span><strong>{item.label}</strong><small>{item.description}</small></span><ArrowUpRight size={15}/></button>)}{!searchResults.length && <p className="aiw-no-results">未找到相关内容，试试其他关键词。</p>}</div>

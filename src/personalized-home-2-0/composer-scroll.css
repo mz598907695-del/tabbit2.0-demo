@@ -62,7 +62,7 @@
   transform: translateY(calc(-8px * var(--dock-progress)));
 }
 /* Keep the attached extension aligned with the visible input while docking. */
-.home-feed > .tb-composer-wrap .tb-composer-expansion[data-dock-secondary] {
+.home-feed > .tb-composer-wrap .tb-composer-expansion:not(.tb-composer-task-expansion)[data-dock-secondary] {
   transform: translateY(calc(var(--dock-surface-height, var(--dock-expanded-height, 120px)) - var(--dock-expanded-height, 120px)));
 }
 .tb-composer-wrap [data-dock-secondary]:not([inert]) { pointer-events: auto; }

@@ -5,12 +5,13 @@ import { waitForWallpaperMedia } from './wallpaper-video.js';
  * Space gestures own the same layers/progress and take priority over this fade. */
 export function useWallpaperSelectionTransition(scene, spaceId, gestureTransition) {
   const [selection, setSelection] = useState(() => ({ scene, spaceId, transition:null }));
-  if (selection.scene.id !== scene.id || selection.scene.url !== scene.url || selection.spaceId !== spaceId) {
+  if (selection.scene.id !== scene.id || selection.scene.url !== scene.url || selection.spaceId !== spaceId
+    || (!selection.transition && selection.scene.appearance !== scene.appearance)) {
     const progress = Number(document.documentElement.style.getPropertyValue('--space-wallpaper-progress')) || 0;
     const from = selection.transition && progress < .5 ? selection.transition.from : selection.scene;
     const mediaChanged = from.id !== scene.id || from.url !== scene.url;
     setSelection({ scene, spaceId, transition:!gestureTransition && mediaChanged
-      && (from.url || scene.url) ? { from, to:scene } : null });
+      && (from.url || scene.url) ? { kind:'selection', from, to:scene } : null });
   }
 
   useLayoutEffect(() => {

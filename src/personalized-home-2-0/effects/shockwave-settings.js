@@ -1,7 +1,7 @@
 // Confirmed animation parameters. Light and dark modes share one palette.
 const colors=Object.freeze(['#af65ff','#7384ff','#c577ff','#ff96f5']);
 export const SHOCKWAVE_SETTINGS=Object.freeze({
-  duration:1000,
+  duration:500,
   brightness:1.2,
   width:150,
   lens:14,

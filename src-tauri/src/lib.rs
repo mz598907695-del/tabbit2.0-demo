@@ -287,11 +287,19 @@ pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![update_glass, set_window_appearance, page_switch_haptic, record_swipe_trace, set_app_icon, shockwave::capture_shockwave_content])
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             use tauri::menu::{Menu, MenuItem, MenuItemKind};
             let menu = Menu::default(app.handle())?;
+            let mut update_item_added = false;
             for entry in menu.items()? {
                 if let MenuItemKind::Submenu(submenu) = entry {
+                    if !update_item_added {
+                        let update = MenuItem::with_id(app, "check-for-updates", "检查更新…", true, None::<&str>)?;
+                        submenu.insert(&update, 1)?;
+                        update_item_added = true;
+                    }
                     for (index, item) in submenu.items()?.into_iter().enumerate() {
                         if let MenuItemKind::Predefined(predefined) = item {
                             if predefined.text()?.starts_with("Close") {
@@ -306,6 +314,11 @@ pub fn run() {
             app.set_menu(menu)?;
             app.on_menu_event(|app, event| {
                 use tauri::Manager;
+                if event.id().as_ref() == "check-for-updates" {
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.eval("window.dispatchEvent(new Event('tabbit-check-for-updates'))");
+                    }
+                }
                 if event.id().as_ref() == "close-tab" {
                     if let Some(window) = app.get_webview_window("main") {
                         let _ = window.eval("window.dispatchEvent(new Event('tabbit-close-tab'))");

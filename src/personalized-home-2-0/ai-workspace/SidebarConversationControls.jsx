@@ -1,4 +1,9 @@
 import { Fragment, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { getHomeRoot } from '../home-host';
+import warningIcon from '../../assets/delete-space-warning.png';
+import '../../DeleteSpaceDialog.css';
+import '../../EditSpaceDialog.css';
 import { BatchListChecks, ChevronRight, Cloud, Ellipsis, Laptop } from '../icons';
 import '../context-menu.css';
 import '../../styles/dropdown.css';
@@ -17,7 +22,7 @@ export function HistoryGroup({ title, records, onNavigate, activeConversationId,
       </button>
       {onBatchEdit && <div className="aiwc-group-actions aiwc-batch-actions">
         <span className="aiwc-batch-tooltip-anchor">
-          <button type="button" className="aiwc-small-icon" data-history-actions aria-label="批量编辑会话" aria-describedby={batchTooltipId} disabled={!hasChats || editing} onClick={onBatchEdit}><BatchListChecks size={14}/></button>
+          <button type="button" className="aiwc-small-icon" data-history-actions aria-label="批量编辑会话" aria-pressed={editing} aria-describedby={batchTooltipId} disabled={!hasChats} onClick={onBatchEdit}><BatchListChecks size={14}/></button>
           <span id={batchTooltipId} role="tooltip" className="space-tooltip aiwc-batch-tooltip">批量编辑</span>
         </span>
       </div>}
@@ -93,9 +98,9 @@ export function HistoryMenu({ anchor, label, items, onClose, placement = 'bottom
       buttons[next]?.focus();
     }
   }}>
-    {items.map(({ label: text, Icon, animatedKind, danger, disabled, href, onClick }, index) => {
+    {items.map(({ label: text, Icon, iconName, animatedKind, danger, disabled, href, onClick }, index) => {
       const Tag = href ? 'a' : 'button';
-      return <Fragment key={text}>{danger && index > 0 && <div className="dropdown-divider-container" role="separator"><div className="dropdown-divider"/></div>}<Tag {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : { type: 'button', disabled })} role="menuitem" className={danger ? 'danger' : undefined} onClick={onClick} onPointerEnter={event => { if (event.pointerType !== 'touch') setHoveredItem(text); }} onPointerLeave={() => setHoveredItem(null)} onPointerCancel={() => setHoveredItem(null)} onFocus={event => setFocusedItem(event.currentTarget.matches(':focus-visible') ? text : null)} onBlur={() => setFocusedItem(null)}><span className="dropdown-item-content">{animatedKind ? <SidebarAnimatedIcon kind={animatedKind} size={iconSize} active={hoveredItem === text || focusedItem === text}/> : Icon && <Icon size={iconSize}/>}<span>{text}</span></span></Tag></Fragment>;
+      return <Fragment key={text}>{danger && index > 0 && <div className="dropdown-divider-container" role="separator"><div className="dropdown-divider"/></div>}<Tag {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : { type: 'button', disabled })} role="menuitem" className={danger ? 'danger' : undefined} onClick={onClick} onPointerEnter={event => { if (event.pointerType !== 'touch') setHoveredItem(text); }} onPointerLeave={() => setHoveredItem(null)} onPointerCancel={() => setHoveredItem(null)} onFocus={event => setFocusedItem(event.currentTarget.matches(':focus-visible') ? text : null)} onBlur={() => setFocusedItem(null)}><span className="dropdown-item-content">{animatedKind ? <SidebarAnimatedIcon kind={animatedKind} size={iconSize} active={hoveredItem === text || focusedItem === text}/> : iconName ? <span className={`iconfont icon-${iconName}`} aria-hidden="true"/> : Icon && <Icon size={iconSize}/>}<span>{text}</span></span></Tag></Fragment>;
     })}
   </div>;
 }
@@ -108,17 +113,26 @@ export function HistoryActionDialog({ action, onClose, onConfirm }) {
   useLayoutEffect(() => {
     const node = dialogRef.current;
     node.showModal();
-    if (!deleting) node.querySelector('input')?.select();
+    node.focus({ preventScroll:true });
     return () => node.close();
   }, [deleting]);
-  return <dialog ref={dialogRef} className="aiwc-history-dialog" aria-labelledby={titleId} onCancel={event => { event.preventDefault(); onClose(); }} onKeyDown={event => event.stopPropagation()}>
-    <form onSubmit={event => { event.preventDefault(); onConfirm(title.trim()); }}>
-      <h2 id={titleId}>{deleting ? '删除对话' : '重命名对话'}</h2>
-      {deleting ? <p>确认删除“{action.record.title}”？此操作无法撤销。</p> : <label>对话名称<input autoFocus value={title} maxLength={120} onChange={event => setTitle(event.target.value)}/></label>}
-      <div className="aiwc-dialog-actions">
-        <button type="button" autoFocus={deleting} onClick={onClose}>取消</button>
-        <button type="submit" className={deleting ? 'is-danger' : 'is-primary'} disabled={!deleting && !title.trim()}>{deleting ? '确认删除' : '保存'}</button>
+  const descriptionId = `${titleId}-description`;
+  return createPortal(<dialog ref={dialogRef} tabIndex={-1} autoFocus className={`delete-space-dialog${deleting ? '' : ' edit-space-dialog'} aiwc-conversation-dialog`} role={deleting ? 'alertdialog' : undefined} aria-label={deleting ? undefined : '重命名会话'} aria-labelledby={deleting ? titleId : undefined} aria-describedby={deleting ? descriptionId : undefined} onCancel={event => { event.preventDefault(); onClose(); }} onKeyDown={event => event.stopPropagation()}>
+    <form className="aiwc-conversation-form" onSubmit={event => { event.preventDefault(); if (deleting || title.trim()) onConfirm(title.trim()); }}>
+      {deleting ? <div className="delete-space-content">
+        <img className="delete-space-warning" src={warningIcon} alt="" draggable="false"/>
+        <h2 id={titleId}>删除对话</h2>
+        <p id={descriptionId}>确认删除“{action.record.title}”？删除后不可恢复。</p>
+      </div> : <>
+        <label className="edit-space-field">
+          <span className="edit-space-label">重命名会话</span>
+          <span className="edit-space-input-row"><input value={title} maxLength={120} onChange={event => setTitle(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && event.nativeEvent.isComposing) event.preventDefault(); }}/></span>
+        </label>
+      </>}
+      <div className={`delete-space-actions${deleting ? '' : ' edit-space-actions'}`}>
+        <button type="button" className="delete-space-cancel" onClick={onClose}>取消</button>
+        <button type="submit" className={deleting ? 'delete-space-confirm' : 'edit-space-confirm'} disabled={!deleting && !title.trim()}>{deleting ? '确认删除' : '保存'}</button>
       </div>
     </form>
-  </dialog>;
+  </dialog>, getHomeRoot());
 }

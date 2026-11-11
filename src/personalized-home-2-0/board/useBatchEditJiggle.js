@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
+import { isPageActive, subscribePageActivity } from '../../pageActivity.js';
 
 const TAU = Math.PI * 2;
 
@@ -89,7 +90,7 @@ export default function useBatchEditJiggle(rootRef, enabled, paused = false) {
       frame = 0;
       if (disposed) return;
       if (dirty) collectItems();
-      if (preference.matches || document.hidden) { reset(); return; }
+      if (preference.matches || !isPageActive(document)) { reset(); return; }
 
       const dt = previousTime ? Math.min((time - previousTime) / 1000, .04) : 1 / 60;
       previousTime = time;
@@ -122,7 +123,7 @@ export default function useBatchEditJiggle(rootRef, enabled, paused = false) {
 
     function wake() {
       if (disposed) return;
-      if (preference.matches || document.hidden) { reset(); return; }
+      if (preference.matches || !isPageActive(document)) { reset(); return; }
       // Outside edit mode, preview mounts and widget text updates need no
       // discovery pass, visibility observers or animation frame. Let an
       // already-running exit finish settling before going dormant.
@@ -136,7 +137,7 @@ export default function useBatchEditJiggle(rootRef, enabled, paused = false) {
     });
     changes.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     preference.addEventListener('change', wake);
-    document.addEventListener('visibilitychange', wake);
+    const releaseActivity = subscribePageActivity(wake, document);
     controllerRef.current = { wake };
     wake();
 
@@ -146,7 +147,7 @@ export default function useBatchEditJiggle(rootRef, enabled, paused = false) {
       changes.disconnect();
       visibility.disconnect();
       preference.removeEventListener('change', wake);
-      document.removeEventListener('visibilitychange', wake);
+      releaseActivity();
       controllerRef.current = null;
     };
   }, [rootRef]);

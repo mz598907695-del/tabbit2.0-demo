@@ -1,4 +1,33 @@
 @scope (.personalized-home) {
-.aiw-checkbox { flex:none; width:14px; height:14px; margin:0; accent-color:var(--text); cursor:pointer; }
+.aiw-checkbox {
+  appearance:none;
+  -webkit-appearance:none;
+  display:inline-grid;
+  place-content:center;
+  box-sizing:border-box;
+  flex:none;
+  width:14px;
+  height:14px;
+  margin:0;
+  padding:0;
+  border:1px solid var(--nine-color-border-alpha-regular);
+  border-radius:3px;
+  background:transparent;
+  cursor:pointer;
+}
+.aiw-checkbox::before {
+  content:"";
+  width:7px;
+  height:4px;
+  border-left:2px solid var(--color-text-white);
+  border-bottom:2px solid var(--color-text-white);
+  transform:translateY(-1px) rotate(-45deg);
+  opacity:0;
+}
+.aiw-checkbox:not(:disabled):hover { border-color:var(--checkbox-accent,var(--nine-color-action-primary)); }
+.aiw-checkbox:checked { border-color:var(--checkbox-accent,var(--nine-color-action-primary)); background:var(--checkbox-accent,var(--nine-color-action-primary)); }
+.aiw-checkbox:checked::before { opacity:1; }
+.aiw-checkbox:focus-visible { outline:2px solid var(--checkbox-accent,var(--nine-color-action-primary)); outline-offset:2px; }
+.aiw-checkbox:disabled { cursor:default; opacity:.4; }
 
 }

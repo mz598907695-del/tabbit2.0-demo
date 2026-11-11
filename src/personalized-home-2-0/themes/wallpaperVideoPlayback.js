@@ -1,21 +1,28 @@
 // Each window has a clock per URL: browser chrome and the shared new-tab
 // background (home + sidebar) show the same moment. Native video decoding/looping owns playback; no RAF loop.
+import { isPageActive, subscribePageActivity } from '../../pageActivity.js';
+
 const documents = new WeakMap();
 const MAX_DRIFT = .08;
 
 export function registerWallpaperVideo(video, src) {
   const doc = video.ownerDocument;
-  let groups = documents.get(doc);
-  if (!groups) { groups = new Map(); documents.set(doc, groups); }
-  let group = groups.get(src);
+  let state = documents.get(doc);
+  if (!state) {
+    state = { groups:new Map(), active:isPageActive(doc), releaseActivity:null };
+    state.releaseActivity = subscribePageActivity(active => {
+      state.active = active;
+      for (const group of state.groups.values()) for (const entry of group.entries) entry.update();
+    }, doc);
+    documents.set(doc, state);
+  }
+  let group = state.groups.get(src);
   if (!group) {
     group = { entries:new Set(), time:0 };
-    group.visibility = () => { for (const entry of group.entries) entry.update(); };
-    groups.set(src, group);
-    doc.addEventListener('visibilitychange', group.visibility);
+    state.groups.set(src, group);
   }
   const entry = { video, visible:false, update };
-  const eligible = item => item.visible && !doc.hidden && item.video.isConnected;
+  const eligible = item => item.visible && state.active && item.video.isConnected;
   const leader = () => {
     const playing = item => item && group.entries.has(item) && eligible(item) && !item.video.paused && item.video.readyState >= 2;
     if (!playing(group.primary)) group.primary = [...group.entries].find(playing);
@@ -74,8 +81,11 @@ export function registerWallpaperVideo(video, src) {
     video.removeEventListener('timeupdate', timeupdate);
     video.pause();
     if (!group.entries.size) {
-      doc.removeEventListener('visibilitychange', group.visibility);
-      groups.delete(src);
+      state.groups.delete(src);
+      if (!state.groups.size) {
+        state.releaseActivity();
+        documents.delete(doc);
+      }
     }
   };
 }

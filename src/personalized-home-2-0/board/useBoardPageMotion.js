@@ -55,6 +55,8 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
       const direction = entry.direction, width = entry.width;
       const progress = Math.min(1, entry.offset / Math.max(1, width));
       const options = { duration: Math.round(150 + 100 * (1 - progress)), easing: 'cubic-bezier(.2, .75, .2, 1)', fill: 'both' };
+      // Keep both material planes opaque: fading a grid cuts its cards off
+      // from the wallpaper backdrop and causes a brightness jump on finish.
       const outgoing = entry.snapshot.animate([
         { transform: `translateX(${-direction * entry.offset}px)` },
         { transform: `translateX(${-direction * width}px)` },
@@ -101,9 +103,6 @@ export function useBoardPageMotion(gridRef, pageId, enabled, pages) {
       const width = samePreview ? tracking.current.width : grid.clientWidth;
       const distance = Math.min(width, detail.distance ?? detail.progress * width);
       tracking.current = { ...detail, direction, distance, width };
-      // Opacity/filter on this ancestor creates a backdrop root. Its glass
-      // descendants then lose the wallpaper sample until the animation ends.
-      // Keep both pages fully opaque and slide them continuously instead.
       grid.style.transform = `translateX(${-direction * distance}px)`;
       peer.style.transform = `translateX(${direction * (width - distance)}px)`;
       if (samePreview) peer.style.visibility = 'visible';

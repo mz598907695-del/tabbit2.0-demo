@@ -1,6 +1,6 @@
 @scope (.personalized-home) {
 .aiw-navigation { display:flex; flex-direction:column; min-width:0; height:100%; min-height:0; background:var(--bg,#f4f4f4); border-right:.5px solid var(--border,rgba(0,0,0,.08)); font-size:14px; color:var(--text,#191a1c); overflow:hidden; }
-.aiw-navigation button { color:inherit; font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.aiw-navigation button:not(:where(.dropdown-panel > button)) { color:inherit; font:inherit; cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .aiw-navigation button:focus-visible { outline:2px solid var(--focus-ring,#96999f); outline-offset:2px; }
 .aiwn-header { flex:none; display:flex; align-items:center; justify-content:space-between; height:64px; padding:0 16px 0 20px; gap:8px; }
 .aiwn-title { font-size:17px!important; font-weight:500!important; letter-spacing:-.4px; text-align:left; border-radius:5px; padding:3px 0; }

@@ -98,8 +98,8 @@
 .aiws-card-actions .aiws-install:hover { background:var(--nine-color-fill-layer-strong); }
 .aiws-install > svg { width:16px; height:16px; }
 .aiws-cards.is-list { grid-template-columns:minmax(0,1fr); gap:0; }
-.aiws-cards.is-list .aiws-card { grid-template-columns:40px minmax(0,1fr) auto auto; align-items:center; gap:0 12px; background:transparent; border:0; border-bottom:.5px solid var(--nine-color-border-alpha-subtle); border-radius:0; padding:12px 0; box-shadow:none; }
-.aiws-cards.is-list .aiws-card:last-child { border-bottom:0; }
+.aiws-cards.is-list .aiws-card { position:relative; grid-template-columns:40px minmax(0,1fr) auto auto; align-items:center; gap:0 12px; background:transparent; border:0; border-radius:0; padding:12px 0; box-shadow:none; }
+.aiws-cards.is-list .aiws-card:not(:last-child)::after { content:""; position:absolute; inset:auto 0 0; height:.5px; background:var(--nine-color-border-alpha-subtle); pointer-events:none; }
 .aiw-content .aiws-cards.is-list .aiws-card-title { font-weight:400; }
 .aiws-cards.is-list .aiws-card-name { display:flex; align-items:center; gap:8px; min-width:0; }
 .aiws-cards.is-list .aiws-card-title { width:auto; max-width:100%; }

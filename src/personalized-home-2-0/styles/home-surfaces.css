@@ -44,7 +44,7 @@
 }
 /* All dark homepage surfaces share the gradient, top light and bottom edge. */
 :scope[data-theme='dark'] :is(.board-card, :is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card) {
-  --home-surface-brightness: 1.5;
+  --home-surface-brightness: 1.4;
   --home-surface-dither: url('/personalized-home-2-0/asset/material-dither.png');
   --home-content-surface-fill: linear-gradient(#33333366, #3333334d);
   --home-surface-backdrop: blur(30px) saturate(100%);

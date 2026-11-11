@@ -1,0 +1,21 @@
+.app-update-notice {
+  position:fixed; z-index:1500; right:20px; bottom:20px;
+  display:flex; flex-direction:column; gap:12px;
+  width:340px; max-width:calc(100vw - 40px); padding:16px;
+  border:1px solid var(--nine-color-border-alpha-subtle); border-radius:var(--nine-radius-lg);
+  background:var(--nine-color-bg-page); color:var(--nine-color-text-title);
+  box-shadow:var(--nine-shadow-level-2);
+  font-family:var(--app-font-family); font-size:var(--nine-font-size-13); line-height:20px;
+}
+.app-update-copy strong { display:block; font-weight:500; }
+.app-update-copy p { margin:4px 0 0; color:var(--nine-color-text-secondary); }
+.app-update-notice progress { width:100%; height:4px; accent-color:var(--nine-color-action-primary); }
+.app-update-actions { display:flex; justify-content:flex-end; gap:8px; }
+.app-update-actions button {
+  min-height:32px; padding:6px 12px; border-radius:var(--nine-radius-sm);
+  color:var(--nine-color-text-primary); background:var(--nine-color-fill-layer-muted); cursor:pointer;
+}
+.app-update-actions button:hover { background:var(--nine-color-fill-layer-strong); }
+.app-update-actions button.is-primary { background:var(--nine-color-action-primary); color:var(--nine-color-action-primary-on); }
+.app-update-actions button.is-primary:hover { background:var(--nine-color-action-primary-hover); }
+.app-update-actions button:focus-visible { outline:2px solid var(--nine-color-action-primary); outline-offset:2px; }

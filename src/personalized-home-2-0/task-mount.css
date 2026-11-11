@@ -5,32 +5,32 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--nine-space-xs);
-  height: 44px;
-  padding: 6px 8px;
+  min-height: 30px;
+  padding: 0 0 6px;
   color: var(--nine-color-text-title);
 }
 .tb-task-mount-controls { display: flex; align-items: center; gap: var(--nine-space-sm); min-width: 0; }
 .tb-task-mount-end { display: flex; flex: 0 0 auto; align-items: center; gap: var(--nine-space-xxs); }
-.tb-task-mount-end .tb-local-task-trigger { height: 28px; padding-inline: calc(var(--spacing-base) * 1.5); touch-action: manipulation; }
+.tb-task-mount-end .tb-local-task-trigger { height: 24px; gap: 4px; padding-inline: 6px; font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); touch-action: manipulation; }
 .tb-task-mount-button {
   display: flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  gap: calc(var(--spacing-base) * 1.5);
+  gap: 4px;
   min-width: 0;
-  height: 32px;
-  padding: 0 calc(var(--spacing-base) * 1.5);
+  height: 24px;
+  padding: 0 6px;
   border: 0;
   border-radius: var(--nine-radius-full);
   color: inherit;
   background: transparent;
   font-family: inherit;
-  font-size: var(--nine-font-size-13);
-  line-height: var(--nine-font-line-height-13);
+  font-size: var(--nine-font-size-12);
+  line-height: var(--nine-font-line-height-12);
   touch-action: manipulation;
 }
-.tb-task-mount-button > svg { flex-shrink: 0; }
+.tb-task-mount-button > svg { flex-shrink: 0; width:14px; height:14px; }
 .tb-task-mount-button > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .tb-task-mount-button > small { flex-shrink: 0; color: var(--nine-color-text-tertiary); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
 .tb-task-project { flex: 0 1 auto; max-width: 200px; }
@@ -39,33 +39,34 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--spacing-base) * 1.5);
-  height: 28px;
-  padding: 0 var(--nine-space-xs);
+  gap: 4px;
+  height: 24px;
+  padding: 0 6px;
   border: 0;
   border-radius: var(--nine-radius-full);
   color: var(--nine-color-text-tertiary);
-  background: var(--nine-color-fill-layer-strong);
+  background: transparent;
   font-family: inherit;
-  font-size: var(--nine-font-size-13);
-  line-height: var(--nine-font-line-height-13);
+  font-size: var(--nine-font-size-12);
+  line-height: var(--nine-font-line-height-12);
   white-space: nowrap;
   touch-action: manipulation;
 }
-.tb-task-runtime > svg { flex-shrink: 0; }
+.tb-task-runtime > svg { flex-shrink: 0; width:14px; height:14px; }
+.tb-task-runtime > .tb-task-runtime-chevron { width:12px; height:12px; transition: transform 160ms ease; }
+.tb-task-runtime[aria-expanded="true"] > .tb-task-runtime-chevron { transform: rotate(180deg); }
 .tb-task-mount button:focus-visible { outline: 1px solid var(--nine-color-border-alpha-regular); outline-offset: -1px; }
 .tb-task-mount button.is-open { background: var(--nine-color-fill-layer-strong); color: var(--nine-color-text-title); }
 /* The enclosing composer frame owns the backing material. */
 @media (hover: hover) {
-  .tb-task-mount button:hover { background: var(--nine-color-fill-layer-strong); color: var(--nine-color-text-title); }
+  .tb-task-mount button:hover { background: rgb(from var(--nine-color-fill-layer-strong) r g b / 5%); color: var(--nine-color-text-title); }
+  .tb-task-runtime:hover { background: var(--nine-color-fill-layer-strong); }
 }
 @container composer-controls (max-width: 430px) {
-  .tb-task-mount { gap: var(--nine-space-xxs); padding-inline: calc(var(--spacing-base) * 1.5); }
+  .tb-task-mount { gap: var(--nine-space-xxs); }
   .tb-task-mount-controls { gap: var(--nine-space-xxs); }
-  .tb-task-mount-button { gap: var(--nine-space-xxs); padding-inline: var(--nine-space-xxs); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
   .tb-task-project { max-width: 130px; }
-  .tb-task-mount-end .tb-local-task-trigger { gap: var(--nine-space-xxs); padding-inline: var(--nine-space-xxs); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
-  .tb-task-runtime { gap: var(--nine-space-xxs); padding-inline: calc(var(--spacing-base) * 1.5); font-size: var(--nine-font-size-12); line-height: var(--nine-font-line-height-12); }
+  .tb-task-mount-end .tb-local-task-trigger { gap: 3px; padding-inline: 4px; }
 }
 
 }

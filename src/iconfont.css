@@ -31,6 +31,12 @@
 .icon-new-window::before { content: "\e34a"; }
 .icon-incognito::before { content: "\e4ab"; }
 .icon-edit::before { content: "\e060"; }
+.icon-bi_qianbixian::before { content: "\e29f"; }
+.icon-datouding_guding_jinzhi::before { content: "\e2ae"; }
+.icon-datouding::before { content: "\e2b8"; }
+.icon-celiangyiqi::before { content: "\e443"; }
+.icon-piao_ruchangquan-2::before { content: "\e367"; }
+.icon-fapiao_wenben::before { content: "\e32e"; }
 .icon-trash::before { content: "\e032"; }
 .icon-shezhi_chilun::before { content: "\e2d8"; }
 .icon-nav-back::before { content: "\e01f"; }

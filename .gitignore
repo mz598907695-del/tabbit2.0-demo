@@ -10,6 +10,12 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+release
+sites/tabbit-download/
+__pycache__/
+# Updater signing material belongs outside the repository.
+*.key
+*.key.pub
 *.local
 
 # Editor directories and files

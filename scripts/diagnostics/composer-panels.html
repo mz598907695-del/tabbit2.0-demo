@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>输入框展开区域检查</title>
+<body>
+<button data-check="checkHomePanels">检查首页</button>
+<button data-check="checkConversationPanels">检查对话页</button>
+<button data-check="checkWidgetPanels">检查小组件</button>
+<button data-check="checkSidebarEntry">检查侧边栏入口</button>
+<button data-check="all">检查全部</button>
+<pre id="result">等待检查</pre>
+<script type="module">
+import { runIsolatedCheck } from './frame-check.js';
+for (const button of document.querySelectorAll('[data-check]')) {
+  button.onclick = async () => {
+    const output = document.getElementById('result');
+    output.textContent = '正在检查';
+    try {
+      const checks = button.dataset.check === 'all' ? ['checkHomePanels', 'checkConversationPanels', 'checkWidgetPanels', 'checkSidebarEntry'] : [button.dataset.check];
+      const results = await Promise.all(checks.map(name => runIsolatedCheck('/scripts/diagnostics/composer-panels.jsx', name)));
+      output.textContent = JSON.stringify({passed:true, checks:results.map(result => ({passed:result.passed, context:result.scenarios[0].context, scenarios:result.scenarios.length}))}, null, 2);
+    }
+    catch (error) { output.textContent = String(error); }
+  };
+}
+</script>
+</body>
+</html>

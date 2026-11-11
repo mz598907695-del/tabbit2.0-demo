@@ -3,8 +3,8 @@ export const oceanDepth = (scrollTop, height) => clamp(scrollTop / Math.max(1, h
 export const depthName = depth => depth < .22 ? '日光浅海' : depth < .6 ? '海草森林' : '蓝色深渊';
 export const fishLimit = width => width < 650 ? 3 : 5;
 export const fishArtSources = {
-  amber: '/personalized-home-2-0/asset/themes/ocean/fish-amber.png',
-  moon: '/personalized-home-2-0/asset/themes/ocean/fish-moon.png',
+  amber: '/personalized-home-2-0/asset/themes/ocean/fish-amber.webp',
+  moon: '/personalized-home-2-0/asset/themes/ocean/fish-moon.webp',
   teal: '/personalized-home-2-0/asset/themes/ocean/fish-teal.webp',
 };
 

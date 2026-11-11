@@ -1,4 +1,4 @@
-export const OCEAN_ATLAS_URL = '/personalized-home-2-0/asset/themes/ocean/depth-atlas.png';
+export const OCEAN_ATLAS_URL = '/personalized-home-2-0/asset/themes/ocean/depth-atlas.webp';
 
 const MAX_PIXELS = 1_000_000;
 const WATERLINE = 0.15;

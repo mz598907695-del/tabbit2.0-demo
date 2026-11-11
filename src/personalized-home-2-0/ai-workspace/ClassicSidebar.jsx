@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Bell, Ellipsis, BatchListChecks, ListChecks, Pencil, Pin, PinOff, Search, Trash2 } from '../icons';
+import { ArrowUpRight, Bell, Ellipsis, BatchListChecks, ListChecks, Trash2 } from '../icons';
 import './classic-sidebar.css';
 import SidebarScrollArea from './SidebarScrollArea';
 import SidebarToggleIcon from './SidebarToggleIcon';
@@ -42,13 +42,13 @@ function PrimaryNavItem({ id, label, selected, enabled, reducedMotion, onClick }
 }
 
 function IconButton({ label, Icon, onClick, selected, children }) {
-  return <button type="button" className="aiwc-icon" aria-label={label} title={label} aria-current={selected ? 'page' : undefined} onClick={onClick}>
+  return <button type="button" className="aiwc-icon" aria-label={label} title={label} data-notification-trigger={label === '通知' || undefined} aria-current={selected ? 'page' : undefined} onClick={onClick}>
     <Icon size={16} strokeWidth={1.8}/>{children}
   </button>;
 }
 
 // Scheme 1 owns its anatomy and styles; the seven comparison schemes stay intact.
-export default function ClassicSidebar({ page, data, active = true, activeConversationId, onNavigate, onClose, onSearch, onNewChat, onUpdateChat, onDeleteChats }) {
+export default function ClassicSidebar({ page, data, active = true, activeConversationId, onNavigate, onClose, onNewChat, onUpdateChat, onDeleteChats }) {
   const [menu, setMenu] = useState(null);
   const [action, setAction] = useState(null);
   const [editing, setEditing] = useState(false);
@@ -77,6 +77,10 @@ export default function ClassicSidebar({ page, data, active = true, activeConver
   const restoreFocus = useCallback(() => requestAnimationFrame(() => {
     const target = focusTarget.current;
     const row = target?.id && scrollRef.current?.querySelector(`[data-chat-id="${CSS.escape(target.id)}"] .aiwc-row-more`);
+    if (target?.id && !row) {
+      scrollRef.current?.focus({ preventScroll:true });
+      return;
+    }
     const fallback = scrollRef.current?.querySelector('[data-history-actions]:not(:disabled)') || scrollRef.current?.querySelector('[aria-label="新建对话"]');
     [row, target?.anchor, fallback].find(node => node?.isConnected && node.getClientRects().length && !node.disabled)?.focus({ preventScroll: true });
   }), []);
@@ -90,6 +94,11 @@ export default function ClassicSidebar({ page, data, active = true, activeConver
     setMenu(current => current?.anchor === anchor ? null : { anchor, id: record?.id || 'recent' });
   }
   function finishEditing() { setEditing(false); setSelected([]); restoreFocus(); }
+  function toggleEditing(event) {
+    focusTarget.current = { anchor: event.currentTarget };
+    if (editing) finishEditing();
+    else startEditing();
+  }
   function startEditing() {
     setMenu(null); setSelected([]); setEditing(true);
     requestAnimationFrame(() => scrollRef.current?.querySelector('input[type="checkbox"]')?.focus({ preventScroll: true }));
@@ -106,8 +115,8 @@ export default function ClassicSidebar({ page, data, active = true, activeConver
     { label: '收藏管理', animatedKind: 'bookmarks', onClick: () => { closeMenu(true); onNavigate('bookmarks'); } },
     { label: '分享管理', animatedKind: 'shares', onClick: () => { closeMenu(true); onNavigate('shares'); } },
   ] : menuRecord ? [
-    { label: menuRecord.pinned ? '取消置顶' : '置顶', Icon: menuRecord.pinned ? PinOff : Pin, onClick: () => { onUpdateChat(menuRecord.id, { pinned: !menuRecord.pinned }); closeMenu(true); } },
-    { label: '重命名', Icon: Pencil, onClick: () => { setMenu(null); setAction({ type: 'rename', record: menuRecord }); } },
+    { label: menuRecord.pinned ? '取消置顶' : '置顶', iconName: menuRecord.pinned ? 'datouding_guding_jinzhi' : 'datouding', onClick: () => { onUpdateChat(menuRecord.id, { pinned: !menuRecord.pinned }); closeMenu(true); } },
+    { label: '重命名', iconName: 'bi_qianbixian', onClick: () => { setMenu(null); setAction({ type: 'rename', record: menuRecord }); } },
     { label: '删除', Icon: Trash2, danger: true, onClick: () => { setMenu(null); setAction({ type: 'delete', record: menuRecord }); } },
   ] : editing ? [
     { label: selectedIds.size === visibleChats.length ? '取消全选' : '全选', Icon: ListChecks, disabled: !visibleChats.length, onClick: () => { setSelected(selectedIds.size === visibleChats.length ? [] : visibleChats.map(chat => chat.id)); closeMenu(true); } },
@@ -133,8 +142,7 @@ export default function ClassicSidebar({ page, data, active = true, activeConver
         <img src="/personalized-home-2-0/asset/icons/tabbit-solid.svg" alt="" width="18" height="18" draggable="false"/>
       </button>
       <div className="aiwc-header-actions">
-        <IconButton label="搜索全部内容" Icon={Search} onClick={onSearch}/>
-        <IconButton label="通知" Icon={Bell} selected={page === 'notifications'} onClick={() => onNavigate('notifications')}>
+        <IconButton label="通知" Icon={Bell} selected={page === 'notifications'} onClick={event => onNavigate('notifications', undefined, event.currentTarget)}>
           {unread > 0 && <i className="aiwc-unread" aria-label={`${unread} 条未读通知`}/>}
         </IconButton>
         <IconButton label="收起 AI 侧边栏" Icon={SidebarToggleIcon} onClick={onClose}/>
@@ -151,7 +159,7 @@ export default function ClassicSidebar({ page, data, active = true, activeConver
           setMenu({ anchor, id: 'navigation', hover: false });
         }}><span className="aiwc-nav-leading"><Ellipsis size={16} strokeWidth={2} aria-hidden="true"/><span>更多</span></span><span className="aiwc-nav-actions" aria-hidden="true"/></button>
       </nav>
-      {[{ title: '置顶', pinned: true }, { title: '最近', pinned: false }].filter(group => !group.pinned || visibleChats.some(item => item.pinned)).map(group => <HistoryGroup hasChats={Boolean(visibleChats.length)} key={group.title} title={group.title} records={visibleChats.filter(item => Boolean(item.pinned) === group.pinned).slice(0, group.pinned ? undefined : 8)} source={!group.pinned ? source : undefined} onSourceChange={next => { setSource(next); setSelected([]); setMenu(null); }} onNavigate={onNavigate} activeConversationId={activeConversationId} editing={editing} selectedIds={selectedIds} onSelect={selectChat} onMenu={openMenu} menuId={menu?.id} onBatchEdit={!group.pinned ? startEditing : undefined}/>)}
+      {[{ title: '置顶', pinned: true }, { title: '最近', pinned: false }].filter(group => !group.pinned || visibleChats.some(item => item.pinned)).map(group => <HistoryGroup hasChats={Boolean(visibleChats.length)} key={group.title} title={group.title} records={visibleChats.filter(item => Boolean(item.pinned) === group.pinned).slice(0, group.pinned ? undefined : 8)} source={!group.pinned ? source : undefined} onSourceChange={next => { setSource(next); setSelected([]); setMenu(null); }} onNavigate={onNavigate} activeConversationId={activeConversationId} editing={editing} selectedIds={selectedIds} onSelect={selectChat} onMenu={openMenu} menuId={menu?.id} onBatchEdit={!group.pinned ? toggleEditing : undefined}/>)}
     </SidebarScrollArea>
     <footer className={`aiwc-footer${editing ? ' is-editing' : ''}`} onKeyDown={editingKeyDown}>
       {editing ? <>

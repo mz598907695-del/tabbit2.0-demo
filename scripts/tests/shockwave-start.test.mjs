@@ -44,26 +44,23 @@ function rendererHost(t) {
   return {region,children,calls,doc,win,frames,tick(offset=16){const [key,fn]=frames.entries().next().value;frames.delete(key);fn(performance.now()+offset);}};
 }
 
-test('halo paints before a pending screenshot resolves and cancellation releases resources',async t=>{
+test('halo waits for the committed screenshot and cancellation releases resources',async t=>{
   const host=rendererHost(t);let resolve;
   const cancel=playTaskShockwave({region:host.region,origin:{x:640,y:400},capture:()=>new Promise(done=>{resolve=done;})});
-  assert.equal(host.children.length,1,'press must mount the halo synchronously');
-  assert.equal(host.children[0].dataset.snapshot,'pending');
-  host.tick();assert.equal(host.calls.draws,1,'the first frame must not await a snapshot');
+  assert.equal(host.children.length,0,'the halo must not replace the page before its screenshot is ready');
   cancel();assert.equal(host.children.length,0);assert.equal(host.frames.size,0);
-  assert.equal(host.calls.deletedTextures,2);assert.equal(host.calls.lost,true);
+  assert.equal(host.calls.deletedTextures,0);assert.equal(host.calls.lost,false);
   assert.equal(host.win.listeners.size+host.doc.listeners.size,0);
   const image={src:'late-snapshot'};resolve(image);
   await new Promise(done=>setImmediate(done));
   assert.equal(image.src,'');assert.equal(host.children.length,0,'late screenshots must not resurrect a cancelled effect');
 });
 
-test('a ready snapshot enriches the same running wave without restarting its first frame',async t=>{
+test('a ready snapshot starts one native-textured wave',async t=>{
   const host=rendererHost(t);let resolve;
   playTaskShockwave({region:host.region,origin:{x:640,y:400},capture:()=>new Promise(done=>{resolve=done;})});
-  const canvas=host.children[0];host.tick();const first=canvas.dataset.firstFrameMs;
   resolve({src:'ready-snapshot'});await new Promise(done=>setImmediate(done));
-  assert.equal(host.children[0],canvas);assert.equal(canvas.dataset.snapshot,'native');
-  assert.equal(canvas.dataset.firstFrameMs,first);assert.equal(host.frames.size,1);
+  const canvas=host.children[0];assert.equal(canvas.dataset.snapshot,'native');
+  host.tick();assert.ok(canvas.dataset.firstFrameMs);assert.equal(host.frames.size,1);
   host.tick(SHOCKWAVE_DURATION+100);assert.equal(host.children.length,0);assert.equal(host.calls.lost,true);
 });

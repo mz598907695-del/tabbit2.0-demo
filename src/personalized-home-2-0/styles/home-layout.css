@@ -84,9 +84,9 @@
   width: min(var(--page-content-max), calc(100% - 48px));
   margin-inline: auto;
   /* Keep the viewport baseline when the surrounding frame gains its top gutter. */
-  padding-top: calc(var(--home-content-top) - var(--home-frame-top));
+  padding-top: calc(var(--home-content-top) - var(--home-frame-top) - var(--composer-task-height, 0px));
   padding-bottom: 0;
-  transition: padding-top 320ms var(--nine-motion-easing-standard);
+  transition: padding-top 320ms cubic-bezier(.22, 1, .36, 1);
 }
 .home[data-page-swipe-enabled] .home-scroll {
   /* Keep an owned horizontal page swipe from chaining into browser history.
@@ -94,7 +94,10 @@
   overscroll-behavior-x: none;
 }
 .home-layout .home-content[data-page-width="wide"] { --page-content-max: 1100px; }
-.home-feed { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; min-width: 0; position: relative; }
+/* The matching offset lifts only the logo; the input and board keep their anchor. */
+.home-feed { display: flex; flex-direction: column; align-items: center; gap: 24px; width: 100%; min-width: 0; position: relative; margin-top:var(--composer-task-height, 0px); transition:margin-top 320ms cubic-bezier(.22, 1, .36, 1); }
+.home-layout .home-content[data-mode-switch-instant],
+.home-content[data-mode-switch-instant] > .home-feed { transition:none; }
 .home-scroll { scroll-padding-top: 110px; }
 .home-scroll:has(.home-feed > .tb-composer-wrap:focus-within) { scroll-padding-top: 0; }
 :scope:has(dialog:modal) .home-scroll { overflow-y: hidden; }

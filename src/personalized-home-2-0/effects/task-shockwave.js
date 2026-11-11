@@ -98,25 +98,18 @@ export function playTaskShockwave({ region, owner = region, origin, triggerTime 
   document.addEventListener('pointerdown',cancel,true);
   document.addEventListener('keydown',cancel,true);
 
-  function start() {
-    // Request the old presented frame before adding the overlay. The halo does
-    // not await PNG encoding or IPC; full refraction blends in when ready.
-    let captureResult;
-    try { captureResult=reduced ? null : capture(bounds,ratio); }
-    catch(error) { captureResult=Promise.reject(error); }
-    let uploadSnapshot=null;
-    void Promise.resolve(captureResult).catch(error=>{
+  async function start() {
+    // Capture the committed task frame before mounting the overlay. Starting
+    // once with that texture avoids replacing the live page mid-wave, which
+    // showed up as a flash even when the replacement was cross-faded.
+    let image=null;
+    try { image=reduced ? null : await capture(bounds,ratio); }
+    catch(error) {
       if(import.meta.env.DEV) console.warn('Shockwave uses its light-only fallback:',error);
-      return null;
-    }).then(image=>{
-      if(!image) {if(!stopped)canvas.dataset.snapshot='overlay';return;}
-      if(stopped || !live() || !uploadSnapshot) {image.src='';return;}
-      const current=region.getBoundingClientRect();
-      if(['x','y','width','height'].some(key=>Math.abs(current[key]-bounds[key])>1)) {image.src='';cancel();return;}
-      try {uploadSnapshot(image);}
-      catch(error) {if(import.meta.env.DEV)console.warn('Shockwave snapshot unavailable:',error);}
-      finally {image.src='';}
-    });
+    }
+    if(stopped || !live()) {if(image)image.src='';cancel();return;}
+    const current=region.getBoundingClientRect();
+    if(['x','y','width','height'].some(key=>Math.abs(current[key]-bounds[key])>1)) {if(image)image.src='';cancel();return;}
     canvas.width=Math.round(bounds.width*ratio);canvas.height=Math.round(bounds.height*ratio);
     gl=canvas.getContext('webgl2',{alpha:true,premultipliedAlpha:true,antialias:false,depth:false,stencil:false,preserveDrawingBuffer:false});
     if(!gl) {cancel();return;}
@@ -151,18 +144,19 @@ export function playTaskShockwave({ region, owner = region, origin, triggerTime 
       const radiusUniform=uniform('uRadius'),strengthUniform=uniform('uStrength'),colorsUniform=uniform('uColors[0]'),darkUniform=uniform('uDark');
       let colors=shockwavePalette(config,darkMode()?'dark':'light');
       let darkMix=darkMode()?1:0;
-      let snapshotAt=-1;
-      uploadSnapshot=image=>{
-        upload(pageTexture,0,image);
+      if(image) {
+        try {upload(pageTexture,0,image);}
+        catch(error) {image=null;if(import.meta.env.DEV)console.warn('Shockwave snapshot unavailable:',error);}
+      }
+      if(image) {
         if(config.glint>0) {
           mask=createLineMask(region,bounds,canvas.width,canvas.height);
           upload(lineTexture,1,mask);
         }
-        snapshotAt=performance.now();
         canvas.dataset.snapshot='native';
-        canvas.dataset.snapshotAtMs=String(Math.round(snapshotAt-triggerTime));
-      };
-      canvas.dataset.snapshot=reduced?'overlay':'pending';
+        canvas.dataset.snapshotAtMs=String(Math.round(performance.now()-triggerTime));
+      } else canvas.dataset.snapshot='overlay';
+      if(image)image.src='';
       canvas.dataset.origin=`${Math.round(source.x)},${Math.round(source.y)}`;
       canvas.addEventListener('webglcontextlost',cancel);
       document.body.append(canvas);
@@ -183,7 +177,7 @@ export function playTaskShockwave({ region, owner = region, origin, triggerTime 
         previous=now;
         const state=getShockwaveFrame(progress,bounds.width,bounds.height,source,reduced,parameters.easing);
         gl.uniform1f(radiusUniform,state.radius);gl.uniform1f(strengthUniform,state.strength);
-        gl.uniform1f(snapshotUniform,snapshotAt<0?0:Math.min(1,(now-snapshotAt)/100));
+        gl.uniform1f(snapshotUniform,image?1:0);
         gl.uniform3fv(colorsUniform,new Float32Array(colors));gl.uniform1f(darkUniform,darkMix);
         gl.viewport(0,0,canvas.width,canvas.height);gl.drawArrays(gl.TRIANGLES,0,3);
         if(!canvas.dataset.firstFrameMs)canvas.dataset.firstFrameMs=String(Math.round(now-triggerTime));
@@ -191,7 +185,7 @@ export function playTaskShockwave({ region, owner = region, origin, triggerTime 
         frame=requestAnimationFrame(tick);
       };
       frame=requestAnimationFrame(tick);
-    } catch(error) {if(import.meta.env.DEV)console.warn('Shockwave unavailable:',error);cancel();}
+    } catch(error) {if(image)image.src='';if(import.meta.env.DEV)console.warn('Shockwave unavailable:',error);cancel();}
   }
   void start();
   return cancel;

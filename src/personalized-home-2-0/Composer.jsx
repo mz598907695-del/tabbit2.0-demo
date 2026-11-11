@@ -75,6 +75,17 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
     overlayOpen: anyOverlay || externalOverlayOpen,
   });
 
+  useLayoutEffect(() => {
+    const owner = wrapRef.current;
+    if (!owner?.hasAttribute('data-mode-switch-instant')) return;
+    // Commit the new geometry without transitions before restoring normal picker motion.
+    owner.getBoundingClientRect();
+    owner.removeAttribute('data-mode-switch-instant');
+    if (owner.parentElement?.classList.contains('home-feed')) {
+      owner.closest('.home-content')?.removeAttribute('data-mode-switch-instant');
+    }
+  }, [mode]);
+
   function focusInput(options) {
     const input = inputRef.current;
     if (!input) return;
@@ -203,9 +214,16 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
   }
 
   function changeMode(nextMode) {
-    setOverlay(null);
+    if (nextMode === '任务' && nextMode !== mode) {
+      const owner = wrapRef.current;
+      owner?.setAttribute('data-mode-switch-instant', '');
+      if (owner?.parentElement?.classList.contains('home-feed')) {
+        owner.closest('.home-content')?.setAttribute('data-mode-switch-instant', '');
+      }
+    }
+    setOverlay(current => INLINE_PANEL_LABELS[current] ? current : null);
     setMode(nextMode);
-    focusInput();
+    if (!inlineKind) focusInput();
   }
 
   function openFiles() {
@@ -365,8 +383,19 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
     return persistCommands(customCommands.filter(command => command.id !== commandId));
   }
 
-  return <div ref={wrapRef} className="tb-composer-wrap" data-expansion={expansionKind || undefined} data-inline-panel={inlineKind || undefined} onKeyDown={expansionKeydown} data-composer-owner={id} style={{ '--composer-input-height': `${inputHeight}px`, '--composer-skill-indent': `${skillWidth}px` }}>
+  return <div ref={wrapRef} className="tb-composer-wrap" data-expansion={expansionKind || undefined} data-task-mode={taskMode || undefined} data-inline-panel={inlineKind || undefined} onKeyDown={expansionKeydown} data-composer-owner={id} style={{ '--composer-input-height': `${inputHeight}px`, '--composer-skill-indent': `${skillWidth}px` }}>
     <div className="tb-composer-frame">
+    <ComposerExpansion kind={taskMode ? 'task' : null} ownerRef={wrapRef} disabled={dockControlsHidden} side="top" heightProperty="--composer-task-height">
+      <div id={`${id}-mount`} className="tb-task-mount" role="group" aria-label="任务挂载区">
+        <div className="tb-task-mount-controls">
+          <button ref={node => { triggers.current.project = node; }} type="button" className={`tb-task-mount-button tb-task-project${overlay === 'project' ? ' is-open' : ''}`} aria-label={selectedProject ? `选择项目：${selectedProject.name}` : '选择项目'} title={selectedProject?.name || '选择项目'} aria-haspopup="dialog" aria-expanded={overlay === 'project'} aria-controls={overlay === 'project' ? `${id}-project` : undefined} onClick={() => toggleOverlay('project')}><Folder size={14} /><span>{selectedProject?.name || '选择项目'}</span></button>
+        </div>
+        <div className="tb-task-mount-end">
+          {!simple && localTask && <button ref={node => { triggers.current.approval = node; }} type="button" className={`tb-local-task-trigger${overlay === 'approval' ? ' is-open' : ''}${approvalPolicy === 'full' ? ' is-full-access' : ''}`} aria-label={`审批策略：${selectedApproval.name}`} aria-haspopup="menu" aria-expanded={overlay === 'approval'} aria-controls={overlay === 'approval' ? `${id}-approval` : undefined} onClick={() => toggleOverlay('approval')}><selectedApproval.Icon size={16} aria-hidden="true" /><span>{selectedApproval.name}</span><ChevronDown className="tb-local-task-chevron" size={14} aria-hidden="true" /></button>}
+          <button ref={node => { triggers.current.runtime = node; }} type="button" className={`tb-task-runtime${overlay === 'runtime' ? ' is-open' : ''}`} aria-label={`运行位置：${runLocation === 'cloud' ? '云端' : '本地'}`} title={runLocation === 'cloud' ? '在云端运行' : '在你的计算机上运行'} aria-haspopup="menu" aria-expanded={overlay === 'runtime'} aria-controls={overlay === 'runtime' ? `${id}-runtime` : undefined} onClick={() => toggleOverlay('runtime')}>{runLocation === 'cloud' ? <Cloud size={14} aria-hidden="true" /> : <Laptop size={14} aria-hidden="true" />}<span>{runLocation === 'cloud' ? '云端' : '本地'}</span><ChevronDown className="tb-task-runtime-chevron" size={12} aria-hidden="true" /></button>
+        </div>
+      </div>
+    </ComposerExpansion>
     <form className="tb-composer" onSubmit={submit}>
       <div className="tb-composer-surface" aria-hidden="true" onClick={() => focusInput()}/>
       <ComposerWeather />
@@ -426,8 +455,8 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
       </div>
     </form>
 
-    <ComposerExpansion kind={expansionKind} ownerRef={wrapRef} disabled={dockControlsHidden}>
-      {inlineKind ? <ComposerInlinePanel key={inlineKind} kind={inlineKind} id={`${id}-${inlineKind}`} label={INLINE_PANEL_LABELS[inlineKind]} active={!dockControlsHidden}>
+    <ComposerExpansion kind={inlineKind} ownerRef={wrapRef} disabled={dockControlsHidden} reserveTaskSpace={taskMode}>
+      {inlineKind && <ComposerInlinePanel key={inlineKind} kind={inlineKind} id={`${id}-${inlineKind}`} label={INLINE_PANEL_LABELS[inlineKind]} active={!dockControlsHidden}>
         {inlineKind === 'add' && <ComposerAddMenu active={!dockControlsHidden} onReferences={addReferences} onFiles={openFiles} onFolder={openFolder}/>}
         {inlineKind === 'model' && <ComposerModelMenu selection={modelSelection}
           onSelect={name => { setModelSelection(current => toggleReplyModel(current, name)); if (!modelSelection.multiple) closePopover(); }}
@@ -435,15 +464,7 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
         {inlineKind === 'ideas' && <ComposerIdeasMenu customCommands={customCommands}
           onSelect={(prompt, nextMode) => { setSkill(null); if (nextMode) setMode(nextMode); fillPrompt(prompt); }}
           onCreate={() => { setOverlay(null); setCommandEditor('create'); }} onManage={() => { setOverlay(null); setCommandEditor('manage'); }}/>}
-      </ComposerInlinePanel> : <div id={`${id}-mount`} className="tb-task-mount" role="group" aria-label="任务挂载区">
-        <div className="tb-task-mount-controls">
-          <button ref={node => { triggers.current.project = node; }} type="button" className={`tb-task-mount-button tb-task-project${overlay === 'project' ? ' is-open' : ''}`} aria-label={selectedProject ? `选择项目：${selectedProject.name}` : '选择项目'} title={selectedProject?.name || '选择项目'} aria-haspopup="dialog" aria-expanded={overlay === 'project'} aria-controls={overlay === 'project' ? `${id}-project` : undefined} onClick={() => toggleOverlay('project')}><Folder size={16} /><span>{selectedProject?.name || '选择项目'}</span></button>
-        </div>
-        <div className="tb-task-mount-end">
-          {!simple && localTask && <button ref={node => { triggers.current.approval = node; }} type="button" className={`tb-local-task-trigger${overlay === 'approval' ? ' is-open' : ''}${approvalPolicy === 'full' ? ' is-full-access' : ''}`} aria-label={`审批策略：${selectedApproval.name}`} aria-haspopup="menu" aria-expanded={overlay === 'approval'} aria-controls={overlay === 'approval' ? `${id}-approval` : undefined} onClick={() => toggleOverlay('approval')}><selectedApproval.Icon size={16} aria-hidden="true" /><span>{selectedApproval.name}</span><ChevronDown className="tb-local-task-chevron" size={14} aria-hidden="true" /></button>}
-          <button ref={node => { triggers.current.runtime = node; }} type="button" className={`tb-task-runtime${overlay === 'runtime' ? ' is-open' : ''}`} aria-label={`运行位置：${runLocation === 'cloud' ? '云端' : '本地'}`} title={runLocation === 'cloud' ? '在云端运行' : '在你的计算机上运行'} aria-haspopup="menu" aria-expanded={overlay === 'runtime'} aria-controls={overlay === 'runtime' ? `${id}-runtime` : undefined} onClick={() => toggleOverlay('runtime')}>{runLocation === 'cloud' ? <Cloud size={17} aria-hidden="true" /> : <Laptop size={17} aria-hidden="true" />}<span>{runLocation === 'cloud' ? '云端' : '本地'}</span></button>
-        </div>
-      </div>}
+      </ComposerInlinePanel>}
     </ComposerExpansion>
     </div>
 

@@ -1,0 +1,85 @@
+@scope (.personalized-home) {
+.aiw-content-usage { container:usage-content / inline-size; }
+.aiw-content-usage > .aiw-content-primary { display:flex; flex-direction:column; gap:16px; }
+.aiw-content-usage > .aiw-content-primary > .aiwp-page-header { display:contents; }
+.aiw-content-usage .aiwp-heading,.aiw-content-usage .aiwp-toolbar { margin:0; }
+.aiw-content-usage .aiwp-heading { margin-bottom:4px; }
+.aiw-content-usage .aiwp-heading-copy { display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
+.aiw-content-usage .aiwp-heading h1 { font-size:var(--nine-font-size-24); line-height:var(--nine-font-line-height-24); font-weight:500; color:var(--nine-color-text-title); }
+.aiw-content-usage .aiwp-heading-description { font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); color:var(--nine-color-text-tertiary); }
+.aiw-content-usage .aiwp-heading-actions:empty { display:none; }
+.aiw-content-usage .aiwp-tabs { padding:0; margin:0; }
+.aiw-content-usage .aiwp-tabs .iconfont { display:inline-grid; place-items:center; flex:none; width:16px; height:16px; font-size:16px; }
+.aiw-content-usage .aiwp-tabs button { height:32px; padding:0 16px; border-radius:999px; font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); color:var(--nine-color-text-tertiary); }
+.aiw-content-usage .aiwp-tabs button:is(:hover,[aria-selected='true']) { background:var(--nine-color-fill-layer-strong); }
+.aiw-content-usage .aiwp-tabs button[aria-selected='true'] { color:var(--nine-color-text-title); font-weight:500; }
+.aiwu-membership-content { display:flex; flex:1; width:100%; flex-direction:column; align-items:center; justify-content:center; gap:20px; padding-block:20px; }
+.aiw-content-usage:has(.aiwu-membership-content) { display:flex; flex-direction:column; min-height:100%; }
+.aiw-content-usage:has(.aiwu-membership-content) :is(.aiw-content-primary,.aiw-content-browser,.aiw-content-results) { display:flex; flex:1; flex-direction:column; min-height:0; }
+.aiw-content-usage .aiwu-records-entry { flex:none; padding:0; border:0; background:transparent; color:var(--nine-color-text-secondary); font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); cursor:pointer; }
+.aiwu-records-entry:hover { color:var(--nine-color-text-title); text-decoration:underline; text-underline-offset:3px; }
+.aiwu-records-dialog .aiwu-table-scroll { max-width:100%; }
+.aiwu-records-dialog .aiwu-time-col { width:30%; }
+.aiwu-records-dialog .aiwu-usage-table col:not(.aiwu-time-col) { width:25%; }
+.aiwu-records-dialog .aiwu-usage-table col:last-child { width:20%; }
+.delete-space-dialog.aiwu-records-modal { width:680px; max-height:calc(100vh - 40px); text-align:left; font-family:inherit; }
+.aiwu-records-modal .aiwu-records-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; flex:none; width:100%; }
+.aiwu-records-modal .aiwu-records-close { display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:8px; background:transparent; color:var(--nine-color-text-secondary); cursor:pointer; }
+.aiwu-records-modal .aiwu-records-close:hover { background:var(--nine-color-fill-layer-strong); }
+.aiwu-records-modal .aiwu-records-close:focus-visible { outline:1px solid var(--nine-color-border-alpha-regular); outline-offset:2px; }
+.aiwu-records-modal .aiwu-records-dialog { width:100%; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.aiwu-card.aiwu-membership-card { align-self:center; min-width:0; }
+.aiwu-membership-card .aiwu-membership-top { align-items:flex-start; flex-direction:column; gap:12px; }
+.aiwu-membership-card .aiwu-upgrade { align-self:flex-start; margin-top:auto; }
+.aiwu-membership-card .aiwu-card-divider { flex:none; }
+.aiwu-table .aiwf-divider-row > td { height:auto; padding:0; border:0; }
+.aiwu-membership-top { display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.aiwu-plan-copy { min-width:0; }
+.aiwu-membership-logo { display:block; width:32px; height:32px; margin-bottom:12px; background:var(--nine-color-text-title); mask:url('/personalized-home-2-0/asset/icons/tabbit-solid.svg') center / contain no-repeat; -webkit-mask:url('/personalized-home-2-0/asset/icons/tabbit-solid.svg') center / contain no-repeat; }
+.aiwu-plan-copy h2 { color:var(--nine-color-text-title); font-size:var(--nine-font-size-20); line-height:var(--nine-font-line-height-20); font-weight:500; }
+.aiw-content-usage .aiwu-plan-copy p { margin-top:4px; color:var(--nine-color-text-quaternary); font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); }
+.aiw-content-usage .aiwu-upgrade { display:inline-flex; flex:none; align-items:center; justify-content:center; gap:4px; height:36px; padding:0 12px; border:0; border-radius:10px; color:var(--nine-color-text-fixed-black); background:linear-gradient(140deg,#fff5d6 0%,#e4fff6 48%,#f1dfff 100%); box-shadow:inset 0 0 0 .5px var(--nine-color-border-alpha-regular); font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:500; white-space:nowrap; }
+.aiwu-upgrade:hover { filter:brightness(.97); }
+.aiwu-upgrade svg { flex:none; }
+.aiwu-card-divider { height:.5px; margin:20px 0 16px; background:var(--nine-color-border-alpha-subtle); }
+.aiwu-quota h3 { color:var(--nine-color-text-title); font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:500; }
+.aiwu-quota-meta { display:flex; align-items:center; justify-content:space-between; gap:16px; margin:4px 0 6px; font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); }
+.aiwu-quota-meta > span { color:var(--nine-color-text-tertiary); }
+.aiwu-quota-meta strong { color:var(--nine-color-text-title); font-weight:500; white-space:nowrap; }
+.aiwu-progress { height:6px; overflow:hidden; border-radius:999px; background:var(--nine-color-border-alpha-subtle); }
+.aiwu-progress > span { display:block; height:100%; border-radius:inherit; background:var(--nine-color-fill-action-inverse); }
+.aiwu-section { display:flex; flex-direction:column; min-width:0; gap:8px; }
+.aiwu-section-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; }
+.aiwu-section-heading h2 { color:var(--nine-color-text-title); font-size:var(--nine-font-size-16); line-height:var(--nine-font-line-height-16); font-weight:500; }
+.aiwu-section-heading > span,.aiwu-count { color:var(--nine-color-text-tertiary); font-size:var(--nine-font-size-12); line-height:var(--nine-font-line-height-12); font-weight:400; }
+.aiwu-count { margin-left:4px; }
+.aiwu-table-scroll { min-width:0; overflow-x:auto; }
+.aiwu-table { width:100%; min-width:540px; border-collapse:collapse; text-align:left; white-space:nowrap; font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); }
+.aiwu-table th { padding:0 24px 12px 0; color:var(--nine-color-text-tertiary); font-size:var(--nine-font-size-12); line-height:var(--nine-font-line-height-12); font-weight:400; }
+.aiwu-table td { padding:12px 24px 12px 0; border:0; vertical-align:middle; line-height:20px; color:var(--nine-color-text-title); }
+.aiwu-table :is(th,td):last-child { padding-right:0; }
+.aiwu-usage-table { table-layout:fixed; }
+.aiwu-time-col { width:55%; }
+.aiwu-usage-table col:not(.aiwu-time-col) { width:17.5%; }
+.aiwu-usage-table col:last-child { width:10%; }
+.aiwu-change { display:inline-flex; align-items:center; gap:4px; color:var(--nine-color-text-title); font-weight:500; font-variant-numeric:tabular-nums; }
+.aiwu-change.is-gain { color:var(--nine-color-success); }
+.aiwu-change svg { flex:none; }
+.aiwu-order-id { font-variant-numeric:tabular-nums; }
+.aiwu-status { display:inline-flex; align-items:center; padding:0 6px; border:.5px solid var(--nine-color-border-alpha-subtle); border-radius:999px; background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-secondary); font-size:var(--nine-font-size-12); line-height:20px; font-weight:400; }
+.aiw-content-usage:has(.aiwu-empty) { display:flex; flex-direction:column; min-height:100%; }
+.aiw-content-usage:has(.aiwu-empty) > .aiw-content-primary { flex:1; }
+.aiw-content-usage:has(.aiwu-empty) .aiw-content-browser,.aiw-content-usage:has(.aiwu-empty) .aiw-content-results { display:flex; flex:1; min-height:0; }
+.aiwu-empty { display:flex; flex:1; flex-direction:column; align-items:center; justify-content:center; gap:8px; min-width:0; min-height:320px; padding:24px; text-align:center; }
+.aiwu-empty-icon { display:block; flex:none; width:48px; height:48px; background:var(--nine-color-text-secondary); mask:url('/personalized-home-2-0/asset/icons/ni-sticker.svg') center / contain no-repeat; -webkit-mask:url('/personalized-home-2-0/asset/icons/ni-sticker.svg') center / contain no-repeat; }
+.aiwu-empty-copy { display:flex; flex-direction:column; align-items:center; }
+.aiwu-empty h2 { color:var(--nine-color-text-title); font-size:var(--nine-font-size-16); line-height:var(--nine-font-line-height-16); font-weight:500; }
+.aiwu-empty p { color:var(--nine-color-text-quaternary); font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); }
+.aiwu-empty .aiwu-button { margin-top:8px; }
+.aiw-content-usage .aiwu-button { display:inline-flex; align-items:center; justify-content:center; flex:none; gap:4px; min-height:32px; padding:4px 12px; border:0; border-radius:10px; background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-title); font-size:var(--nine-font-size-14); line-height:var(--nine-font-line-height-14); font-weight:500; white-space:nowrap; }
+.aiw-content-usage .aiwu-button:hover { background:var(--nine-color-border-alpha-subtle); }
+.aiw-content-usage .aiwu-button.is-primary { background:var(--nine-color-fill-action-inverse); color:var(--nine-color-text-on-neutral); }
+.aiw-content-usage .aiwu-button.is-primary:hover { opacity:.85; }
+@container usage-content (max-width:720px) { .aiwu-time-col { width:30%; } .aiwu-usage-table col:not(.aiwu-time-col) { width:25%; } .aiwu-usage-table col:last-child { width:20%; } }
+@container usage-content (max-width:420px) { .aiwu-membership-top { align-items:flex-start; flex-direction:column; gap:12px; } }
+}

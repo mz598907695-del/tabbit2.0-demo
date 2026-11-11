@@ -1,11 +1,13 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Bell, Bookmark, CalendarClock, Check, Cloud, Copy, Code2, CreditCard, File, FileImage, FileText, Folder, Gauge, Globe, House, LayoutDashboard, Lightbulb, MessageCircle, Monitor, Pause, Pin, Play, Plus, Search, Share2, Sparkles, Table2, Ticket, Upload, X } from '../icons';
+import { ArrowRight, ArrowUpRight, Bell, Bookmark, CalendarClock, Check, Cloud, Copy, Code2, CreditCard, File, FileImage, FileText, Folder, Gauge, Globe, House, LayoutDashboard, Lightbulb, MessageCircle, Monitor, Pause, Pin, Play, Plus, Search, Share2, Sparkles, Table2, Upload, X } from '../icons';
 import { MODULES, PAGE_TABS, TYPE_LABELS, filterWorkspaceItems } from './workspace-data';
 import './workspace-content.css';
 import { WorkspaceFiles, WorkspaceFilesHeader } from './WorkspaceFiles';
 import WorkspacePageHeader from './WorkspacePageHeader';
 import WorkspaceSkills from './WorkspaceSkills';
 import WorkspaceTasks from './WorkspaceTasks';
+import WorkspaceUsage from './WorkspaceUsage';
+import UsageRecordsDialog from './UsageRecordsDialog';
 import WorkspaceSkillDetail from './WorkspaceSkillDetail';
 import { getFileShareText, refreshWorkspaceOutputs } from './file-actions';
 import { getSkillCatalogue, saveSkill } from './workspace-skills';
@@ -108,14 +110,7 @@ function Detail({ page, item, onClose, onNavigate, onNewChat, onUpdate, inline =
     </div>
   </DetailFrame>;
 }
-function UsagePanel({ filter, onNavigate, onPlans }) {
-  const [used, setUsed] = useState(() => { try { return localStorage.getItem('personalized-home-2-0-ai-workspace-coupon-used-v1') === 'true'; } catch { return false; } });
-  const useCoupon = () => { setUsed(true); try { localStorage.setItem('personalized-home-2-0-ai-workspace-coupon-used-v1', 'true'); } catch { /* Session-only fallback. */ } };
-  if (filter === 'coupons') return <><div className="aiw-section-caption">可用重置券 <span>{used ? 0 : 1}</span></div><article className="aiw-coupon"><IconBadge icon={Ticket}/><div><h3>周用量重置券</h3><p>立即开始一个新的用量周期</p><small>有效期至 2026 年 11 月 30 日</small></div><button className="aiw-button" disabled={used} onClick={useCoupon}>{used ? '示例券已使用' : '体验使用'}</button></article><p className="aiw-form-note">示例操作不会更改真实账号用量。</p></>;
-  if (filter === 'orders') return <div className="aiw-table-wrap"><table className="aiw-data-table"><thead><tr><th>订单</th><th>创建时间</th><th>内容</th><th>状态</th></tr></thead><tbody><tr><td>TB202610230001</td><td>2026/10/23</td><td>专业版月度会员</td><td><span className="aiw-status">示例订单</span></td></tr><tr><td>TB202609230001</td><td>2026/09/23</td><td>专业版月度会员</td><td><span className="aiw-status">示例订单</span></td></tr></tbody></table></div>;
-  return <><section className="aiw-membership"><div className="aiw-membership-top"><div><span className="aiw-eyebrow">当前计划</span><h2>专业版 <span className="aiw-demo-badge">示例</span></h2><p>给每天的思考与创造，多一点空间。</p></div><button className="aiw-button" onClick={onPlans}>查看会员权益<ArrowUpRight size={15}/></button></div><div className="aiw-usage-meter"><div><span>本周剩余用量</span><strong>85<span>%</span></strong></div><span>4 天 6 小时后重置</span></div><div className="aiw-meter-track" role="meter" aria-label="示例剩余用量" aria-valuemin={0} aria-valuemax={100} aria-valuenow={85}><span style={{ width: '85%' }}/></div></section><div className="aiw-section-heading"><h2>当前周期的使用记录</h2><span>10 月 19 日 — 10 月 26 日</span></div><div className="aiw-table-wrap"><table className="aiw-data-table"><thead><tr><th>时间</th><th>模式 / 来源</th><th>用量变化</th><th>相关内容</th></tr></thead><tbody>{[['今天 14:01', '对话 · Auto', '−2.4%', '首页信息架构'], ['今天 09:43', '任务 · Pro', '−1.8%', '本周项目进展'], ['昨天 16:20', '对话 · Auto', '−0.8%', 'AI 工具对比']].map(row => <tr key={row[0]}><td>{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td><button className="aiw-inline-button" onClick={() => onNavigate?.('chats')}>{row[3]}<ArrowUpRight size={14}/></button></td></tr>)}</tbody></table></div></>;
-}
-export default function WorkspaceContent({ active = true, page = 'chats', variant = 1, data, setData, initialFilter, navigationKey, onNavigate, onNewChat, onFilterChange }) {
+export default function WorkspaceContent({ wallpaper, active = true, page = 'chats', variant = 1, data, setData, initialFilter, navigationKey, onNavigate, onNewChat, onFilterChange }) {
   const [shareItem, setShareItem] = useState(null);
   const [pageUI, setPageUI] = useState({}); const [detail, setDetail] = useState(null); const [create, setCreate] = useState(false); const [plans, setPlans] = useState(false); const [notice, setNotice] = useState('');
   const contentRef = useRef(null);
@@ -195,13 +190,13 @@ export default function WorkspaceContent({ active = true, page = 'chats', varian
   return <section ref={contentRef} className={`aiw-content aiw-content-${page} aiw-content-variant-${variant} ${inlinePreview ? 'has-inspector' : ''}`} aria-label={`${module.label}内容`}>
     {skillDetail && <WorkspaceSkillDetail key={selected.id} item={selected} backLabel={ui.skillScope === 'mine' ? '返回我的妙招' : '返回发现妙招'} onBack={closeDetail} onUpdate={updateItem} onUse={onNewChat}/>}
     <div className="aiw-content-primary" hidden={Boolean(skillDetail)} inert={Boolean(skillDetail)}>
-    {page === 'skills' ? null : page === 'files' ? <WorkspaceFilesHeader ui={ui} setUI={setUI} onCreate={primaryAction} onRefresh={refreshOutputs}/> : <WorkspacePageHeader key={page} page={page} title={module.label} action={module.action} onAction={primaryAction} tabs={PAGE_TABS[page] || []} ui={ui} setUI={setUI} searchable={page !== 'usage'} hasViews={page !== 'tasks' && GRID_PAGES.has(page)} counts={page === 'tasks' ? Object.fromEntries(PAGE_TABS.tasks.map(([value]) => [value, countFor(value)])) : undefined}
+    {page === 'skills' ? null : page === 'files' ? <WorkspaceFilesHeader ui={ui} setUI={setUI} onCreate={primaryAction} onRefresh={refreshOutputs}/> : <WorkspacePageHeader key={page} page={page} title={page === 'usage' ? '会员计划' : module.label} action={module.action} onAction={primaryAction} tabs={PAGE_TABS[page] || []} ui={ui} setUI={setUI} searchable={page !== 'usage'} hasViews={page !== 'tasks' && GRID_PAGES.has(page)} counts={page === 'tasks' ? Object.fromEntries(PAGE_TABS.tasks.map(([value]) => [value, countFor(value)])) : undefined}
       secondaryActions={<>{page === 'assets' && <button className="aiwp-secondary" onClick={() => setCreate('card')}>上传 AI 卡片</button>}</>}
       filters={page === 'skills' && <select className="aiwp-kind-filter" aria-label="妙招类型" value={ui.kind} onChange={event => setUI({ kind: event.target.value })}><option value="all">所有类型</option><option value="prompt">提示词</option><option value="script">网页脚本</option><option value="task">任务</option></select>}
     />}
     {notice && <p className="aiw-inline-feedback" role="status"><Check size={14}/>{notice}<button aria-label="关闭提示" onClick={() => setNotice('')}><X size={13}/></button></p>}
     <div className="aiw-content-browser"><div className="aiw-content-results" id={page === 'files' ? undefined : `aiw-${page}-results`} role={['files','skills'].includes(page) ? undefined : 'tabpanel'} aria-labelledby={['files','skills'].includes(page) ? undefined : `aiw-${page}-tab-${ui.filter}`}>
-    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <UsagePanel filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)}/> : <>
+    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <WorkspaceUsage wallpaper={wallpaper} filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)} onPurchaseCoupons={() => setPlans('coupons')} onUsageRecords={() => setPlans('records')}/> : <>
       {ui.query && <p className="aiw-results-label" role="status">找到 {filtered.length} 项相关内容</p>}
       {!filtered.length ? <EmptyState icon={ICONS[page]} title={ui.query ? '没有找到相关内容' : '这里还没有内容'} description={ui.query ? '换个关键词，或者切换分类试试。' : '从添加第一项内容开始。'} action={!ui.query && !['notifications'].includes(page) ? module.action : null} onAction={primaryAction}/> : <div className={`aiw-content-items ${grid ? 'aiw-content-grid' : 'aiw-content-list'}`}>
         {filtered.map(item => {
@@ -224,6 +219,6 @@ export default function WorkspaceContent({ active = true, page = 'chats', varian
     </div>
     {shareItem && <ShareOutput item={shareItem} onClose={() => setShareItem(null)}/>}
     {create && <CreateForm page={page} defaultType={typeof create === 'string' ? create : undefined} onClose={() => setCreate(false)} onSave={saveCreated}/>}
-    {plans && <Modal title="会员计划" onClose={() => setPlans(false)}><div className="aiw-detail-body"><p className="aiw-form-note">用于比较框架的权益示例，不会产生订单或扣费。</p><div className="aiw-plan-options">{[['标准版', '日常提问与轻量探索'], ['专业版', '更多用量，支持深度工作'], ['进阶版', '高频协作与复杂任务']].map(([title, text]) => <article key={title}><CreditCard size={18}/><h3>{title}</h3><p>{text}</p>{title === '专业版' && <span className="aiw-status">当前示例计划</span>}</article>)}</div></div></Modal>}
+    {plans === 'records' ? <UsageRecordsDialog onClose={() => setPlans(false)}/> : plans === 'coupons' ? <Modal title="购买重置券" onClose={() => setPlans(false)}><div className="aiw-detail-body"><p>使用重置券，可立即开启新的用量周期。</p><p className="aiw-form-note">当前为界面演示，不会生成订单或扣费。</p></div></Modal> : plans && <Modal title="会员计划" onClose={() => setPlans(false)}><div className="aiw-detail-body"><p className="aiw-form-note">用于比较框架的权益示例，不会产生订单或扣费。</p><div className="aiw-plan-options">{[['标准版', '日常提问与轻量探索'], ['专业版', '更多用量，支持深度工作'], ['进阶版', '高频协作与复杂任务']].map(([title, text]) => <article key={title}><CreditCard size={18}/><h3>{title}</h3><p>{text}</p>{title === '专业版' && <span className="aiw-status">当前示例计划</span>}</article>)}</div></div></Modal>}
   </section>;
 }

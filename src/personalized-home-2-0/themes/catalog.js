@@ -1,4 +1,4 @@
-/** Original artwork and authored motion parameters, migrated without image recompression.
+/** Original artwork uses WebP quality 90; authored motion parameters are preserved.
  * scene.id keeps the source numeric string because the shader uses it.
  * Baked-in UI masks are retained; gallery descriptions and UI state are excluded.
  */
@@ -7,12 +7,12 @@ export const illustratedThemes = [
     "id": "scene-01",
     "title": "晴空草甸",
     "name": "晴空草甸",
-    "image": "/personalized-home-2-0/asset/themes/01-blue_meadow.png",
+    "image": "/personalized-home-2-0/asset/themes/01-blue_meadow.webp",
     "scene": {
       "id": "01",
       "title": "晴空草甸",
       "slug": "blue_meadow",
-      "image": "/personalized-home-2-0/asset/themes/01-blue_meadow.png",
+      "image": "/personalized-home-2-0/asset/themes/01-blue_meadow.webp",
       "size": [
         1586,
         992
@@ -301,12 +301,12 @@ export const illustratedThemes = [
     "id": "scene-02",
     "title": "风吹过蓝原",
     "name": "风吹过蓝原",
-    "image": "/personalized-home-2-0/asset/themes/02-blue_wind.png",
+    "image": "/personalized-home-2-0/asset/themes/02-blue_wind.webp",
     "scene": {
       "id": "02",
       "title": "风吹过蓝原",
       "slug": "blue_wind",
-      "image": "/personalized-home-2-0/asset/themes/02-blue_wind.png",
+      "image": "/personalized-home-2-0/asset/themes/02-blue_wind.webp",
       "size": [
         1586,
         992
@@ -621,12 +621,12 @@ export const illustratedThemes = [
     "id": "scene-03",
     "title": "一条地平线",
     "name": "一条地平线",
-    "image": "/personalized-home-2-0/asset/themes/03-single_horizon.png",
+    "image": "/personalized-home-2-0/asset/themes/03-single_horizon.webp",
     "scene": {
       "id": "03",
       "title": "一条地平线",
       "slug": "single_horizon",
-      "image": "/personalized-home-2-0/asset/themes/03-single_horizon.png",
+      "image": "/personalized-home-2-0/asset/themes/03-single_horizon.webp",
       "size": [
         1586,
         992
@@ -915,12 +915,12 @@ export const illustratedThemes = [
     "id": "scene-04",
     "title": "云影停留",
     "name": "云影停留",
-    "image": "/personalized-home-2-0/asset/themes/04-cloud_shadow.png",
+    "image": "/personalized-home-2-0/asset/themes/04-cloud_shadow.webp",
     "scene": {
       "id": "04",
       "title": "云影停留",
       "slug": "cloud_shadow",
-      "image": "/personalized-home-2-0/asset/themes/04-cloud_shadow.png",
+      "image": "/personalized-home-2-0/asset/themes/04-cloud_shadow.webp",
       "size": [
         1586,
         992
@@ -1219,12 +1219,12 @@ export const illustratedThemes = [
     "id": "scene-05",
     "title": "湖边留白",
     "name": "湖边留白",
-    "image": "/personalized-home-2-0/asset/themes/05-lakeside.png",
+    "image": "/personalized-home-2-0/asset/themes/05-lakeside.webp",
     "scene": {
       "id": "05",
       "title": "湖边留白",
       "slug": "lakeside",
-      "image": "/personalized-home-2-0/asset/themes/05-lakeside.png",
+      "image": "/personalized-home-2-0/asset/themes/05-lakeside.webp",
       "size": [
         1586,
         992
@@ -1588,12 +1588,12 @@ export const illustratedThemes = [
     "id": "scene-06",
     "title": "白纸住客",
     "name": "白纸住客",
-    "image": "/personalized-home-2-0/asset/themes/06-paper_guest.png",
+    "image": "/personalized-home-2-0/asset/themes/06-paper_guest.webp",
     "scene": {
       "id": "06",
       "title": "白纸住客",
       "slug": "paper_guest",
-      "image": "/personalized-home-2-0/asset/themes/06-paper_guest.png",
+      "image": "/personalized-home-2-0/asset/themes/06-paper_guest.webp",
       "size": [
         1586,
         992
@@ -1882,12 +1882,12 @@ export const illustratedThemes = [
     "id": "scene-07",
     "title": "撕纸小丘",
     "name": "撕纸小丘",
-    "image": "/personalized-home-2-0/asset/themes/07-torn_hill.png",
+    "image": "/personalized-home-2-0/asset/themes/07-torn_hill.webp",
     "scene": {
       "id": "07",
       "title": "撕纸小丘",
       "slug": "torn_hill",
-      "image": "/personalized-home-2-0/asset/themes/07-torn_hill.png",
+      "image": "/personalized-home-2-0/asset/themes/07-torn_hill.webp",
       "size": [
         1586,
         992
@@ -2141,12 +2141,12 @@ export const illustratedThemes = [
     "id": "scene-08",
     "title": "折纸午后",
     "name": "折纸午后",
-    "image": "/personalized-home-2-0/asset/themes/08-origami.png",
+    "image": "/personalized-home-2-0/asset/themes/08-origami.webp",
     "scene": {
       "id": "08",
       "title": "折纸午后",
       "slug": "origami",
-      "image": "/personalized-home-2-0/asset/themes/08-origami.png",
+      "image": "/personalized-home-2-0/asset/themes/08-origami.webp",
       "size": [
         1586,
         992
@@ -2409,12 +2409,12 @@ export const illustratedThemes = [
     "id": "scene-09",
     "title": "铅笔伸懒腰",
     "name": "铅笔伸懒腰",
-    "image": "/personalized-home-2-0/asset/themes/09-pencil_stretch.png",
+    "image": "/personalized-home-2-0/asset/themes/09-pencil_stretch.webp",
     "scene": {
       "id": "09",
       "title": "铅笔伸懒腰",
       "slug": "pencil_stretch",
-      "image": "/personalized-home-2-0/asset/themes/09-pencil_stretch.png",
+      "image": "/personalized-home-2-0/asset/themes/09-pencil_stretch.webp",
       "size": [
         1586,
         992
@@ -2704,12 +2704,12 @@ export const illustratedThemes = [
     "id": "scene-10",
     "title": "墨色一角",
     "name": "墨色一角",
-    "image": "/personalized-home-2-0/asset/themes/10-ink_corner.png",
+    "image": "/personalized-home-2-0/asset/themes/10-ink_corner.webp",
     "scene": {
       "id": "10",
       "title": "墨色一角",
       "slug": "ink_corner",
-      "image": "/personalized-home-2-0/asset/themes/10-ink_corner.png",
+      "image": "/personalized-home-2-0/asset/themes/10-ink_corner.webp",
       "size": [
         1586,
         992
@@ -2913,12 +2913,12 @@ export const illustratedThemes = [
     "id": "scene-11",
     "title": "丝网印刷",
     "name": "丝网印刷",
-    "image": "/personalized-home-2-0/asset/themes/11-screenprint.png",
+    "image": "/personalized-home-2-0/asset/themes/11-screenprint.webp",
     "scene": {
       "id": "11",
       "title": "丝网印刷",
       "slug": "screenprint",
-      "image": "/personalized-home-2-0/asset/themes/11-screenprint.png",
+      "image": "/personalized-home-2-0/asset/themes/11-screenprint.webp",
       "size": [
         1586,
         992
@@ -3207,12 +3207,12 @@ export const illustratedThemes = [
     "id": "scene-12",
     "title": "蜡笔清晨",
     "name": "蜡笔清晨",
-    "image": "/personalized-home-2-0/asset/themes/12-crayon.png",
+    "image": "/personalized-home-2-0/asset/themes/12-crayon.webp",
     "scene": {
       "id": "12",
       "title": "蜡笔清晨",
       "slug": "crayon",
-      "image": "/personalized-home-2-0/asset/themes/12-crayon.png",
+      "image": "/personalized-home-2-0/asset/themes/12-crayon.webp",
       "size": [
         1586,
         992
@@ -3435,12 +3435,12 @@ export const illustratedThemes = [
     "id": "scene-13",
     "title": "纸浮雕",
     "name": "纸浮雕",
-    "image": "/personalized-home-2-0/asset/themes/13-relief.png",
+    "image": "/personalized-home-2-0/asset/themes/13-relief.webp",
     "scene": {
       "id": "13",
       "title": "纸浮雕",
       "slug": "relief",
-      "image": "/personalized-home-2-0/asset/themes/13-relief.png",
+      "image": "/personalized-home-2-0/asset/themes/13-relief.webp",
       "size": [
         1586,
         992
@@ -3730,12 +3730,12 @@ export const illustratedThemes = [
     "id": "scene-14",
     "title": "毛毡小憩",
     "name": "毛毡小憩",
-    "image": "/personalized-home-2-0/asset/themes/14-felt.png",
+    "image": "/personalized-home-2-0/asset/themes/14-felt.webp",
     "scene": {
       "id": "14",
       "title": "毛毡小憩",
       "slug": "felt",
-      "image": "/personalized-home-2-0/asset/themes/14-felt.png",
+      "image": "/personalized-home-2-0/asset/themes/14-felt.webp",
       "size": [
         1586,
         992
@@ -3939,12 +3939,12 @@ export const illustratedThemes = [
     "id": "scene-15",
     "title": "哑光陶土",
     "name": "哑光陶土",
-    "image": "/personalized-home-2-0/asset/themes/15-clay.png",
+    "image": "/personalized-home-2-0/asset/themes/15-clay.webp",
     "scene": {
       "id": "15",
       "title": "哑光陶土",
       "slug": "clay",
-      "image": "/personalized-home-2-0/asset/themes/15-clay.png",
+      "image": "/personalized-home-2-0/asset/themes/15-clay.webp",
       "size": [
         1586,
         992
@@ -4233,12 +4233,12 @@ export const illustratedThemes = [
     "id": "scene-16",
     "title": "窗光午睡",
     "name": "窗光午睡",
-    "image": "/personalized-home-2-0/asset/themes/16-window_light.png",
+    "image": "/personalized-home-2-0/asset/themes/16-window_light.webp",
     "scene": {
       "id": "16",
       "title": "窗光午睡",
       "slug": "window_light",
-      "image": "/personalized-home-2-0/asset/themes/16-window_light.png",
+      "image": "/personalized-home-2-0/asset/themes/16-window_light.webp",
       "size": [
         1586,
         992
@@ -4461,12 +4461,12 @@ export const illustratedThemes = [
     "id": "scene-17",
     "title": "长影黄昏",
     "name": "长影黄昏",
-    "image": "/personalized-home-2-0/asset/themes/17-long_shadow.png",
+    "image": "/personalized-home-2-0/asset/themes/17-long_shadow.webp",
     "scene": {
       "id": "17",
       "title": "长影黄昏",
       "slug": "long_shadow",
-      "image": "/personalized-home-2-0/asset/themes/17-long_shadow.png",
+      "image": "/personalized-home-2-0/asset/themes/17-long_shadow.webp",
       "size": [
         1586,
         992
@@ -4755,12 +4755,12 @@ export const illustratedThemes = [
     "id": "scene-18",
     "title": "雪后脚印",
     "name": "雪后脚印",
-    "image": "/personalized-home-2-0/asset/themes/18-snow_tracks.png",
+    "image": "/personalized-home-2-0/asset/themes/18-snow_tracks.webp",
     "scene": {
       "id": "18",
       "title": "雪后脚印",
       "slug": "snow_tracks",
-      "image": "/personalized-home-2-0/asset/themes/18-snow_tracks.png",
+      "image": "/personalized-home-2-0/asset/themes/18-snow_tracks.webp",
       "size": [
         1586,
         992
@@ -5068,12 +5068,12 @@ export const illustratedThemes = [
     "id": "scene-19",
     "title": "薄雾散步",
     "name": "薄雾散步",
-    "image": "/personalized-home-2-0/asset/themes/19-mist.png",
+    "image": "/personalized-home-2-0/asset/themes/19-mist.webp",
     "scene": {
       "id": "19",
       "title": "薄雾散步",
       "slug": "mist",
-      "image": "/personalized-home-2-0/asset/themes/19-mist.png",
+      "image": "/personalized-home-2-0/asset/themes/19-mist.webp",
       "size": [
         1586,
         992
@@ -5380,12 +5380,12 @@ export const illustratedThemes = [
     "id": "scene-20",
     "title": "月光小坡",
     "name": "月光小坡",
-    "image": "/personalized-home-2-0/asset/themes/20-moon_slope.png",
+    "image": "/personalized-home-2-0/asset/themes/20-moon_slope.webp",
     "scene": {
       "id": "20",
       "title": "月光小坡",
       "slug": "moon_slope",
-      "image": "/personalized-home-2-0/asset/themes/20-moon_slope.png",
+      "image": "/personalized-home-2-0/asset/themes/20-moon_slope.webp",
       "size": [
         1586,
         992
@@ -5668,12 +5668,12 @@ export const illustratedThemes = [
     "id": "scene-21",
     "title": "露珠草尖",
     "name": "露珠草尖",
-    "image": "/personalized-home-2-0/asset/themes/21-dew_tip.png",
+    "image": "/personalized-home-2-0/asset/themes/21-dew_tip.webp",
     "scene": {
       "id": "21",
       "title": "露珠草尖",
       "slug": "dew_tip",
-      "image": "/personalized-home-2-0/asset/themes/21-dew_tip.png",
+      "image": "/personalized-home-2-0/asset/themes/21-dew_tip.webp",
       "size": [
         1586,
         992
@@ -6002,12 +6002,12 @@ export const illustratedThemes = [
     "id": "scene-22",
     "title": "竹影摇摇",
     "name": "竹影摇摇",
-    "image": "/personalized-home-2-0/asset/themes/22-bamboo_shadows.png",
+    "image": "/personalized-home-2-0/asset/themes/22-bamboo_shadows.webp",
     "scene": {
       "id": "22",
       "title": "竹影摇摇",
       "slug": "bamboo_shadows",
-      "image": "/personalized-home-2-0/asset/themes/22-bamboo_shadows.png",
+      "image": "/personalized-home-2-0/asset/themes/22-bamboo_shadows.webp",
       "size": [
         1586,
         992
@@ -6333,12 +6333,12 @@ export const illustratedThemes = [
     "id": "scene-23",
     "title": "雨后水洼",
     "name": "雨后水洼",
-    "image": "/personalized-home-2-0/asset/themes/23-after_rain.png",
+    "image": "/personalized-home-2-0/asset/themes/23-after_rain.webp",
     "scene": {
       "id": "23",
       "title": "雨后水洼",
       "slug": "after_rain",
-      "image": "/personalized-home-2-0/asset/themes/23-after_rain.png",
+      "image": "/personalized-home-2-0/asset/themes/23-after_rain.webp",
       "size": [
         1586,
         992
@@ -6720,12 +6720,12 @@ export const illustratedThemes = [
     "id": "scene-24",
     "title": "纸船慢游",
     "name": "纸船慢游",
-    "image": "/personalized-home-2-0/asset/themes/24-paper_boat.png",
+    "image": "/personalized-home-2-0/asset/themes/24-paper_boat.webp",
     "scene": {
       "id": "24",
       "title": "纸船慢游",
       "slug": "paper_boat",
-      "image": "/personalized-home-2-0/asset/themes/24-paper_boat.png",
+      "image": "/personalized-home-2-0/asset/themes/24-paper_boat.webp",
       "size": [
         1586,
         992
@@ -7085,12 +7085,12 @@ export const illustratedThemes = [
     "id": "scene-25",
     "title": "海盐潮汐",
     "name": "海盐潮汐",
-    "image": "/personalized-home-2-0/asset/themes/25-sea_salt.png",
+    "image": "/personalized-home-2-0/asset/themes/25-sea_salt.webp",
     "scene": {
       "id": "25",
       "title": "海盐潮汐",
       "slug": "sea_salt",
-      "image": "/personalized-home-2-0/asset/themes/25-sea_salt.png",
+      "image": "/personalized-home-2-0/asset/themes/25-sea_salt.webp",
       "size": [
         1586,
         992
@@ -7444,12 +7444,12 @@ export const illustratedThemes = [
     "id": "scene-26",
     "title": "风里银杏",
     "name": "风里银杏",
-    "image": "/personalized-home-2-0/asset/themes/26-ginkgo_breeze.png",
+    "image": "/personalized-home-2-0/asset/themes/26-ginkgo_breeze.webp",
     "scene": {
       "id": "26",
       "title": "风里银杏",
       "slug": "ginkgo_breeze",
-      "image": "/personalized-home-2-0/asset/themes/26-ginkgo_breeze.png",
+      "image": "/personalized-home-2-0/asset/themes/26-ginkgo_breeze.webp",
       "size": [
         1586,
         992
@@ -7784,12 +7784,12 @@ export const illustratedThemes = [
     "id": "scene-27",
     "title": "蒲公英信笺",
     "name": "蒲公英信笺",
-    "image": "/personalized-home-2-0/asset/themes/27-dandelion_letter.png",
+    "image": "/personalized-home-2-0/asset/themes/27-dandelion_letter.webp",
     "scene": {
       "id": "27",
       "title": "蒲公英信笺",
       "slug": "dandelion_letter",
-      "image": "/personalized-home-2-0/asset/themes/27-dandelion_letter.png",
+      "image": "/personalized-home-2-0/asset/themes/27-dandelion_letter.webp",
       "size": [
         1586,
         992
@@ -8122,7 +8122,7 @@ export const illustratedThemes = [
     "id": "scene-28",
     "title": "粉笔星屑",
     "name": "粉笔星屑",
-    "image": "/personalized-home-2-0/asset/themes/28-chalk-stardust.png",
+    "image": "/personalized-home-2-0/asset/themes/28-chalk-stardust.webp",
     "scene": {
       "id": "28",
       "title": "粉笔星屑",
@@ -8370,7 +8370,7 @@ export const illustratedThemes = [
         "period": 4.2
       },
       "propType": "chalkstar",
-      "image": "/personalized-home-2-0/asset/themes/28-chalk-stardust.png",
+      "image": "/personalized-home-2-0/asset/themes/28-chalk-stardust.webp",
       "size": [
         1586,
         992
@@ -8408,7 +8408,7 @@ export const illustratedThemes = [
     "id": "scene-29",
     "title": "信纸折角",
     "name": "信纸折角",
-    "image": "/personalized-home-2-0/asset/themes/29-folded-letter.png",
+    "image": "/personalized-home-2-0/asset/themes/29-folded-letter.webp",
     "scene": {
       "id": "29",
       "title": "信纸折角",
@@ -8647,7 +8647,7 @@ export const illustratedThemes = [
         "period": 5.5
       },
       "propType": "fold",
-      "image": "/personalized-home-2-0/asset/themes/29-folded-letter.png",
+      "image": "/personalized-home-2-0/asset/themes/29-folded-letter.webp",
       "size": [
         1586,
         992
@@ -8685,7 +8685,7 @@ export const illustratedThemes = [
     "id": "scene-30",
     "title": "气泡陶土",
     "name": "气泡陶土",
-    "image": "/personalized-home-2-0/asset/themes/30-bubble-clay.png",
+    "image": "/personalized-home-2-0/asset/themes/30-bubble-clay.webp",
     "scene": {
       "id": "30",
       "title": "气泡陶土",
@@ -8933,7 +8933,7 @@ export const illustratedThemes = [
         "period": 4.7
       },
       "propType": "bubble",
-      "image": "/personalized-home-2-0/asset/themes/30-bubble-clay.png",
+      "image": "/personalized-home-2-0/asset/themes/30-bubble-clay.webp",
       "size": [
         1586,
         992
@@ -8971,7 +8971,7 @@ export const illustratedThemes = [
     "id": "scene-31",
     "title": "薰衣草梦",
     "name": "薰衣草梦",
-    "image": "/personalized-home-2-0/asset/themes/31-lavender-dream.png",
+    "image": "/personalized-home-2-0/asset/themes/31-lavender-dream.webp",
     "scene": {
       "id": "31",
       "title": "薰衣草梦",
@@ -9170,7 +9170,7 @@ export const illustratedThemes = [
         "period": 5.6
       },
       "propType": "lavender",
-      "image": "/personalized-home-2-0/asset/themes/31-lavender-dream.png",
+      "image": "/personalized-home-2-0/asset/themes/31-lavender-dream.webp",
       "size": [
         1586,
         992
@@ -9208,7 +9208,7 @@ export const illustratedThemes = [
     "id": "scene-32",
     "title": "萤火微光",
     "name": "萤火微光",
-    "image": "/personalized-home-2-0/asset/themes/32-firefly-glow.png",
+    "image": "/personalized-home-2-0/asset/themes/32-firefly-glow.webp",
     "scene": {
       "id": "32",
       "title": "萤火微光",
@@ -9456,7 +9456,7 @@ export const illustratedThemes = [
         "period": 5.6
       },
       "propType": "fireflies",
-      "image": "/personalized-home-2-0/asset/themes/32-firefly-glow.png",
+      "image": "/personalized-home-2-0/asset/themes/32-firefly-glow.webp",
       "size": [
         1586,
         992
@@ -9494,7 +9494,7 @@ export const illustratedThemes = [
     "id": "scene-33",
     "title": "枫糖秋丘",
     "name": "枫糖秋丘",
-    "image": "/personalized-home-2-0/asset/themes/33-maple-hill.png",
+    "image": "/personalized-home-2-0/asset/themes/33-maple-hill.webp",
     "scene": {
       "id": "33",
       "title": "枫糖秋丘",
@@ -9736,7 +9736,7 @@ export const illustratedThemes = [
         "period": 4.4
       },
       "propType": "maple",
-      "image": "/personalized-home-2-0/asset/themes/33-maple-hill.png",
+      "image": "/personalized-home-2-0/asset/themes/33-maple-hill.webp",
       "size": [
         1586,
         992
@@ -9774,7 +9774,7 @@ export const illustratedThemes = [
     "id": "scene-34",
     "title": "雨线窗边",
     "name": "雨线窗边",
-    "image": "/personalized-home-2-0/asset/themes/34-rain-window.png",
+    "image": "/personalized-home-2-0/asset/themes/34-rain-window.webp",
     "scene": {
       "id": "34",
       "title": "雨线窗边",
@@ -10007,7 +10007,7 @@ export const illustratedThemes = [
         "period": 4.2
       },
       "propType": "rain",
-      "image": "/personalized-home-2-0/asset/themes/34-rain-window.png",
+      "image": "/personalized-home-2-0/asset/themes/34-rain-window.webp",
       "size": [
         1586,
         992
@@ -10045,7 +10045,7 @@ export const illustratedThemes = [
     "id": "scene-35",
     "title": "石子涟漪",
     "name": "石子涟漪",
-    "image": "/personalized-home-2-0/asset/themes/35-pebble-ripples.png",
+    "image": "/personalized-home-2-0/asset/themes/35-pebble-ripples.webp",
     "scene": {
       "id": "35",
       "title": "石子涟漪",
@@ -10330,7 +10330,7 @@ export const illustratedThemes = [
           "ear": 0
         }
       ],
-      "image": "/personalized-home-2-0/asset/themes/35-pebble-ripples.png",
+      "image": "/personalized-home-2-0/asset/themes/35-pebble-ripples.webp",
       "size": [
         1586,
         992
@@ -10372,7 +10372,7 @@ export const illustratedThemes = [
     "id": "scene-36",
     "title": "雪球来信",
     "name": "雪球来信",
-    "image": "/personalized-home-2-0/asset/themes/36-snowball-letter.png",
+    "image": "/personalized-home-2-0/asset/themes/36-snowball-letter.webp",
     "scene": {
       "id": "36",
       "title": "雪球来信",
@@ -10632,7 +10632,7 @@ export const illustratedThemes = [
           "ear": 0
         }
       ],
-      "image": "/personalized-home-2-0/asset/themes/36-snowball-letter.png",
+      "image": "/personalized-home-2-0/asset/themes/36-snowball-letter.webp",
       "size": [
         1586,
         992
@@ -10674,7 +10674,7 @@ export const illustratedThemes = [
     "id": "scene-37",
     "title": "月牙摇篮",
     "name": "月牙摇篮",
-    "image": "/personalized-home-2-0/asset/themes/37-crescent-cradle.png",
+    "image": "/personalized-home-2-0/asset/themes/37-crescent-cradle.webp",
     "scene": {
       "id": "37",
       "title": "月牙摇篮",
@@ -10873,7 +10873,7 @@ export const illustratedThemes = [
           "ear": 0
         }
       ],
-      "image": "/personalized-home-2-0/asset/themes/37-crescent-cradle.png",
+      "image": "/personalized-home-2-0/asset/themes/37-crescent-cradle.webp",
       "size": [
         1586,
         992
@@ -10915,7 +10915,7 @@ export const illustratedThemes = [
     "id": "scene-38",
     "title": "毛线慢慢",
     "name": "毛线慢慢",
-    "image": "/personalized-home-2-0/asset/themes/38-slow-yarn.png",
+    "image": "/personalized-home-2-0/asset/themes/38-slow-yarn.webp",
     "scene": {
       "id": "38",
       "title": "毛线慢慢",
@@ -11172,7 +11172,7 @@ export const illustratedThemes = [
           "ear": 0
         }
       ],
-      "image": "/personalized-home-2-0/asset/themes/38-slow-yarn.png",
+      "image": "/personalized-home-2-0/asset/themes/38-slow-yarn.webp",
       "size": [
         1586,
         992
@@ -11214,7 +11214,7 @@ export const illustratedThemes = [
     "id": "scene-39",
     "title": "晨雾芦苇",
     "name": "晨雾芦苇",
-    "image": "/personalized-home-2-0/asset/themes/39-morning-reeds.png",
+    "image": "/personalized-home-2-0/asset/themes/39-morning-reeds.webp",
     "scene": {
       "id": "39",
       "title": "晨雾芦苇",
@@ -11465,7 +11465,7 @@ export const illustratedThemes = [
           "ear": 0
         }
       ],
-      "image": "/personalized-home-2-0/asset/themes/39-morning-reeds.png",
+      "image": "/personalized-home-2-0/asset/themes/39-morning-reeds.webp",
       "size": [
         1586,
         992
@@ -11507,7 +11507,7 @@ export const illustratedThemes = [
     "id": "scene-40",
     "title": "花瓣午后",
     "name": "花瓣午后",
-    "image": "/personalized-home-2-0/asset/themes/40-petal-afternoon.png",
+    "image": "/personalized-home-2-0/asset/themes/40-petal-afternoon.webp",
     "scene": {
       "id": "40",
       "title": "花瓣午后",
@@ -11724,7 +11724,7 @@ export const illustratedThemes = [
           "ear": 0
         }
       ],
-      "image": "/personalized-home-2-0/asset/themes/40-petal-afternoon.png",
+      "image": "/personalized-home-2-0/asset/themes/40-petal-afternoon.webp",
       "size": [
         1586,
         992

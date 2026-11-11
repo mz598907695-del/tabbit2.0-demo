@@ -1,5 +1,5 @@
 @scope (.personalized-home) {
-.aiw-shell { --aiw-topbar-height:56px; --aiw-sticky-surface:transparent; position:relative; height:var(--home-viewport-height); min-width:320px; overflow:hidden; }
+.aiw-shell { --aiw-topbar-height:48px; --aiw-sticky-surface:transparent; position:relative; height:var(--home-viewport-height); min-width:320px; overflow:hidden; }
 :scope[data-theme="dark"] .aiw-shell { --aiw-sticky-surface:transparent; }
 .aiw-shell[hidden] { display:none; }
 .aiw-shell.is-open { display:grid; grid-template-columns:256px minmax(0,1fr); grid-template-rows:minmax(0,1fr); }

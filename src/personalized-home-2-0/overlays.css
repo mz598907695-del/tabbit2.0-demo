@@ -339,8 +339,8 @@
 .overlay-app-icon-heading { gap:8px; }
 .overlay-app-icon-unlock { display:flex; align-items:center; min-width:0; gap:2px; padding:2px 0; border:0; border-radius:6px; background:transparent; color:var(--nine-color-text-tertiary); font:inherit; font-size:var(--nine-font-size-12); line-height:var(--nine-font-line-height-12); cursor:pointer; }
 .overlay-app-icon-unlock > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.overlay-app-icon-unlock > svg { flex:none; }
-.overlay-app-icon-unlock:hover { color:var(--nine-color-text-title); }
+.overlay-app-icon-unlock-action { color:var(--nine-color-action-primary-text); }
+.overlay-app-icon-unlock:hover .overlay-app-icon-unlock-action { text-decoration:underline; text-underline-offset:2px; }
 .overlay-app-icon-unlock:focus-visible { outline:1px solid var(--focus-indicator); outline-offset:2px; }
 .overlay-app-icon-placeholders { position:relative; container-type:inline-size; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
 .overlay-app-icon-selection-card { position:absolute; z-index:0; top:0; left:0; box-sizing:border-box; width:calc((100cqw - 32px) / 5); height:calc((100cqw - 32px) / 5 + 8px); border:.5px solid var(--nine-color-border-alpha-subtle); border-radius:16px; background:var(--overlay-panel-card); transform:translate(calc(var(--app-icon-column) * (100% + 8px)),calc(var(--app-icon-row) * (100% + 8px))); transition:transform 220ms var(--nine-motion-easing-standard); pointer-events:none; }
@@ -511,7 +511,7 @@
   flex: 1 1 0%;
   flex-direction: column;
   min-height: 0;
-  gap: 12px;
+  gap: 8px;
   padding: 0 12px 12px;
 }
 .theme-panel .overlay-theme-tabs {
@@ -782,7 +782,6 @@
 @media (prefers-reduced-motion: reduce) {
   .overlay-wallpaper-delete { transition: none; }
 }
-.overlay-wallpaper-note,
 .overlay-wallpaper-error {
   margin: 16px 1px 0;
   color: var(--muted);
@@ -890,7 +889,6 @@
   padding: 12px 14px;
   margin-bottom: 20px;
   color: var(--muted, #7c8088);
-  user-select: text;
 }
 .overlay-primary-button {
   display: flex;

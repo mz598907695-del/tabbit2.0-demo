@@ -1,3 +1,4 @@
+import WorkspaceListDivider from './WorkspaceListDivider';
 import React from 'react';
 import { Pause, Start } from '../icons';
 import './workspace-files.css';
@@ -12,12 +13,12 @@ export default function WorkspaceTasks({ items, query, onOpen, onUpdate }) {
     {query && <p className="aiw-results-label" role="status">找到 {items.length} 项相关任务</p>}
     {<div className="aiwt-table-scroll aiwf-table-scroll"><table className="aiwt-table">
       <colgroup><col className="aiwt-col-name"/><col className="aiwt-col-schedule"/><col className="aiwt-col-next"/><col className="aiwt-col-status"/><col className="aiwt-col-action"/></colgroup>
-      <thead><tr><th scope="col">名称</th><th scope="col">执行计划</th><th scope="col">下次执行</th><th scope="col">状态</th><th scope="col">操作</th></tr><tr className="aiwf-divider-row" aria-hidden="true"><td colSpan={5}><div className="aiwf-list-divider"/></td></tr></thead>
+      <thead><tr><th scope="col">名称</th><th scope="col">执行计划</th><th scope="col">下次执行</th><th scope="col">状态</th><th scope="col">操作</th></tr><WorkspaceListDivider columns={5}/></thead>
       <tbody>{items.map((item,index) => <React.Fragment key={item.id}><tr>
         <td><div className="aiwt-name"><div><button className="aiwt-title aiwf-list-title" onClick={() => onOpen(item)}>{item.title}</button><p className="aiwt-description">{item.description}</p></div></div></td>
         <td>{item.schedule}</td><td>{item.type === 'active' ? item.date : '—'}</td><td>{status(item)}</td>
         <td><WorkspaceActionButton title={item.type === 'active' ? '暂停任务' : '恢复任务'} aria-label={`${item.type === 'active' ? '暂停' : '恢复'} ${item.title}`} onClick={() => onUpdate({ ...item, type: item.type === 'active' ? 'paused' : 'active' })}>{item.type === 'active' ? <Pause size={16}/> : <Start size={16}/>}</WorkspaceActionButton></td>
-      </tr>{index < items.length - 1 && <tr className="aiwf-divider-row" aria-hidden="true"><td colSpan={5}><div className="aiwf-list-divider"/></td></tr>}</React.Fragment>)}</tbody>
+      </tr>{index < items.length - 1 && <WorkspaceListDivider columns={5}/>}</React.Fragment>)}</tbody>
     </table></div>}
   </div>;
 }

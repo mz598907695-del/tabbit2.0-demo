@@ -48,8 +48,8 @@
 .aiw-type-label { padding:1px 5px; background:var(--aiw-content-soft); border-radius:4px; }
 .aiw-content-results { container-type:inline-size; container-name:workspace-results; }
 .aiw-content-list { display:flex; flex-direction:column; }
-.aiw-content-list .aiw-content-item { display:flex; align-items:center; position:relative; isolation:isolate; gap:20px; padding:12px 0; min-height:66px; border:0; border-bottom:.5px solid var(--border); border-radius:0; background:transparent; }
-.aiw-content-list .aiw-content-item:last-child { border-bottom:0; }
+.aiw-content-list .aiw-content-item { display:flex; align-items:center; position:relative; isolation:isolate; gap:20px; padding:12px 0; min-height:66px; border:0; border-radius:0; background:transparent; }
+.aiw-content-list .aiw-content-item:not(:last-child)::after { content:""; position:absolute; inset:auto 0 0; height:.5px; background:var(--nine-color-border-alpha-subtle); pointer-events:none; }
 .aiw-content-list .aiw-content-item { overflow:visible; }
 .aiw-content-list .aiw-content-item::before { content:""; position:absolute; inset:0 -8px; z-index:-1; border-radius:12px; pointer-events:none; }
 .aiw-content-list .aiw-content-item:hover::before,.aiw-content-list .aiw-content-item:focus-within::before { background:var(--aiw-content-soft); }
@@ -101,18 +101,6 @@
 .aiw-empty p { font-size:13px; color:var(--muted); margin:8px 0 19px; }
 .aiw-inline-feedback { display:flex; align-items:center; gap:7px; font-size:11px; color:var(--muted); padding:8px 10px; background:var(--aiw-content-soft); border-radius:7px; margin:0 0 16px!important; }
 .aiw-inline-feedback button { margin-left:auto; }
-.aiw-membership { border:.5px solid var(--border); background:var(--surface); border-radius:12px; padding:24px; margin-top:0; }
-.aiw-membership-top { display:flex; justify-content:space-between; align-items:center; gap:15px; }
-.aiw-eyebrow { color:var(--muted); font-size:10px; }
-.aiw-membership-top h2 { font-size:20px; font-weight:500; margin:6px 0; }
-.aiw-membership-top h2 .aiw-demo-badge { margin-left:7px; }
-.aiw-membership-top p { font-size:12px; color:var(--muted); }
-.aiw-usage-meter { display:flex; align-items:flex-end; justify-content:space-between; margin-top:28px; font-size:11px; color:var(--muted); }
-.aiw-usage-meter>div { display:flex; flex-direction:column; gap:5px; }
-.aiw-usage-meter strong { font-size:32px; font-weight:550; color:var(--text); line-height:1.2; font-variant-numeric:tabular-nums; }
-.aiw-usage-meter strong span { font-size:18px; margin-left:2px; }
-.aiw-meter-track { height:8px; border-radius:6px; background:color-mix(in srgb,var(--text) 8%,var(--surface)); margin-top:15px; overflow:hidden; }
-.aiw-meter-track>span { display:block; height:100%; border-radius:inherit; background:color-mix(in srgb,var(--text) 75%,var(--surface)); }
 .aiw-section-heading { display:flex; justify-content:space-between; align-items:center; gap:15px; margin:30px 0 14px; }
 .aiw-section-heading h2 { font-size:16px; font-weight:500; }
 .aiw-section-heading>span { font-size:12px; color:var(--muted); }
@@ -123,11 +111,6 @@
 .aiw-data-table th:last-child,.aiw-data-table td:last-child { padding-right:0; }
 .aiw-section-caption { font-size:12px; color:var(--muted); margin:0 0 16px; }
 .aiw-section-caption>span { color:var(--muted); margin-left:5px; }
-.aiw-coupon { display:flex; align-items:center; gap:18px; padding:24px; background:var(--surface); border:.5px solid var(--border); border-radius:12px; }
-.aiw-coupon>div { flex:1; }
-.aiw-coupon h3 { font-size:16px; font-weight:500; }
-.aiw-coupon p { font-size:12px; color:var(--muted); margin:5px 0; }
-.aiw-coupon small { color:var(--muted); font-size:10px; }
 .aiw-form-note { color:var(--muted); font-size:11px; line-height:1.8; margin:14px 0!important; }
 .aiw-content-dialog { width:min(470px,calc(var(--home-viewport-width) - 32px)); max-height:min(800px,calc(var(--home-viewport-height) - 50px)); padding:0; border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--text); box-shadow:0 16px 60px #0002; font-family:inherit; font-size:13px; }
 .aiw-content-dialog::backdrop { background:#0004; }
@@ -215,17 +198,11 @@
 }
 
 @media(max-width:760px) {
-  .aiw-membership { padding:20px; }
-  .aiw-membership-top { align-items:flex-start; flex-direction:column; }
   .aiw-section-heading { align-items:flex-start; flex-direction:column; gap:6px; }
 }
 @media(max-width:600px) {
   .aiw-content-grid { grid-template-columns:1fr; }
   .aiw-item-date { max-width:90px; white-space:normal; text-align:right; }
-  .aiw-coupon { gap:12px; padding:16px; flex-wrap:wrap; }
-  .aiw-coupon>.aiw-button { margin-left:auto; }
-  .aiw-usage-meter { gap:10px; }
-  .aiw-usage-meter>span { font-size:10px; text-align:right; }
 }
 
 @container workspace-results (max-width:600px) {

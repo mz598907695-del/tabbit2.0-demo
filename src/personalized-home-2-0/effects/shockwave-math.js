@@ -8,9 +8,8 @@ export function getShockwaveFrame(progress, width, height, origin, reduced = fal
   const t = Math.max(0, Math.min(1, progress));
   const farthest = Math.max(...[[0,0],[width,0],[0,height],[width,height]]
     .map(([x,y]) => Math.hypot(x - origin.x, y - origin.y)));
-  // Keep the wave near its origin while the native snapshot is arriving.
-  // The old exponential curve spent 70% of its travel in the first 200ms,
-  // so the actual lens only became visible near the window's edges.
+  // Playback begins after the native snapshot is ready. The smooth curve keeps
+  // the wave near its origin initially and crosses the center halfway through.
   const travel = easing==='linear'?t:easing==='fast'?1-(1-t)**3:t*t*(3-2*t);
   return {
     radius:reduced ? farthest * .45 : 20 + (farthest + 80) * travel,

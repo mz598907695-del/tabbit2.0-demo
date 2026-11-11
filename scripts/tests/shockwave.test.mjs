@@ -18,16 +18,17 @@ test('a point-origin wave reaches every corner and fades completely', () => {
   }
 });
 
-test('the lens still crosses the central content after a 400ms native capture', () => {
+test('the confirmed 500ms smooth wave crosses the center halfway through playback', () => {
   const width=1280,height=800,origin={x:640,y:440};
   const end=getShockwaveFrame(1,width,height,origin).radius;
-  const early=getShockwaveFrame(200/SHOCKWAVE_DURATION,width,height,origin);
+  const early=getShockwaveFrame(100/SHOCKWAVE_DURATION,width,height,origin);
   const ready=getShockwaveFrame(400/SHOCKWAVE_DURATION,width,height,origin);
   const middle=getShockwaveFrame(.5,width,height,origin);
-  assert.ok(early.radius/end<.2,'the wave leaves the input before the snapshot arrives');
-  assert.ok(ready.radius/end<.6,'full refraction should still cross the central content');
+  assert.equal(SHOCKWAVE_DURATION,500);
+  assert.ok(early.radius/end<.2,'the smooth wave should start close to the input');
+  assert.ok(ready.radius/end>.8,'the wave should finish most of its travel by 400ms');
   assert.ok(middle.radius/end>.4&&middle.radius/end<.6);
-  assert.ok(ready.strength>.75);
+  assert.ok(ready.strength>0&&ready.strength<.5,'the wave fades near the end');
   assert.ok(SHOCKWAVE_LENS_PIXELS>SHOCKWAVE_BEVEL_PIXELS,'the page lens must not be overpowered by edge refraction');
 });
 

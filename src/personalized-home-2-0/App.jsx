@@ -57,6 +57,7 @@ export function App() {
   const [spaceColor, setSpaceColor] = useState(baseGlassSettings.color);
   const controlColorPreset = spaceColors.find((item, index) => index > 0 && item.tintColor.toLowerCase() === spaceColor.toLowerCase());
   const controlAccent = preferences.themeSource === 'gallery' ? 'var(--nine-color-action-primary)' : controlColorPreset?.color || 'var(--nine-color-action-primary)';
+  const checkboxAccent = preferences.themeSource === 'gallery' ? 'var(--nine-color-action-primary)' : controlColorPreset?.accentToken || 'var(--nine-color-action-primary)';
   const composerFrameColor = preferences.themeSource === 'color' && spaceColor.toLowerCase() !== baseGlassSettings.color.toLowerCase()
     ? controlColorPreset?.color || spaceColor : null;
   const [frameTint,setFrameTint] = useState(50);
@@ -122,6 +123,11 @@ export function App() {
     || wallpaperLibrary.wallpapers.find((item) => item.id === preferences.theme);
   const wallpaperTransition = useSpaceWallpaperTransition(preferences.theme, selectedWallpaper,
     wallpaperLibrary.wallpapers, document.documentElement.dataset.mode, preferences.wallpaperBlur, spaceId);
+  // A manually selected video can spend a few frames waiting for its first
+  // drawable frame. Keep the source material appearance during that handoff so
+  // dark translucent surfaces never sample the still-visible light wallpaper.
+  const surfaceAppearanceTheme = wallpaperTransition?.kind === 'selection'
+    ? wallpaperTransition.from.appearance || appearanceTheme : appearanceTheme;
   const [composerOpen, setComposerOpen] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const [themePanelPresent, setThemePanelPresent] = useState(false);
@@ -290,7 +296,7 @@ export function App() {
   }
 
   useLayoutEffect(() => {
-    getHomeRoot().dataset.theme = appearanceTheme;
+    getHomeRoot().dataset.theme = surfaceAppearanceTheme;
     if (preferences.liquidGlass) {
       getHomeRoot().dataset.material = "liquid-glass";
     } else {
@@ -299,14 +305,15 @@ export function App() {
     delete getHomeRoot().dataset.glassStyle;
     delete getHomeRoot().dataset.glassVariant;
     applyLiquidGlassOpacity(getHomeRoot(), preferences.liquidGlassOpacity);
-  }, [appearanceTheme, preferences.liquidGlass, preferences.liquidGlassOpacity]);
+  }, [surfaceAppearanceTheme, preferences.liquidGlass, preferences.liquidGlassOpacity]);
 
   useLayoutEffect(() => {
     const root = getHomeRoot();
     root.style.setProperty('--accent', controlAccent);
+    root.style.setProperty('--checkbox-accent', checkboxAccent);
     if (composerFrameColor) root.style.setProperty('--composer-frame-fill', `color-mix(in srgb, ${composerFrameColor} 15%, transparent)`);
     else root.style.removeProperty('--composer-frame-fill');
-  }, [controlAccent, composerFrameColor]);
+  }, [controlAccent, checkboxAccent, composerFrameColor]);
 
   useLayoutEffect(() => {
     document.documentElement.dataset.largeTabRadius = String(preferences.largeTabRadius);
@@ -483,6 +490,8 @@ export function App() {
             onUploadWallpaper={uploadWallpaper}
             largeTabRadius={preferences.largeTabRadius}
             onLargeTabRadius={(value) => updatePreference("largeTabRadius", value)}
+            pageWidth={preferences.pageWidth}
+            onPageWidth={value => updatePreference("pageWidth", value)}
             selectedAppIcon={selectedAppIcon}
             onAppIcon={setSelectedAppIcon}
             onDefaultBrowserUnlock={() => promotionAction(promotions.find(item => item.kind === 'default-browser'))}
@@ -500,7 +509,7 @@ export function App() {
 
   return (
     <ComposerWeatherContext.Provider value={selectedWallpaper?.weather || null}>
-    <AIWorkspace wallpaper={selectedWallpaper} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNewChat={prompt => {
+    <AIWorkspace wallpaper={selectedWallpaper} reflectionWallpaper={selectedWallpaper || { url:illustratedTheme?.scene ? `/personalized-home-2-0/asset/themes/previews/${illustratedTheme.scene.id}.webp` : undefined, color:getThemeBackground(preferences.theme, appearanceTheme), name:illustratedTheme?.name || '当前主题' }} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNewChat={prompt => {
       setWidgetAI(false); aiComposerRef.current?.closeOverlays();
       setDialog(null); setThemeOpen(false); setPageManagerOpen(false); boardRef.current?.dismissOverlays(); setBoardEditing(false);
       composerRef.current?.startNew(prompt);
@@ -558,7 +567,7 @@ export function App() {
             if (result.ok) setShortcutPages(result.pages);
             return {ok: result.ok, message: result.message};
           },
-          showLabels: preferences.shortcutLabels, appearanceTheme,
+          showLabels: preferences.shortcutLabels, appearanceTheme:surfaceAppearanceTheme,
           shortcutSize: preferences.shortcutSize, shortcutShape: preferences.shortcutShape,
           onEditingChange: setShortcutEditing, onGenerateWidget: openWidgetAI,
           undo: boardState.undo, redo: boardState.redo,
@@ -597,7 +606,7 @@ export function App() {
     </div>
     </AIWorkspace>
     {themePortalHost && !widgetAI && createPortal(
-      <div className="personalized-home browser-theme-panel-host" data-theme={appearanceTheme} data-open={themeOpen} aria-hidden={!themeOpen} inert={!themeOpen} style={{ '--accent': controlAccent }}>
+      <div className="personalized-home browser-theme-panel-host" data-theme={surfaceAppearanceTheme} data-open={themeOpen} aria-hidden={!themeOpen} inert={!themeOpen} style={{ '--accent': controlAccent }}>
         {themeSidebar}
       </div>, themePortalHost
     )}

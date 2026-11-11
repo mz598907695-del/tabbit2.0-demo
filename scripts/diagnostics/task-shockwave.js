@@ -28,21 +28,23 @@ export async function checkTaskShockwave() {
     if(wasTask) {chat.click();await wait(40);}
     const began=performance.now();
     task.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerType:'mouse',button:0,buttons:1}));
+    await wait(40);
+    assert(!overlay(),'任务模式提交前已经启动冲击波');
+    task.click();
     await until(()=>overlay()?.dataset.firstFrameMs);
     const canvas=overlay(),gl=canvas.getContext('webgl2');
-    assert(task.getAttribute('aria-pressed')!=='true','光环仍等切换任务后才启动');
+    assert(task.getAttribute('aria-pressed')==='true','冲击波没有使用切换后的任务画面');
     const pressStartMs=Number(canvas.dataset.firstFrameMs);
     const box=canvas.getBoundingClientRect();
     const region=owner.closest('.glass-surface')||document.documentElement;
     const bounds=region.getBoundingClientRect();
     assert(Math.abs(box.left-bounds.left)<1&&Math.abs(box.top-bounds.top)<1
       && Math.abs(box.width-bounds.width)<1&&Math.abs(box.height-bounds.height)<1,'光环没有覆盖整个窗口');
-    task.click();
     await until(()=>canvas.dataset.snapshot==='native'||!canvas.isConnected,2000);
     assert(canvas.isConnected,'原生截图未在光环期间就绪');
     assert(canvas.dataset.snapshot==='native','完整效果没有获得原生页面截图');
     assert(getComputedStyle(canvas).pointerEvents==='none','动画拦截了交互');
-    const info={pressStartMs,beforeTaskCommit:true,wholeWindow:true,snapshotReadyMs:Math.round(performance.now()-began),snapshot:canvas.dataset.snapshot,
+    const info={pressStartMs,afterTaskCommit:true,wholeWindow:true,snapshotReadyMs:Math.round(performance.now()-began),snapshot:canvas.dataset.snapshot,
       pixels:[canvas.width,canvas.height],origin:canvas.dataset.origin,glError:gl.getError()};
     assert(info.glError===0,'GPU 渲染出错');
     assert(canvas.width*canvas.height<=4_010_000,'超出截图像素预算');

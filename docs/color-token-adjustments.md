@@ -1,5 +1,22 @@
 # 颜色 Token 调整台账
 
+## composer-task-controls
+
+- 应用位置：输入框上方任务挂载行的“选择项目”和“云端／本地”按钮
+- Hover 填充：复用 `--nine-color-fill-layer-strong` 的 RGB，透明度固定为 `5%`，随亮暗模式变化
+- 按钮：图标 `14px`、文字 `12px`、图文间距 `4px`、高度 `24px`、左右内边距 `6px`
+- 行容器：左右内边距 `0`，与输入框间距 `6px`
+- 外框：仅任务模式顶部圆角 `16px`；底部及其他模式圆角沿用原值
+- 实现文件：`src/personalized-home-2-0/task-mount.css`、`src/personalized-home-2-0/composer-expansion.css`
+
+## app-icon-default-browser-link
+
+- 应用位置：应用图标标题旁“设置为默认浏览器”链接文字
+- 默认外观与图片主题：复用 `--nine-color-action-primary-text` → `--color-blue-6`（B6）；亮色 `#005ba6`，深色 `#a6daff`
+- 彩色主题：分别复用 orange / yellow / green / cyan / blue / purple / hotpink 的 6 级 Token，随亮暗模式自动变化；通过空间色板的 `linkColor` 映射使用
+- Hover：仅增加下划线，颜色保持相同等级；后缀“，即可解锁”仍使用原提示文字色
+- 实现文件：`src/spaceColors.ts`、`src/personalized-home-2-0/ThemePanel.jsx`、`src/personalized-home-2-0/overlays.css`
+
 ## homepage-shared-tile-surface
 
 - 语义：首页快捷方式与小组件的统一容器表面（图片小组件也使用同一外框）；深色活动卡片复用同一套材质

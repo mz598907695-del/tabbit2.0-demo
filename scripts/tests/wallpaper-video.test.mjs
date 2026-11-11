@@ -6,16 +6,18 @@ import { validateWallpaperFile, isStoredWallpaper, MAX_VIDEO_WALLPAPER_BYTES } f
 
 function mediaDocument() {
   const observers=new Map(),listeners=new Set();
-  const doc=new EventTarget();doc.hidden=false;
+  const doc=new EventTarget();doc.hidden=false;let focused=true;
   const add=doc.addEventListener.bind(doc),remove=doc.removeEventListener.bind(doc);
   doc.addEventListener=(type,fn)=>{listeners.add(fn);add(type,fn);};
   doc.removeEventListener=(type,fn)=>{listeners.delete(fn);remove(type,fn);};
-  doc.defaultView={IntersectionObserver:class{
+  const view=new EventTarget();
+  view.IntersectionObserver=class{
     constructor(callback){this.callback=callback;}
     observe(video){this.video=video;observers.set(video,this);}
     disconnect(){observers.delete(this.video);}
-  }};
-  return {doc,listeners,observers,visible(video,value){observers.get(video).callback([{isIntersecting:value}]);}};
+  };
+  doc.defaultView=view;doc.hasFocus=()=>focused;
+  return {doc,listeners,observers,visible(video,value){observers.get(video).callback([{isIntersecting:value}]);},focus(value){focused=value;view.dispatchEvent(new Event(value?'focus':'blur'));}};
 }
 class Video extends EventTarget {
   constructor(doc){super();this.ownerDocument=doc;this.tagName='VIDEO';this.isConnected=true;this.readyState=4;this.duration=10;this.currentTime=0;this.paused=true;this.plays=0;}
@@ -42,6 +44,8 @@ test('hidden backgrounds pause and resume together; disposal removes playback li
   host.visible(a,true);host.visible(b,true);a.currentTime=b.currentTime=4.25;
   host.doc.hidden=true;host.doc.dispatchEvent(new Event('visibilitychange'));assert.ok(a.paused&&b.paused);
   host.doc.hidden=false;host.doc.dispatchEvent(new Event('visibilitychange'));assert.ok(!a.paused&&!b.paused);assert.equal(a.currentTime,4.25);
+  host.focus(false);assert.ok(a.paused&&b.paused);
+  host.focus(true);assert.ok(!a.paused&&!b.paused);assert.equal(a.currentTime,4.25);
   host.visible(a,false);assert.equal(a.paused,true);assert.equal(b.paused,false);
   b.currentTime=5;host.visible(a,true);assert.equal(a.currentTime,5);
   stopA();const plays=a.plays;a.dispatchEvent(new Event('loadeddata'));assert.equal(a.plays,plays);

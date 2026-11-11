@@ -4,12 +4,12 @@ let renderer;
 const loadRenderer=()=>renderer ||= import('./effects/task-shockwave.js').catch(error=>{renderer=null;throw error;});
 
 export function useTaskShockwave(ownerRef, mode) {
-  const current=useRef({epoch:0,cancel:null});
+  const current=useRef({epoch:0,cancel:null,frame:0});
   const previousMode=useRef(mode);
-  const pressed=useRef(false);
   const cancel=useCallback(()=>{
     const state=current.current;
     state.epoch++;
+    cancelAnimationFrame(state.frame); state.frame=0;
     state.cancel?.(); state.cancel=null;
   },[]);
   useEffect(()=>cancel,[cancel]);
@@ -34,17 +34,25 @@ export function useTaskShockwave(ownerRef, mode) {
   useEffect(()=>{
     if(previousMode.current===mode) return;
     previousMode.current=mode;
-    const fromPress=pressed.current;
-    pressed.current=false;
-    if(mode==='任务') {if(!fromPress)start();}
-    else cancel();
+    cancel();
+    if(mode!=='任务') return;
+    // Composer commits mode changes without layout transitions. Wait until that
+    // new task frame has actually been presented so the native snapshot matches
+    // the live page underneath the lens instead of flashing the previous mode.
+    const state=current.current,epoch=state.epoch;
+    state.frame=requestAnimationFrame(()=>{
+      state.frame=0;
+      if(state.epoch===epoch)start();
+    });
+    return ()=>{if(state.epoch===epoch)cancel();};
   },[mode,start,cancel]);
   const onPress=event=>{
     if(mode==='任务' || (event.type==='pointerdown' && event.button!==0)
       || (event.type==='keydown' && (!['Enter',' '].includes(event.key)||event.repeat))) return;
-    pressed.current=true;
-    start();
+    // Warm the renderer while the click/keypress is committing the new mode.
+    // Capture and animation begin from the mode effect after the new frame paints.
+    void loadRenderer().catch(()=>{});
   };
   return {onPointerDown:onPress,onKeyDown:onPress,onPointerEnter:()=>{void loadRenderer().catch(()=>{});},
-    onPointerCancel:()=>{pressed.current=false;cancel();}};
+    onPointerCancel:cancel};
 }

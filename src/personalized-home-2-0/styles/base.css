@@ -64,7 +64,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
-[tabindex]:focus-visible {
+[tabindex]:not(dialog):focus-visible {
   outline: 1px solid var(--focus-indicator);
   outline-offset: -1px;
 }

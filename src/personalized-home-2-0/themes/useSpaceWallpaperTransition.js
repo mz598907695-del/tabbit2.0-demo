@@ -21,7 +21,7 @@ export function useSpaceWallpaperTransition(theme, wallpaper, wallpapers, appear
   const frame = useRef(0);
   const selectionTransition = useWallpaperSelectionTransition({ id:theme, url:wallpaper?.url || '',
     mimeType:wallpaper?.mimeType, posterUrl:wallpaper?.posterUrl, blurred,
-    color:glassBackgroundThemes.has(theme) ? 'transparent' : getThemeBackground(theme, appearance) }, spaceId, transition);
+    color:glassBackgroundThemes.has(theme) ? 'transparent' : getThemeBackground(theme, appearance), appearance }, spaceId, transition);
   const backgroundTransition = transition || selectionTransition;
 
   useEffect(() => {

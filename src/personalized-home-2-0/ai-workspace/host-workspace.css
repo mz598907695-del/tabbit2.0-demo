@@ -103,30 +103,43 @@
 /* The new-session wallpaper spans both columns in window coordinates. */
 .aiw-shell.has-home-wallpaper > .aiw-nav-host { position:relative; z-index:24; will-change:transform; }
 .aiw-shell.has-home-wallpaper > .aiw-stage { z-index:1; }
-.aiw-shell.has-home-wallpaper > .aiw-nav-host > .aiw-navigation {
+.aiw-shell.has-home-wallpaper:not(.is-sidebar-overlay) > .aiw-nav-host > .aiw-navigation {
  background:var(--nine-color-fill-layer-muted);
  backdrop-filter:blur(30px);
  -webkit-backdrop-filter:blur(30px);
 }
 .aiw-shell.has-home-wallpaper.is-sidebar-overlay > .aiw-nav-host { position:absolute; }
 /* The home entry buttons and sidebar share one translucent material. */
-.aiw-shell .aiw-nav-host > .aiw-navigation.aiwn-variant-1,
+.aiw-shell.has-home-wallpaper:not(.has-content):not(.is-sidebar-overlay) .aiw-nav-host > .aiw-navigation.aiwn-variant-1,
 .theme-button,
 .aiw-shell:not(.has-content) .aiw-launcher {
  background:rgba(255,255,255,.15);
  backdrop-filter:blur(8px);
  -webkit-backdrop-filter:blur(8px);
 }
-:scope[data-theme='dark'] .aiw-shell .aiw-nav-host > .aiw-navigation.aiwn-variant-1,
+:scope[data-theme='dark'] .aiw-shell.has-home-wallpaper:not(.has-content):not(.is-sidebar-overlay) .aiw-nav-host > .aiw-navigation.aiwn-variant-1,
 :where(:scope[data-theme='dark']) .theme-button,
 :where(:scope[data-theme='dark']) .aiw-shell:not(.has-content) .aiw-launcher {
  background:rgba(0,0,0,.15);
+}
+.aiw-shell.has-content:not(.is-sidebar-overlay) .aiw-nav-host > .aiw-navigation.aiwn-variant-1 {
+ background:transparent;
+ backdrop-filter:none;
+ -webkit-backdrop-filter:none;
+}
+.aiw-shell:not(.has-home-wallpaper):not(.is-sidebar-overlay) .aiw-nav-host > .aiw-navigation.aiwn-variant-1 {
+ background:transparent;
+ backdrop-filter:none;
+ -webkit-backdrop-filter:none;
 }
 @media(max-width:650px) {
  .aiw-shell.has-home-wallpaper > .aiw-nav-host { position:absolute; }
 }
 
 .aiw-shell .aiw-launcher {
+ position:absolute;
+ left:8px;
+ top:8px;
  opacity:1;
  visibility:visible;
  transition:opacity 160ms ease var(--aiw-sidebar-motion),visibility 0s linear var(--aiw-sidebar-motion),scale 280ms var(--nine-motion-easing-standard);
@@ -138,10 +151,11 @@
  pointer-events:none;
  transition:opacity 80ms ease,visibility 0s linear 80ms;
 }
-.aiw-shell:not(.has-content) .aiw-stage-topbar {
+.aiw-shell .aiw-stage-topbar {
  height:48px;
- padding-inline:8px;
+ padding-inline:12px;
 }
+.aiw-shell:not(.is-open) .aiw-stage-topbar { padding-left:52px; }
 @media(max-width:650px) {
  .aiw-shell,.aiw-shell.is-open[data-variant] { grid-template-columns:minmax(0,1fr); }
  .aiw-shell > .aiw-stage,.aiw-shell.is-open > .aiw-stage { grid-column:1; }

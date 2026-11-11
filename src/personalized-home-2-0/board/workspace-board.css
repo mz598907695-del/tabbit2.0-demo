@@ -51,7 +51,7 @@
 .is-editing .board-widget-card { pointer-events: none; }
 .board-item.is-dragging { transition: none; cursor: grabbing; z-index: 8; outline: none; box-shadow: 0 12px 28px #0002; opacity: .88; }
 .board-item.is-dragging :focus-visible { outline: none; }
-.board-drop-preview { position: absolute; top: 0; left: 0; border: 1.5px dashed #989ba2; border-radius: var(--board-card-radius, 24px); background: rgb(128 128 128 / 6%); pointer-events: none; }
+.board-drop-preview { position: absolute; top: 0; left: 0; border: 1px dashed var(--nine-color-border-alpha-regular); border-radius: var(--board-card-radius, 24px); background: rgb(from var(--nine-color-border-alpha-subtle) r g b / 3%); pointer-events: none; }
 .board-drop-preview.is-shortcut { border-radius: var(--shortcut-radius, 50%); }
 .board-item.is-widget { cursor: grab; }
 .board-item input, .board-item textarea { user-select: text; touch-action: auto; }

@@ -1,8 +1,8 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, ImagePlus, RefreshCw, Trash2, X } from './icons';
+import { ChevronLeft, ImagePlus, RefreshCw, Trash2, X } from './icons';
 import { isWallpaperTheme, WALLPAPER_ACCEPT } from './themes/wallpapers';
 import { getExampleWallpaper } from './themes/exampleWallpapers';
-import { officialWallpapers as officialThemes, isOfficialWallpaperTheme } from './themes/officialWallpapers';
+import { officialWallpapers as officialThemes, communityWallpapers as communityThemes, isOfficialWallpaperTheme, isCommunityWallpaperTheme } from './themes/officialWallpapers';
 import WallpaperMedia from './themes/WallpaperMedia';
 import { BoardConfirm } from './board/BoardDialogs';
 import SettingSegments from './SettingSegments';
@@ -21,7 +21,7 @@ function GalleryPreview({ item }) {
 }
 
 const themeCategories = ["solid", "illustrated", "mine"];
-const getThemeCategory = theme => isOfficialWallpaperTheme(theme) ? "solid" : isWallpaperTheme(theme) ? "mine" : "solid";
+const getThemeCategory = theme => isOfficialWallpaperTheme(theme) ? "solid" : isCommunityWallpaperTheme(theme) ? "illustrated" : isWallpaperTheme(theme) ? "mine" : "solid";
 
 export function ThemePanel({
   theme,
@@ -45,6 +45,8 @@ export function ThemePanel({
   onPromotion,
   largeTabRadius = true,
   onLargeTabRadius,
+  pageWidth = 'standard',
+  onPageWidth,
   selectedAppIcon = 0,
   onAppIcon,
   onDefaultBrowserUnlock,
@@ -324,6 +326,12 @@ export function ThemePanel({
             <h3 id={`${panelId}-layout-heading`}>布局</h3>
             <div className="overlay-settings-card overlay-layout-card">
               <label className="overlay-setting-row overlay-toggle-row">
+                <span className="overlay-setting-label">超宽模式</span>
+                <input type="checkbox" checked={pageWidth === 'wide'} onChange={event => onPageWidth?.(event.target.checked ? 'wide' : 'standard')} aria-label="超宽模式" />
+                <span className="overlay-toggle-track" aria-hidden="true" />
+              </label>
+              <div className="overlay-layout-divider" aria-hidden="true" />
+              <label className="overlay-setting-row overlay-toggle-row">
                 <span className="overlay-setting-label">标签页大圆角</span>
                 <input type="checkbox" checked={largeTabRadius} onChange={event => onLargeTabRadius?.(event.target.checked)} aria-label="标签页大圆角" />
                 <span className="overlay-toggle-track" aria-hidden="true" />
@@ -346,7 +354,7 @@ export function ThemePanel({
             <div className="overlay-settings-group-heading overlay-app-icon-heading">
               <h3 id={`${panelId}-app-icons-heading`}>应用图标</h3>
               <button type="button" className="overlay-app-icon-unlock" onClick={onDefaultBrowserUnlock}>
-                <span>设置默认浏览器解锁</span><ChevronRight size={12} />
+                <span><span className="overlay-app-icon-unlock-action" style={{ color:gallerySelected ? undefined : palette[selectedSwatchIndex]?.linkColor }}>设置为默认浏览器</span>，即可解锁</span>
               </button>
             </div>
             <div className="overlay-app-icon-placeholders" aria-label="应用图标">
@@ -379,7 +387,7 @@ export function ThemePanel({
           <div className="overlay-theme-tabs" data-category={category} role="tablist" aria-label="主题类型">
             {[
               { id: "solid", label: "官方", count: officialThemes.length },
-              { id: "illustrated", label: "社区", count: 0 },
+              { id: "illustrated", label: "社区", count: communityThemes.length },
               { id: "mine", label: "我的", count: wallpapers.length },
             ].map((tab, index) => (
               <button
@@ -399,15 +407,18 @@ export function ThemePanel({
             ))}
           </div>
           <div className="overlay-theme-browser-stack">
-            <div className="overlay-theme-browser" data-active={category === "solid"} ref={category === "solid" ? galleryRef : null}
-              role="tabpanel" id={`${panelId}-solid-panel`} aria-labelledby={`${panelId}-solid-tab`}
-              aria-hidden={category !== "solid"} inert={category !== "solid"}>
-              <div ref={category === "solid" ? themeGridRef : null} className="overlay-official-theme-grid" aria-label="官方主题">
-                {category === "solid" && themeSelection}
-                {officialThemes.map(item => (
+            {[
+              { id:"solid", label:"官方主题", items:officialThemes },
+              { id:"illustrated", label:"社区主题", items:communityThemes },
+            ].map(({ id, label, items }) => <div key={id} className="overlay-theme-browser" data-active={category === id} ref={category === id ? galleryRef : null}
+              role="tabpanel" id={`${panelId}-${id}-panel`} aria-labelledby={`${panelId}-${id}-tab`}
+              aria-hidden={category !== id} inert={category !== id}>
+              <div ref={category === id ? themeGridRef : null} className="overlay-official-theme-grid" aria-label={label}>
+                {category === id && themeSelection}
+                {items.map(item => (
                   <button
                     key={item.id}
-                    ref={element => { if (category === "solid" && item.id === theme) selectedThemeRef.current = element; }}
+                    ref={element => { if (category === id && item.id === theme) selectedThemeRef.current = element; }}
                     type="button"
                     className="overlay-official-theme-card"
                     aria-pressed={gallerySelected && item.id === theme}
@@ -420,12 +431,7 @@ export function ThemePanel({
                   </button>
                 ))}
               </div>
-            </div>
-            <div className="overlay-theme-browser" data-active={category === "illustrated"} ref={category === "illustrated" ? galleryRef : null}
-              role="tabpanel" id={`${panelId}-illustrated-panel`} aria-labelledby={`${panelId}-illustrated-tab`}
-              aria-hidden={category !== "illustrated"} inert={category !== "illustrated"}>
-              <div ref={category === "illustrated" ? themeGridRef : null} className="overlay-scene-grid" aria-label="社区主题"/>
-            </div>
+            </div>)}
             <div className="overlay-theme-browser" data-active={category === "mine"} ref={category === "mine" ? galleryRef : null}
               role="tabpanel" id={`${panelId}-mine-panel`} aria-labelledby={`${panelId}-mine-tab`}
               aria-hidden={category !== "mine"} inert={category !== "mine"}>
@@ -474,7 +480,6 @@ export function ThemePanel({
                   })}
                 </div>
                 {error && <p className="overlay-wallpaper-error" role="status">{error}</p>}
-                {!error && <p className="overlay-wallpaper-note">支持图片和视频，视频静音循环播放，仅保存在当前设备。</p>}
             </div>
           </div>
         </div>

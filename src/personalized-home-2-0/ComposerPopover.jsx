@@ -33,9 +33,9 @@ export default function ComposerPopover({ anchor, kind, id, label, width, maxHei
     const above = Math.max(0, bounds.top - viewTop - 20);
     const below = Math.max(0, viewTop + viewHeight - bounds.bottom - 20);
     const desiredHeight = Math.min(maxHeight, layer.scrollHeight + 2);
-    // Prefer opening below, shrinking the scrollable body to fit. Only flip
-    // when there is not enough room for even one usable menu row.
-    const side = below >= Math.min(desiredHeight, 48) || below >= above ? 'bottom' : 'top';
+    // Prefer below only when the full menu fits; otherwise flip above instead
+    // of opening a clipped menu that happens to have a few rows of room.
+    const side = below >= desiredHeight ? 'bottom' : 'top';
     const height = Math.min(maxHeight, Math.max(0, viewHeight - 24), side === 'bottom' ? below : above);
     const left = Math.min(viewLeft + viewWidth - layerWidth - 12, Math.max(viewLeft + 12, ['runtime', 'approval'].includes(kind) ? bounds.right - layerWidth : bounds.left));
     const shownHeight = Math.min(desiredHeight, height);

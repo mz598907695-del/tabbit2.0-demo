@@ -43,7 +43,7 @@ export default function SidebarScrollArea({ scrollRef, onKeyDown, children }) {
     return () => { observer.disconnect(); mutations.disconnect(); scroll.removeEventListener('scroll', update); };
   }, [scrollRef]);
   return <div className="aiwc-scroll-area">
-    <div className="aiwc-scroll" ref={scrollRef} onKeyDown={onKeyDown}>{children}</div>
+    <div className="aiwc-scroll" ref={scrollRef} tabIndex={-1} onKeyDown={onKeyDown}>{children}</div>
     <div className="aiwc-scroll-thumb" ref={thumbRef} hidden aria-hidden="true"
       onPointerDown={event => {
         if (event.button !== 0) return;
