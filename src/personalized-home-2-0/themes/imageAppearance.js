@@ -50,6 +50,9 @@ export function getAutomaticThemeAppearance(theme, wallpapers = []) {
   const wallpaper = getExampleWallpaper(theme) || wallpapers.find(item => item.id === theme);
   const illustration = getIllustratedTheme(theme);
   const authored = getMonochromeTheme(theme) || getScrollTheme(theme) || (theme === oceanTheme.id ? oceanTheme : null);
+  // Bundled wallpapers have authored metadata. Personal uploads intentionally
+  // omit it and continue through the on-device image/video analysis below.
+  if (wallpaper?.appearance === 'light' || wallpaper?.appearance === 'dark') return Promise.resolve(wallpaper.appearance);
   const url = wallpaper?.posterUrl || wallpaper?.url || illustration?.image || authored?.preview;
   const fallback = authored?.mode || getThemeAppearance(theme);
   if (wallpaper && isVideoWallpaper(wallpaper) && !wallpaper.posterUrl) {

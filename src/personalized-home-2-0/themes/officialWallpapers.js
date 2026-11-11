@@ -3,12 +3,31 @@ import { resolveResource } from '@tauri-apps/api/path';
 
 // Curated from wallpapers previously shown in 我的. Existing IDs keep saved space themes intact.
 const base = '/personalized-home-2-0/asset/wallpapers/official';
+// Generated from each bundled preview with the same 64 x 64 linear-light
+// classifier used for personal uploads. Keep this metadata in the catalog so
+// release builds never depend on reading asset:// pixels at runtime.
+const lightWallpaperIds = new Set([
+  'wallpaper-01a67213-86df-4270-abef-f0fe521671c9',
+  'wallpaper-040c4db9-37e5-4f0f-a6ff-d5fbe51fb3e9',
+  'wallpaper-0af445ba-2bf4-4a34-886a-62aed9879bef',
+  'wallpaper-1536accc-25cb-4533-9894-029700d2731e',
+  'wallpaper-71e830d1-94f5-402a-b8c4-8cf06cfc3cb9',
+  'wallpaper-8c6413cf-e932-4f4d-940e-924d8600c484',
+  'wallpaper-914b554f-53e8-40d6-ae8f-0d4576db336a',
+  'wallpaper-9402e2a8-2e52-409c-a48e-0459a96876e4',
+  'wallpaper-ada8a9d4-5749-4e74-b359-bca9a6a68551',
+  'wallpaper-dc3f84cd-17b1-4367-b246-022427e68fe0',
+  'wallpaper-e3a448d2-084d-4724-a6ee-6b21a9440f1e',
+  'wallpaper-fff99ed7-a448-4379-aa98-1bc0e0cbffa1',
+]);
+const presetWallpaperAppearance = id => lightWallpaperIds.has(id) ? 'light' : 'dark';
 // A replacement keeps its theme ID while refreshing full images and previews.
 const wallpaper = (id, name, category, file, mimeType = file.endsWith('.webp') ? 'image/webp' : 'image/jpeg', revision = '', weather = null) => {
   const version = revision ? `?v=${revision}` : '';
   const preview = `${base}/previews/${file.replace(/\.[^.]+$/, '.webp')}${version}`;
   return {
     id, name, category, url:`${base}/${file}${version}`, mimeType,
+    appearance:presetWallpaperAppearance(id),
     preview,
     ...(mimeType.startsWith('video/') ? { posterUrl:preview } : {}),
     ...(weather ? { weather } : {}),
