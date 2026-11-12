@@ -56,16 +56,21 @@
 }
 .board-item.is-shortcut { border-radius: var(--shortcut-radius, 50%); }
 .board-item.is-selected { outline: none; }
-.is-editing .board-item { cursor: grab; }
+.is-editing .board-item { cursor: default; }
 .is-editing .board-widget-card { pointer-events: none; }
 .board-item.is-dragging { transition: none; cursor: grabbing; z-index: 8; outline: none; box-shadow: 0 12px 28px #0002; opacity: .88; }
 .board-item.is-dragging :focus-visible { outline: none; }
 .board-drop-preview { position: absolute; top: 0; left: 0; border: 1px dashed var(--nine-color-border-alpha-regular); border-radius: var(--board-card-radius, 24px); background: rgb(from var(--nine-color-border-alpha-subtle) r g b / 3%); pointer-events: none; }
 .board-drop-preview.is-shortcut { border-radius: var(--shortcut-radius, 50%); }
-.board-item.is-widget { cursor: grab; }
+.board-item.is-widget { cursor: default; }
+/* Widget contents include full-card buttons with their own pointer cursor. */
+.board-item.is-widget > .board-widget-card,
+.board-item.is-widget > .board-widget-card *,
+.is-editing .board-item > .shortcut,
+.is-editing .board-item > .shortcut * { cursor: default; }
 .board-item input, .board-item textarea { user-select: text; touch-action: auto; }
 .board-item > .shortcut { height: 50px; padding: 0; gap: 0; justify-content: flex-start; border-radius: var(--shortcut-radius, 50%); }
-.board-remove-button, .board-resize-visual {
+.board-remove-button {
   position: absolute;
   z-index: 4;
   display: grid;
@@ -80,31 +85,42 @@
   box-shadow: 0 2px 6px #0000000a;
 }
 .board-remove-button { left: -6px; top: -5px; cursor: pointer; }
-.board-remove-button:hover { background: var(--segmented); }
+.board-remove-button:hover { background: #f1f1f1; }
+:scope[data-theme='dark'] .board-remove-button { background: #2f2f2f; }
+:scope[data-theme='dark'] .board-remove-button:hover { background: #3b3b3b; }
 /* The transparent hit area remains available before the corner is hovered. */
 .board-resize-handle {
   position: absolute;
   z-index: 4;
   bottom: -6px;
   right: -6px;
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 0 0 24px 0;
   background: transparent;
   touch-action: none;
   cursor: nwse-resize;
   opacity: 0;
   transition: opacity 120ms ease;
 }
-/* Keep the 23px corner control inside its 28px hit area. */
+/* An open corner arc follows the card radius without a button surface. */
 .board-resize-visual {
+  position: absolute;
   right: 0;
-  bottom: 1px;
+  bottom: 0;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-right: 2px solid var(--nine-color-border-alpha-regular);
+  border-bottom: 2px solid var(--nine-color-border-alpha-regular);
+  border-bottom-right-radius: 24px;
   pointer-events: none;
 }
-.board-resize-handle:hover,
+.board-item > .board-resize-handle,
+.board-item > .board-resize-handle * { cursor: nwse-resize; }
+.board-item:hover > .board-resize-handle,
 .board-resize-handle:focus-visible,
 .board-item.is-resizing > .board-resize-handle { opacity: 1; }
 .board-item.is-dragging:not(.is-resizing) > .board-resize-handle { opacity: 0; pointer-events: none; }

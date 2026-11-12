@@ -1,4 +1,4 @@
-import { Minus, MoveDiagonal2 } from '../icons';
+import { Minus } from '../icons';
 import { useCallback, useRef } from 'react';
 import { BoardItemContent, boardItemName } from './BoardItemContent';
 
@@ -48,7 +48,7 @@ export default function BoardItem({
         const delta = ['ArrowRight', 'ArrowDown'].includes(event.key) ? 1 : -1;
         onResize({ w: item.w, h: item.h, [axis]: item[axis] + delta }, axis);
       }}>
-      <span className="board-resize-visual" aria-hidden="true"><MoveDiagonal2 size={14}/></span>
+      <span className="board-resize-visual" aria-hidden="true"/>
     </button>}
   </article>;
 }

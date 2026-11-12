@@ -21,9 +21,9 @@ export function followScrollProgress(current, target, elapsed) {
 // reproduce CSS sticky positioning from the scroll offset without reading DOM
 // rectangles after the previous frame's animated styles.
 export function composerScrollFrame(geometry, scrollTop, progress, glassProgress, { target = progress, glassTarget = glassProgress } = {}) {
-  const { origin, feedHeight, wrapperHeight, canvasInset, formOffset, height } = geometry;
+  const { origin, feedHeight, wrapperHeight, canvasInset, formOffset, height, taskInset = 0 } = geometry;
   const stickyTop = Math.min(
-    Math.max(origin - scrollTop, DOCK_TOP),
+    Math.max(origin - scrollTop, DOCK_TOP + taskInset * (1 - progress)),
     origin + feedHeight - wrapperHeight - scrollTop,
   );
   const formTop = canvasInset + stickyTop + formOffset;

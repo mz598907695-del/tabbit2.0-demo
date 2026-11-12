@@ -9,6 +9,9 @@
   flex: 0 0 auto;
   pointer-events: none;
 }
+.home-feed > .tb-composer-wrap[data-task-mode='true'] {
+  top: calc(16px + (var(--composer-task-height, 0px) + 6px) * (1 - var(--dock-progress)));
+}
 .tb-composer-surface {
   position: absolute;
   top: -.5px;

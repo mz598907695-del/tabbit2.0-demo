@@ -169,8 +169,8 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   font-family: inherit;
-  font-size: var(--nine-font-size-14);
-  line-height: var(--nine-font-line-height-14);
+  font-size: var(--nine-font-size-13);
+  line-height: var(--nine-font-line-height-13);
   scrollbar-width: thin;
 }
 /* Homepage card surfaces own dropdown dimming; keep their backdrop roots stable. */

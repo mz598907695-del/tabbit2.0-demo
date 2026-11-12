@@ -50,6 +50,7 @@ export function useComposerScroll(rootRef, { overlayOpen }) {
         formOffset: formBounds.top - rootBounds.top,
         formWidth: formBounds.width,
         height: form.offsetHeight,
+        taskInset: root.dataset.taskMode === 'true' ? (parseFloat(root.style.getPropertyValue('--composer-task-height')) || 0) + 6 : 0,
         inputShift: (DOCK_HEIGHT - 24) / 2 - input.offsetTop,
         toolbarShift: (DOCK_HEIGHT - 32) / 2 - toolbar.offsetTop,
         endWidth: end.offsetWidth,

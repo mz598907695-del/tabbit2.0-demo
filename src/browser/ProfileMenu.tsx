@@ -1,15 +1,15 @@
-import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type SVGProps } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import { createPortal } from 'react-dom';
 import profileAvatar from '../assets/profile-avatar.webp';
 import {
   AlarmClock, Bell, BookOpen, CalendarCheck, Cat, ChevronRight, Clock3,
-  Download, Folder, Gauge, Layers, Lightbulb, MessageCircle, Star,
-  Ticket,
+  Download, Folder, Lightbulb, MessageCircle, Star,
 } from '../personalized-home-2-0/icons';
-import { KeyRound } from 'lucide-react';
+import { Gift, KeyRound, Layers3 } from 'lucide-react';
 import WorkspaceNotificationsPopover from '../personalized-home-2-0/ai-workspace/WorkspaceNotificationsPopover';
 import '../styles/dropdown.css';
 import './profile-menu.css';
+import UsageCard from './UsageCard';
 
 type MenuIcon = ComponentType<SVGProps<SVGSVGElement> & { size?: string | number }>;
 
@@ -19,7 +19,7 @@ function UpgradeBoltIcon({ size = 16 }:{ size?:number }) {
 
 const shortcuts: Array<[string, MenuIcon]> = [
   ['全部对话', MessageCircle], ['我的妙招', Lightbulb], ['我的收藏', Star], ['我的桌宠', Cat],
-  ['标签页分组', Layers], ['定时任务', AlarmClock], ['我的项目', Folder],
+  ['标签页分组', Layers3], ['定时任务', AlarmClock], ['我的项目', Folder],
 ];
 
 const browserEntries: Array<[string, MenuIcon]> = [
@@ -28,19 +28,16 @@ const browserEntries: Array<[string, MenuIcon]> = [
 
 const benefitEntries: Array<{ title:string; detail:string; value?:string; icon:MenuIcon; chevron?:boolean }> = [
   { title:'学生专区', detail:'身份、权益与专属内容', icon:BookOpen, chevron:true },
-  { title:'本周剩余用量', detail:'17 小时 23 分钟后重置', value:'99%', icon:Gauge, chevron:true },
   { title:'每日签到', detail:'领用量、桌宠签到', value:'连续 2 天', icon:CalendarCheck },
-  { title:'邀好友领专业版会员', detail:'好友助力解锁专属权益', icon:Ticket, chevron:true },
+  { title:'邀好友领专业版会员', detail:'好友助力解锁专属权益', icon:Gift, chevron:true },
 ];
 
 export default function ProfileMenu({ anchor, onClose }:{ anchor:HTMLElement; onClose:()=>void }) {
   const menuRef = useRef<HTMLDivElement>(null);
   const notificationButtonRef = useRef<HTMLButtonElement>(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [remaining, setRemaining] = useState(78);
   const [position, setPosition] = useState({ left:12, top:48, maxHeight:720 });
-  const home = document.querySelector<HTMLElement>('.home');
-  const surfaceKind = home?.dataset.surfaceThemeKind || 'default';
-  const surfaceThemeColor = home?.dataset.surfaceThemeColor || 'transparent';
 
   useLayoutEffect(() => {
     const place = () => {
@@ -77,21 +74,22 @@ export default function ProfileMenu({ anchor, onClose }:{ anchor:HTMLElement; on
   return createPortal(<div
     ref={menuRef}
     className="profile-menu dropdown-surface"
-    data-surface-kind={surfaceKind}
     role="dialog"
     aria-label="个人面板"
-    style={{ left:position.left, top:position.top, width:Math.min(320, window.innerWidth - 24), maxHeight:position.maxHeight, '--profile-theme-color':surfaceThemeColor } as CSSProperties}
+    style={{ left:position.left, top:position.top, width:Math.min(320, window.innerWidth - 24), maxHeight:position.maxHeight }}
   >
     <section className="profile-menu-primary">
       <header className="profile-menu-info">
         <img src={profileAvatar} alt="" draggable={false}/>
-        <div><strong>李子维</strong><span>标准版</span></div>
+        <div className="profile-menu-identity"><strong>李子维</strong><span>标准版</span></div>
         <button ref={notificationButtonRef} type="button" className="profile-menu-bell" data-notification-trigger aria-label="通知" aria-expanded={notificationOpen} onClick={() => setNotificationOpen(open => !open)}><Bell size={17}/><i aria-hidden="true"/></button>
+        <button type="button" className={`profile-menu-upgrade${remaining <= 10 ? ' is-low-usage' : ''}`}><UpgradeBoltIcon size={14}/><span>升级</span></button>
       </header>
-      <div className="profile-menu-upgrade-wrap"><button type="button" className="profile-menu-upgrade"><UpgradeBoltIcon size={16}/><span>升级计划</span></button></div>
     </section>
-    <div className="dropdown-divider-container"><div className="dropdown-divider"/></div>
-    <section className="profile-menu-shortcuts">
+    <section className="profile-menu-usage" aria-label="本周用量">
+      <UsageCard onRemainingChange={setRemaining}/>
+    </section>
+    <section className="profile-menu-shortcuts" aria-label="常用功能">
       {shortcuts.map(([label, Icon]) => <button type="button" key={label}><span><Icon size={18}/></span><b>{label}</b></button>)}
     </section>
     <div className="dropdown-divider-container"><div className="dropdown-divider"/></div>
@@ -100,13 +98,10 @@ export default function ProfileMenu({ anchor, onClose }:{ anchor:HTMLElement; on
     </section>
     <div className="dropdown-divider-container"><div className="dropdown-divider"/></div>
     <section className="profile-menu-benefits">
-      {benefitEntries.map(({ title, detail, value, icon:Icon, chevron }, index) => <Fragment key={title}>
-        {index > 0 && <div className="dropdown-divider-container"><div className="dropdown-divider"/></div>}
-        <button type="button">
-          <span className="profile-menu-benefit-leading"><span className="profile-menu-benefit-icon"><Icon size={16}/></span><span className="profile-menu-benefit-copy"><strong>{title}</strong><small>{detail}</small></span></span>
-          <span className="profile-menu-benefit-trailing">{value && <span>{value}</span>}{chevron && <ChevronRight size={16}/>}</span>
-        </button>
-      </Fragment>)}
+      {benefitEntries.map(({ title, detail, value, icon:Icon, chevron }) => <button type="button" key={title} title={detail}>
+        <span className="profile-menu-benefit-leading"><Icon size={16}/><span>{title}</span></span>
+        <span className="profile-menu-benefit-trailing">{value && <span>{value}</span>}{chevron && <ChevronRight size={14}/>}</span>
+      </button>)}
     </section>
     {notificationOpen && notificationButtonRef.current && <WorkspaceNotificationsPopover anchor={notificationButtonRef.current} align="right" onClose={(restore:boolean) => { setNotificationOpen(false); if (restore) notificationButtonRef.current?.focus({ preventScroll:true }); }}/>} 
   </div>, document.body);

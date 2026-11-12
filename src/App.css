@@ -396,8 +396,8 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 [data-mode="dark"] .mode-horizontal .content-container,
 [data-mode="dark"] .mode-vertical .vertical-browser .content-container { background:rgba(20,20,20,.85); box-shadow:0 1px 3px rgba(0,0,0,.3); }
 /* Draw the rim outside the viewport's clipping layer so corners are not masked twice. */
-.content-container::after { content:""; position:absolute; inset:0; z-index:100; border-radius:inherit; border:.5px solid rgba(0,0,0,.1); pointer-events:none; }
-[data-mode="dark"] .content-container::after { border-color:rgba(255,255,255,.12); }
+.content-container::after { content:""; position:absolute; inset:0; z-index:100; border-radius:inherit; border:.5px solid rgba(0,0,0,.15); pointer-events:none; }
+[data-mode="dark"] .content-container::after { border-color:rgba(255,255,255,.15); }
 
 .vertical-mode-toggle .vertical-toggle-icon { width:16px; height:16px; color:var(--nine-color-text-title); }
 .vertical-toggle-bar { width:14.01px; transform-box:fill-box; transform-origin:left center; transform:scaleX(.571); transition:transform 220ms cubic-bezier(.2,0,0,1); }

@@ -33,13 +33,12 @@ dialog.standard-dialog :is(.standard-dialog-heading h2,.board-dialog-heading h2,
 .standard-dialog-error { margin:8px 0 0; color:var(--color-red-4); font-size:12px; line-height:20px; }
 .standard-dialog-actions { display:flex; flex:none; justify-content:flex-end; gap:10px; padding:20px; }
 .standard-dialog-actions button { flex:0 0 88px; min-width:0; height:36px; padding:0 12px; border:0; border-radius:10px; font:500 14px/20px var(--app-font-family); cursor:pointer; }
-.standard-dialog-secondary { background:var(--nine-color-fill-layer-strong); color:var(--nine-color-text-title); }
 .standard-dialog-primary { background:var(--nine-color-fill-action-inverse); color:var(--nine-color-text-on-neutral); }
 .standard-dialog-danger { background:var(--color-red-4); color:var(--color-text-white,#fff); }
 .standard-dialog-actions button:disabled { opacity:.4; cursor:default; }
 .standard-dialog-actions button:focus-visible,.standard-dialog-close:focus-visible { outline:2px solid var(--nine-color-text-secondary); outline-offset:2px; }
 .standard-dialog-close { display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:8px; background:transparent; color:var(--nine-color-text-tertiary); cursor:pointer; }
-@media(hover:hover) { .standard-dialog-close:hover,.standard-dialog-secondary:hover:not(:disabled) { background:var(--nine-color-fill-layer-strong); } .standard-dialog-actions :is(.standard-dialog-primary,.standard-dialog-danger):hover:not(:disabled) { filter:brightness(.94); } }
+@media(hover:hover) { .standard-dialog-close:hover { background:var(--nine-color-fill-layer-strong); } }
 dialog.standard-confirm-dialog { width:320px; text-align:center; }
 .standard-confirm-dialog .standard-dialog-header { flex:1; min-height:0; overflow:auto; flex-direction:column; align-items:center; gap:0; padding:20px 20px 0; }
 .standard-dialog-warning { width:48px; height:48px; margin-bottom:4px; object-fit:contain; }
