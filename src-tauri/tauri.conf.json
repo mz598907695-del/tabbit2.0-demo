@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "tabbit-2-demo",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "identifier": "com.tabbit.demo",
   "build": {
     "beforeDevCommand": "npm run dev",

@@ -214,8 +214,8 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .browser-content-row > .personalized-home.browser-theme-panel-host.is-theme-sidebar-resizing { transition:none; user-select:none; -webkit-user-select:none; }
 @media(prefers-reduced-motion:reduce) { .browser-content-row > .personalized-home.browser-theme-panel-host { transition:none; } }
 .browser-content-row:not(.is-new-tab) > .browser-theme-panel-host { display:none; }
-.content-area { display: flex; min-width: 0; min-height: 0; padding: 0 4px 4px; }
-.content-area.is-new-tab { padding: 0 6px 6px; }
+.content-area { display: flex; min-width: 0; min-height: 0; padding: 0 6px 6px; }
+.mode-vertical:not(.vertical-collapsed) .content-area { padding-left:0; }
 .content-container { position:relative; isolation:isolate; display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; border-radius: 8px 8px 14px 14px; background: #fff; box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.06); overflow: visible; }
 .content-viewport { position:relative; isolation:isolate; display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; overflow:hidden; border-radius:inherit; }
 /* The window wallpaper already owns the full-frame blur. A second backdrop
@@ -341,7 +341,6 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .space-switcher i { width:4px; height:4px; border-radius:50%; background:var(--nine-color-text-disabled); }
 .vertical-browser-container { display:flex; min-width:0; min-height:0; height:100%; padding:0; }
 .vertical-browser { display:grid; flex:1; grid-template-rows:auto auto 1fr; min-width:0; min-height:0; height:100%; overflow:hidden; background:#fff; border-radius:12px; box-shadow:0px 1px 3px 0px rgba(0,0,0,.06),inset 0px 0px 0px .5px rgba(0,0,0,.1); }
-.vertical-browser .content-area:not(.is-new-tab) { padding:0; }
 .vertical-browser .content-container { border-radius:0; background:transparent; box-shadow:none; }
 @media(prefers-reduced-motion:reduce) { .vertical-group-collapse,.vertical-group-toggle .iconfont { transition:none; } }
 
@@ -417,7 +416,6 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .vertical-sidebar-footer { display:flex; flex-direction:column; flex:none; }
 
 .mode-vertical .vertical-browser .bookmarks-row { padding:0 6px 6px 0; }
-.browser-content-row.is-new-tab:has(> .browser-theme-panel-host[data-open="true"]) > .content-area { padding-right:0; }
 
 .sidebar-search input::placeholder { font-size:12px; }
 .sidebar-search-leading { gap:4px; }
@@ -502,6 +500,3 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .vertical-space-entry { display:grid; place-items:center; flex:none; width:30px; height:30px; padding:0; border-radius:var(--tab-radius); }
 .vertical-space-entry img { width:16px; height:16px; }
 .vertical-space-entry:hover { background:var(--nine-color-fill-layer-muted); }
-
-/* New-tab content supplies the shared 6px gutter; do not count it twice. */
-.mode-vertical.has-new-tab .vertical-sidebar { --sidebar-end-gap:0px; }
