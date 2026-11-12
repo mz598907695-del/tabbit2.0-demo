@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type SVGProps } from 'react';
 import { createPortal } from 'react-dom';
-import profileAvatar from '../assets/profile-avatar.png';
+import profileAvatar from '../assets/profile-avatar.webp';
 import {
   AlarmClock, Bell, BookOpen, CalendarCheck, Cat, ChevronRight, Clock3,
   Download, Folder, Gauge, Layers, Lightbulb, MessageCircle, Star,

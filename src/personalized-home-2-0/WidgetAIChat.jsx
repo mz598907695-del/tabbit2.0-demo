@@ -5,7 +5,7 @@ import WidgetAIArtwork from './WidgetAIArtwork';
 import { WIDGET_SKILL, WIDGET_PROMPT } from './widget-ai-data';
 import './widget-ai-chat.css';
 
-export default function WidgetAIChat({ onBack, onSubmit, onVoice, onOverlayChange, active = true, initialDraft, composerRef: providedComposerRef }) {
+export default function WidgetAIChat({ onBack, onSubmit, onOverlayChange, active = true, initialDraft, composerRef: providedComposerRef }) {
   const headingId = useId();
   const localComposerRef = useRef(null);
   const focusedOnce = useRef(false);
@@ -46,7 +46,6 @@ export default function WidgetAIChat({ onBack, onSubmit, onVoice, onOverlayChang
             initialDraft={initialDraft}
             simple
             onSubmit={onSubmit}
-            onVoice={onVoice}
             onOverlayChange={onOverlayChange}
           />
         </div>

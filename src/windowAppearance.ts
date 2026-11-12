@@ -3,6 +3,7 @@ export type ResolvedWindowAppearance = "light" | "dark";
 
 export const WINDOW_APPEARANCE_KEY = "tabbit-window-appearance-v1";
 const SYSTEM_DARK_QUERY = "(prefers-color-scheme: dark)";
+let appearanceFrame = 0;
 
 export function readWindowAppearance(storage: Pick<Storage, "getItem"> = localStorage): WindowAppearance {
   const saved = storage.getItem(WINDOW_APPEARANCE_KEY);
@@ -15,7 +16,22 @@ export function resolveWindowAppearance(appearance: WindowAppearance, systemDark
 
 export function applyExistingTokenMode(appearance: WindowAppearance, systemDark?: boolean): ResolvedWindowAppearance {
   const resolved = resolveWindowAppearance(appearance, systemDark);
-  document.documentElement.dataset.mode = resolved;
+  const root = document.documentElement;
+  if (root.dataset.mode !== resolved) {
+    // A palette change should not launch hundreds of independent background,
+    // border and shadow transitions across every mounted widget and panel.
+    root.dataset.appearanceChanging = 'true';
+    root.dataset.mode = resolved;
+    if (typeof requestAnimationFrame === 'function') {
+      cancelAnimationFrame(appearanceFrame);
+      appearanceFrame = requestAnimationFrame(() => {
+        appearanceFrame = requestAnimationFrame(() => {
+          delete root.dataset.appearanceChanging;
+          appearanceFrame = 0;
+        });
+      });
+    } else delete root.dataset.appearanceChanging;
+  }
   return resolved;
 }
 

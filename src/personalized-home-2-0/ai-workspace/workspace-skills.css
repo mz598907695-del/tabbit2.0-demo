@@ -41,7 +41,7 @@
 .aiws-filter { position:relative; }
 .aiws-toolbar-divider { width:.5px; height:16px; margin:0; flex:none; background:var(--nine-color-border-alpha-subtle); }
 .aiws-filter-popover { position:absolute; right:0; top:40px; max-width:calc(var(--home-viewport-width) - 32px); z-index:20; }
-.aiws-categories { position:relative; margin-top:8px; }
+.aiws-categories { position:relative; margin-top:12px; }
 .aiws-category-scroll { display:flex; align-items:center; gap:4px; overflow-x:auto; scrollbar-width:none; }
 .aiws-category-scroll::-webkit-scrollbar { display:none; }
 .aiw-content .aiws-category-scroll button { font-size:var(--nine-font-size-14); flex:none; white-space:nowrap; padding:4px 16px; line-height:var(--nine-font-line-height-14); border:0; border-radius:999px; background:transparent; color:var(--nine-color-text-tertiary); }
@@ -71,7 +71,7 @@
 .aiws-official-rail[data-left="true"][data-right="true"] { -webkit-mask-image:linear-gradient(to right,transparent,#000 32px,#000 calc(100% - 32px),transparent); mask-image:linear-gradient(to right,transparent,#000 32px,#000 calc(100% - 32px),transparent); }
 .aiws-official-rail .aiws-official-card { flex:0 0 280px; width:280px; align-self:stretch; padding:16px; scroll-snap-align:start; }
 .aiws-official-card .aiwf-card-open { display:flex; flex-direction:column; align-items:flex-start; gap:16px; height:100%; }
-.aiws-official-image { display:block; flex:none; width:48px; height:48px; object-fit:contain; }
+.aiws-official-image { display:block; flex:none; width:36px; height:36px; object-fit:contain; }
 .aiws-official-copy { display:flex; flex:1; flex-direction:column; gap:2px; width:100%; min-width:0; }
 .aiws-official-copy .aiwf-card-title { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .aiws-official-copy .aiwf-card-description { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; line-height:18px; }
@@ -150,7 +150,7 @@
 .aiws-toolbar-navigation .aiws-toolbar-divider { height:20px; width:1px; background:var(--nine-color-border-alpha-regular); }
 .aiws-connector-open { display:flex; flex:1; flex-direction:column; align-items:flex-start; gap:16px; padding:0; border:0; background:transparent; text-align:left; }
 .aiws-connector-mark { display:grid; place-items:center; flex:none; width:48px; height:48px; border-radius:12px; background:color-mix(in srgb,var(--connector-color) 15%,transparent); color:var(--connector-color); font-size:20px; font-weight:600; }
-.aiws-connector-image { display:block; flex:none; width:48px; height:48px; object-fit:contain; }
+.aiws-connector-image { display:block; flex:none; width:36px; height:36px; object-fit:contain; }
 .aiws-connector-title { font-size:14px; font-weight:500; color:var(--nine-color-text-title); }
 .aiws-connector-description { margin-top:-12px; font-size:12px; line-height:18px; color:var(--nine-color-text-tertiary); }
 .aiws-connector-footer { display:flex; justify-content:space-between; align-items:center; gap:8px; color:var(--nine-color-text-quaternary); font-size:12px; }

@@ -3,7 +3,7 @@ import { openBookmarkTab } from './bookmarks/open-bookmarks';
 import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getHomeRoot } from '../home-host';
-import warningIcon from '../../assets/delete-space-warning.png';
+import warningIcon from '../../assets/delete-space-warning.webp';
 import '../../DeleteSpaceDialog.css';
 import '../../EditSpaceDialog.css';
 import { BatchListChecks, ChevronRight, Cloud, Ellipsis, Laptop, Plus, Search, X } from '../icons';

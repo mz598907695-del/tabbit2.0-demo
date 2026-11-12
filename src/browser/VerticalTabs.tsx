@@ -157,7 +157,10 @@ export const VerticalSidebar = memo(function VerticalSidebar({ activeTab, onTab,
     if (activeTab === id) { const rest = all.filter(key => key !== id); selectTab(rest[Math.min(all.indexOf(id), rest.length - 1)] ?? remaining[0] ?? ""); }
   }
   useEffect(() => {
-    const close = () => closeTab(activeTab);
+    const close = () => {
+      if (!active || document.querySelector('dialog[open]')) return;
+      closeTab(activeTab);
+    };
     const key = (event:KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "w" && !event.shiftKey && !event.altKey) { event.preventDefault(); close(); }
     };
@@ -169,7 +172,7 @@ export const VerticalSidebar = memo(function VerticalSidebar({ activeTab, onTab,
     window.addEventListener("tabbit-set-all-groups", all);
     if (!("__TAURI_INTERNALS__" in window)) window.addEventListener("keydown", key);
     return () => { window.removeEventListener("tabbit-close-tab", close); window.removeEventListener("tabbit-set-all-groups", all); window.removeEventListener("keydown", key); };
-  }, [activeTab, tabs, tabGroups, spaceId]);
+  }, [active, activeTab, tabs, tabGroups, spaceId]);
   const matches = (id:string) => titleFor(id).toLowerCase().includes(query.trim().toLowerCase());
   const row = (id:string) => <div key={id} className={`vertical-tab ${activeTab === id ? "active" : ""}`} role="tab" aria-selected={activeTab === id} tabIndex={0} onClick={() => selectTab(id)} onKeyDown={event => { if (event.target === event.currentTarget && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); selectTab(id); } }}>
     <span className="tab-content"><TabFavicon id={id}/><span className="tab-title">{titleFor(id)}</span></span>

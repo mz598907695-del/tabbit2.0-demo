@@ -37,7 +37,7 @@ function readVariant() {
   try { stored = localStorage.getItem('personalized-home-2-0-ai-workspace-variant'); } catch { /* session-only fallback */ }
   return resolveWorkspaceVariant(fromUrl, stored);
 }
-export default function AIWorkspace({ children, wallpaper, reflectionWallpaper = wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNavigatePage, onNewChat, disabled = false }) {
+export default function AIWorkspace({ children, homeTools, wallpaper, reflectionWallpaper = wallpaper, wallpaperTransition, wallpaperBlur = false, onActivityChange, onNavigatePage, onNewChat, disabled = false }) {
   const [open, setOpen] = useState(false);
   const [variant, setVariant] = useState(readVariant);
   const [page, setPage] = useState(() => new URLSearchParams(window.location.search).get('preview') === 'ai-sidebar' && variant === 8 ? 'overview' : 'home');
@@ -287,7 +287,7 @@ export default function AIWorkspace({ children, wallpaper, reflectionWallpaper =
     {open && !navigationOverlay && variant === 1 && <SidebarResizeHandle key={SIDEBAR_WIDTH_DEFAULT}/>}
     {navigationOverlay && open && <button className="aiw-nav-backdrop" aria-label="关闭导航抽屉" tabIndex={-1} onClick={closeSidebar}/>} 
     <WorkspaceNavigationSlot.Provider value={navigationSlot}><div className="aiw-stage">
-      <div className="aiw-home" hidden={activeContent} inert={activeContent || Boolean(modal) || (navigationOverlay && open)} aria-hidden={activeContent || undefined}>{children}</div>
+      <div className="aiw-home" hidden={activeContent} inert={activeContent || Boolean(modal) || (navigationOverlay && open)} aria-hidden={activeContent || undefined}>{children}{homeTools}</div>
       {contentVisited && <div className="aiw-page-host" ref={pageHostRef} hidden={!activeModule} inert={!activeModule || (navigationOverlay && open)}>
         <div hidden={contentPage === 'bookmarks'} inert={contentPage === 'bookmarks'}><WorkspaceContent wallpaper={reflectionWallpaper} active={!disabled && activeModule && contentPage !== 'bookmarks'} page={contentPage} variant={variant} initialFilter={filter} navigationKey={navigationKey} data={workspaceData} setData={setWorkspaceData} onFilterChange={setActiveFilter} onNavigate={navigate} onNewChat={newChat}/></div>
         {contentPage === 'bookmarks' && <Suspense fallback={<div role="status">正在打开收藏…</div>}><WorkspaceBookmarksPage embedded active={!disabled && activeModule}/></Suspense>}

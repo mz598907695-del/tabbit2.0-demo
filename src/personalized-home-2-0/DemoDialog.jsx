@@ -1,14 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Check, ChevronRight, Copy, ExternalLink, ListChecks, MessageSquare, Mic, Paperclip, X } from './icons';
+import { Check, Copy, ExternalLink, ListChecks, MessageSquare, Paperclip, X } from './icons';
 import './overlays.css';
 
 const invitationText =
   "邀请你一起体验 Tabbit，用 AI 开启更轻松的浏览。此文案仅用于个性化首页 2.0 交互演示，未生成真实邀请链接。";
-const voiceExamples = [
-  "帮我规划一个轻松的周末",
-  "找一些简洁的首页设计灵感",
-  "解释一下浏览器里的 AI 能做什么",
-];
+
 
 export function DemoDialog({
   kind,
@@ -22,7 +18,6 @@ export function DemoDialog({
   taskContext = null,
   skill = null,
   returnLabel = '返回首页',
-  onUsePrompt,
 }) {
   const dialogRef = useRef(null);
   const titleId = useId();
@@ -52,10 +47,7 @@ export function DemoDialog({
     }
   }
 
-  function selectVoiceExample(text) {
-    onUsePrompt?.(text);
-    onClose();
-  }
+
 
   const resultContent = mode === "任务"
     ? {
@@ -133,34 +125,6 @@ export function DemoDialog({
               </button>}
             </div>
           </>
-        )}
-
-        {kind === "voice" && (
-          <div className="overlay-dialog-content overlay-voice-content">
-            <div className="overlay-dialog-symbol">
-              <Mic size={25} strokeWidth={1.8} />
-            </div>
-            <h2 id={titleId}>把想法，说出来</h2>
-            <p className="overlay-dialog-description">
-              选择一句示例，体验语音内容填入搜索框的效果。
-            </p>
-            <p className="overlay-demo-note">
-              示例体验 · 不使用麦克风，不录制声音
-            </p>
-            <div className="overlay-voice-examples">
-              {voiceExamples.map((text) => (
-                <button
-                  type="button"
-                  className="overlay-example-button"
-                  key={text}
-                  onClick={() => selectVoiceExample(text)}
-                >
-                  <span>{text}</span>
-                  <ChevronRight size={17} />
-                </button>
-              ))}
-            </div>
-          </div>
         )}
 
         {kind === "result" && (

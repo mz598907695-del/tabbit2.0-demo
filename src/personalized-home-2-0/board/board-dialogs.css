@@ -341,9 +341,6 @@
 :scope[data-theme='dark'] .board-library-dialog { --surface: #28292d; --text: #f0f0f2; --muted: #b0b2ba; --segmented: #303136; --border: rgb(255 255 255 / 9%); --overlay-control: color-mix(in srgb, #f2f2f3 7%, #303135); --library-card: rgb(40 41 45 / 76%); border-color: rgb(255 255 255 / 12%); color-scheme: dark; }
 :scope[data-theme='dark'] .board-library-dialog::backdrop { background: rgb(0 0 0 / 32%); }
 :scope[data-theme='dark'] .board-library-feedback.is-error { color: #f38e8e; }
-.board-confirm-dialog { width: min(400px, calc(calc(var(--home-viewport-width) * 1.0) - 32px)); }
-.board-confirm-dialog .board-dialog-header { min-height: 0; flex-shrink: 1; padding-bottom: 24px; overflow: auto; }
-.board-confirm-dialog .board-dialog-footer { border-top: 0; padding-top: 0; }
 :scope[data-theme='dark'] .board-dialog-error { color: #f38e8e; }
 :scope[data-theme='dark'] .board-dialog-field [aria-invalid='true'] { border-color: #e77c7c; }
 

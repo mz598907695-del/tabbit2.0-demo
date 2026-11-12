@@ -1,3 +1,4 @@
+import { NameDialog } from '../StandardDialog';
 import './curated-desktop.css';
 import { importedAICardSize, validateAICardPackage } from './ai-card-import';
 import { BOARD_STORAGE } from './state';
@@ -511,8 +512,8 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     {confirm&&<BoardConfirm title={`删除看板“${page.name}”？`} description={`将移除此看板中的 ${page.items.length} 个项目，之后可撤销。`} onConfirm={()=>{onDeleteGroup();setConfirm(null);}} onClose={()=>setConfirm(null)}/>}
   </div>;
 }
-function GroupNameDialog({name,onSave,onClose}){
-  const ref=useRef(null);const[value,setValue]=useState(name);
-  useLayoutEffect(()=>{ref.current.showModal();ref.current.querySelector('input').select();},[]);
-  return <dialog ref={ref} className="board-group-dialog" onCancel={e=>{e.preventDefault();onClose();}}><form onSubmit={e=>{e.preventDefault();if(value.trim())onSave(value.trim());}}><h2>重命名看板</h2><label>看板名称<input aria-label="看板名称" value={value} onChange={e=>setValue(e.target.value)} maxLength={24} required/></label><div><button type="button" onClick={onClose}>取消</button><button type="submit">保存</button></div></form></dialog>;
+function GroupNameDialog({name,onSave,onClose}) {
+  const [value,setValue] = useState(name);
+  const inputRef = useRef(null);
+  return <NameDialog title="重命名看板" inputRef={inputRef} value={value} onChange={setValue} onClose={onClose} onSubmit={() => { if(value.trim()) onSave(value.trim()); }}/>;
 }

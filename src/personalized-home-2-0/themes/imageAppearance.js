@@ -1,11 +1,7 @@
 import { isVideoWallpaper, decodeWallpaperVideo } from './wallpaper-video.js';
 import { classifyThemePixels } from './image-luminance.js';
 export { classifyThemePixels } from './image-luminance.js';
-import { getExampleWallpaper } from './exampleWallpapers';
-import { getIllustratedTheme } from './catalog';
-import { getMonochromeTheme } from './monochrome-themes';
-import { getScrollTheme } from './scroll-themes';
-import { oceanTheme } from './ocean/catalog';
+import { getBundledWallpaper } from './officialWallpapers';
 import { getThemeAppearance } from './appearance';
 
 const analyzedImages = new Map();
@@ -47,14 +43,12 @@ function analyzeImage(url, fallback) {
 
 /** Analyze on-device only; artwork never leaves the browser. */
 export function getAutomaticThemeAppearance(theme, wallpapers = []) {
-  const wallpaper = getExampleWallpaper(theme) || wallpapers.find(item => item.id === theme);
-  const illustration = getIllustratedTheme(theme);
-  const authored = getMonochromeTheme(theme) || getScrollTheme(theme) || (theme === oceanTheme.id ? oceanTheme : null);
+  const wallpaper = getBundledWallpaper(theme) || wallpapers.find(item => item.id === theme);
   // Bundled wallpapers have authored metadata. Personal uploads intentionally
   // omit it and continue through the on-device image/video analysis below.
   if (wallpaper?.appearance === 'light' || wallpaper?.appearance === 'dark') return Promise.resolve(wallpaper.appearance);
-  const url = wallpaper?.posterUrl || wallpaper?.url || illustration?.image || authored?.preview;
-  const fallback = authored?.mode || getThemeAppearance(theme);
+  const url = wallpaper?.posterUrl || wallpaper?.url;
+  const fallback = getThemeAppearance(theme);
   if (wallpaper && isVideoWallpaper(wallpaper) && !wallpaper.posterUrl) {
     return decodeWallpaperVideo(wallpaper.url).then(async ({ poster }) => {
       const cover = URL.createObjectURL(poster);

@@ -18,10 +18,3 @@ export function BoardItemContent({ item, appearanceTheme, shortcutSize, shortcut
     {artwork}
   </a>;
 }
-
-export function BoardItemLabel({ item, showLabels }) {
-  const expanded = item.type !== 'widget' && (item.w > 1 || item.h > 1);
-  return <span className="board-item-label shortcut-label" aria-hidden={!showLabels || expanded} title={boardItemName(item)}>
-    <span className="board-item-label-text">{boardItemName(item)}</span>
-  </span>;
-}

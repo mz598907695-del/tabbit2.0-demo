@@ -11,7 +11,7 @@ export default function ConnectorCard({ item, added, onToggle }) {
     node.showModal();
     return () => node.close();
   }, [details]);
-  const icon = <img className="aiws-connector-image" src={`/personalized-home-2-0/asset/official-skills/${item.officialIcon}.png?v=3`} alt="" width="48" height="48" aria-hidden="true"/>;
+  const icon = <img className="aiws-connector-image" src={`/personalized-home-2-0/asset/official-skills/${item.officialIcon}.webp`} alt="" width="36" height="36" aria-hidden="true"/>;
   return <article className="aiws-card aiws-connector-card">
     <button type="button" className="aiws-connector-open" aria-label={`查看 ${item.title}连接器详情`} onClick={() => setDetails(true)}>{icon}<span className="aiws-connector-title">{item.title}</span><span className="aiws-connector-description">{item.description}</span></button>
     <div className="aiws-connector-footer"><span>{item.connectionType === 'mcp' ? 'MCP' : '连接器'} · {item.category}</span><button type="button" className="aiws-connector-add" aria-label={`${added ? '移除' : '添加'} ${item.title}连接器`} aria-pressed={added} onClick={onToggle}>{added ? <Check size={14}/> : <Plus size={14}/>}<span>{added ? '已添加' : '添加'}</span></button></div>

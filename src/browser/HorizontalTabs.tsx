@@ -355,7 +355,10 @@ function HorizontalTabContents({ selectedTab, setSelectedTab, spaceId, active }:
   };
   useEffect(() => {
     if (!active) return;
-    const closeCurrent = () => closeTab(selectedTab);
+    const closeCurrent = () => {
+      if (document.querySelector('dialog[open]')) return;
+      closeTab(selectedTab);
+    };
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "w" && !event.shiftKey && !event.altKey) {
         event.preventDefault();

@@ -1,0 +1,253 @@
+{
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "results": [
+    {
+      "maxGap": 117,
+      "LayoutCount": 16,
+      "RecalcStyleCount": 230,
+      "LayoutDuration": 0.0168,
+      "RecalcStyleDuration": 0.2077,
+      "TaskDuration": 0.5225,
+      "frames": 42,
+      "resizes": 4,
+      "over25ms": 9,
+      "ScriptDuration": 0.0806,
+      "name": "original CSS / collapse",
+      "mutations": 366
+    },
+    {
+      "maxGap": 133,
+      "LayoutCount": 25,
+      "RecalcStyleCount": 447,
+      "LayoutDuration": 0.0315,
+      "RecalcStyleDuration": 0.3667,
+      "TaskDuration": 0.5866,
+      "frames": 28,
+      "resizes": 6,
+      "over25ms": 8,
+      "ScriptDuration": 0.1081,
+      "name": "original CSS / expand",
+      "mutations": 633
+    },
+    {
+      "maxGap": 76,
+      "LayoutCount": 17,
+      "RecalcStyleCount": 312,
+      "LayoutDuration": 0.0274,
+      "RecalcStyleDuration": 0.239,
+      "TaskDuration": 0.4352,
+      "frames": 50,
+      "resizes": 6,
+      "over25ms": 7,
+      "ScriptDuration": 0.1002,
+      "name": "original CSS / open panel",
+      "mutations": 633
+    },
+    {
+      "maxGap": 100,
+      "LayoutCount": 23,
+      "RecalcStyleCount": 319,
+      "LayoutDuration": 0.0252,
+      "RecalcStyleDuration": 0.2852,
+      "TaskDuration": 0.5295,
+      "frames": 37,
+      "resizes": 7,
+      "over25ms": 8,
+      "ScriptDuration": 0.1367,
+      "name": "original CSS / close panel",
+      "mutations": 758
+    },
+    {
+      "maxGap": 51,
+      "LayoutCount": 42,
+      "RecalcStyleCount": 152,
+      "LayoutDuration": 0.0138,
+      "RecalcStyleDuration": 0.1084,
+      "TaskDuration": 0.275,
+      "frames": 51,
+      "resizes": 3,
+      "over25ms": 5,
+      "ScriptDuration": 0.0409,
+      "name": "optimized / collapse",
+      "mutations": 204
+    },
+    {
+      "maxGap": 50,
+      "LayoutCount": 46,
+      "RecalcStyleCount": 144,
+      "LayoutDuration": 0.0125,
+      "RecalcStyleDuration": 0.1148,
+      "TaskDuration": 0.2917,
+      "frames": 58,
+      "resizes": 3,
+      "over25ms": 2,
+      "ScriptDuration": 0.0334,
+      "name": "optimized / expand",
+      "mutations": 188
+    },
+    {
+      "maxGap": 59,
+      "LayoutCount": 38,
+      "RecalcStyleCount": 131,
+      "LayoutDuration": 0.0134,
+      "RecalcStyleDuration": 0.1051,
+      "TaskDuration": 0.3763,
+      "frames": 60,
+      "resizes": 3,
+      "over25ms": 4,
+      "ScriptDuration": 0.1341,
+      "name": "optimized / open panel",
+      "mutations": 213
+    },
+    {
+      "maxGap": 76,
+      "LayoutCount": 35,
+      "RecalcStyleCount": 170,
+      "LayoutDuration": 0.0152,
+      "RecalcStyleDuration": 0.1751,
+      "TaskDuration": 0.4286,
+      "frames": 48,
+      "resizes": 4,
+      "over25ms": 5,
+      "ScriptDuration": 0.1214,
+      "name": "optimized / close panel",
+      "mutations": 334
+    }
+  ],
+  "method": "1280x800 Chromium/CDP; same current page/assets/widgets. Baseline restores original sidebar layout CSS and disables resize freezing. Results measure main-thread work, not native WebKit FPS.",
+  "commonBoardVirtualization": {
+    "environment": "Tabbit Browser / Chromium, Vite development build; 1051x978 CSS viewport. This is not native WebKit FPS validation.",
+    "method": "Same wallpaper and board. Performance.getMetrics delta over 700ms including a sidebar width toggle; two before samples, four after samples. Frames are diagnostic samples, not guaranteed FPS.",
+    "before": {
+      "domNodes": 3711,
+      "widgets": 28,
+      "mountedWidgets": 28,
+      "scrollHeight": 4340,
+      "sidebarTaskMs": [
+        425,
+        305
+      ],
+      "sidebarStyleMs": [
+        179,
+        113
+      ],
+      "sidebarLayoutMs": [
+        19,
+        18
+      ]
+    },
+    "after": {
+      "domNodes": 2109,
+      "widgets": 28,
+      "mountedWidgets": 6,
+      "scrollHeight": 4340,
+      "sidebarTaskMs": [
+        218,
+        217,
+        210,
+        201
+      ],
+      "sidebarStyleMs": [
+        88,
+        78,
+        75,
+        67
+      ],
+      "sidebarLayoutMs": [
+        7,
+        7,
+        6,
+        7
+      ]
+    },
+    "spectrum": {
+      "beforeWidgetNodes": 534,
+      "afterWidgetNodes": 24,
+      "dots": 480,
+      "svgPathsAtIdle": 2,
+      "svgPathsMax": 4
+    },
+    "validation": [
+      "Ten scroll positions: visible widget contents mounted; scroll extent unchanged.",
+      "Calculator draft survives scroll out/back and opens in detail dialog.",
+      "Running pomodoro remains mounted outside prewarm range after page reload; reset verified.",
+      "Theme panel opens/closes; entry hidden while open and returns after close.",
+      "182 tests passed; source hygiene, TypeScript and Vite build passed."
+    ],
+    "stateRetention": "Interacted widgets remain mounted for the lifetime of the board instance to preserve drafts/dialogs. Active timers and imported AI cards remain mounted; untouched distant builtin widgets release contents. Nearby surfaces keep original material; distant widget backdrop filters are suspended."
+  },
+  "pageSwitching": {
+    "environment": "Chromium browser / Vite dev; not native WebKit validation",
+    "before": {
+      "visibleBlankWidgetFramesObserved": 1,
+      "commonScrollTop": 2200,
+      "workScrollTopAfterSwitch": 2200,
+      "workScrollHeightAfterSwitch": 4334
+    },
+    "after": {
+      "visibleBlankWidgetFramesAcrossFiveSwitches": 0,
+      "workScrollTopAfterSwitch": 0,
+      "workScrollHeightAfterSwitch": 896,
+      "commonRestoredScrollTop": 2200,
+      "maximumRunningFrameGapsMs": [
+        34,
+        58,
+        33,
+        84,
+        32
+      ]
+    },
+    "changes": [
+      "Use vertical viewport prewarming during horizontal page motion.",
+      "Refresh incoming viewport synchronously after restoring per-page scroll position.",
+      "Clip outgoing snapshot to viewport so it cannot inflate target scroll range.",
+      "Start page animations after the initial render/paint instead of consuming animation time during mounting."
+    ],
+    "validation": [
+      "183 tests pass; source check, type check and build pass.",
+      "Horizontal wheel swipe commits one page and cleans preview/snapshot layers.",
+      "No runtime errors during measured page switches."
+    ],
+    "remaining": "Occasional 58–84ms frame gaps still observed entering 常用 in the browser dev build; do not claim fully smooth native performance."
+  },
+  "swipeHandoff": {
+    "environment": "Chromium browser with native-phase events simulated and actual Playwright horizontal wheel input; not a native WebKit trackpad/frame-rate measurement.",
+    "changes": [
+      "Finish the existing gesture preview before committing React page selection.",
+      "Atomic preview-to-live handoff at rest; no second entrance animation.",
+      "Native release settles on the next animation frame instead of a fixed 80ms delay.",
+      "Prewarm one likely adjacent page while idle; keep its preview hidden until movement.",
+      "Complete a committed handoff when interrupted by a new finger-down or pointer click."
+    ],
+    "verified": [
+      "First wheel event reveals the prewarmed preview immediately.",
+      "No live entrance animation after 常用 becomes selected.",
+      "Forward, reverse, short swipe rollback, reverse during settlement, and click during settlement complete without script errors.",
+      "183 tests, build, type and source checks passed."
+    ],
+    "remaining": "Browser animation samples still include occasional >33ms frame gaps. Native desktop subjective smoothness has not been independently verified."
+  },
+  "pageFadeAndGutter": {
+    "changes": [
+      "Use scrollport width plus a 48px inter-page gap for travel.",
+      "Fade card contents and labels while keeping card/glass ancestors fully opaque.",
+      "Provide 32px horizontal shadow allowance on each side of snapshot/preview windows."
+    ],
+    "browserChecks": {
+      "smallDragPx": 20,
+      "visibleIncomingItemsOnSmallDrag": 0,
+      "midDragContentOpacity": 0.594298,
+      "midDragCardOpacity": 1,
+      "midDragMaterialOpacity": 1,
+      "midDragMaterialBackdrop": "blur(30px) saturate(1)",
+      "clickSnapshotWidth": 824,
+      "clickGridWidth": 760,
+      "afterRollbackContentOpacity": 1,
+      "afterRollbackTransform": "none"
+    },
+    "validation": "185 tests pass, source/type/build checks pass. Drag and paused click midpoint screenshots inspected in Chromium; not native WebKit visual verification."
+  }
+}

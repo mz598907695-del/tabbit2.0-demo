@@ -59,7 +59,7 @@ export function DailyPictureWidget({ config = {}, onChange, preview = false, act
     {status && <p className="uw-muted" role="status">{status}</p>}
     <div className="uw-row">
       <WidgetButton onClick={refresh} disabled={refreshDisabled}><RefreshCw aria-hidden="true" />{failed ? (english ? 'Retry' : '重试') : (english ? 'Another view' : '换一张')}</WidgetButton>
-      {displayed && <a className="uw-button" href={displayed.src} download={displayed.id === 'personal' ? 'my-photo.jpg' : `${displayed.id}-${appearanceTheme}.png`}><Download size={14} aria-hidden="true" />{english ? 'Save image' : '保存图片'}</a>}
+      {displayed && <a className="uw-button" href={displayed.src} download={displayed.id === 'personal' ? 'my-photo.jpg' : `${displayed.id}-${appearanceTheme}.webp`}><Download size={14} aria-hidden="true" />{english ? 'Save image' : '保存图片'}</a>}
       {personal && <WidgetButton disabled={!onChange} onClick={() => onChange?.({ source: 'daily' })}>{english ? 'Use daily pictures' : '使用每日一图'}</WidgetButton>}
       {!personal && settings.photo && <WidgetButton disabled={!onChange} onClick={() => onChange?.({ source: 'photo' })}>{english ? 'Use my photo' : '使用我的照片'}</WidgetButton>}
     </div>

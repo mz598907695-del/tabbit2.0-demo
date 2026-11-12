@@ -9,7 +9,7 @@ const groups = [
   ['.personalized-home .board-card', null], ['.personalized-home .board-card', '::before', true], ['.personalized-home .board-card', '::after'],
   [material, '::before', true], [material, '::after'],
   ['.personalized-home .aiw-navigation', null], ['.personalized-home .aiw-launcher', null],
-  ['.personalized-home .theme-trigger', null], ['.personalized-home .board-item-label', null],
+  ['.personalized-home .theme-trigger', null],
   ['.personalized-home .tb-composer-modes', null], ['.personalized-home .tb-composer-modes', '::before'],
   ['.personalized-home .brand-mark-default', null],
 ];

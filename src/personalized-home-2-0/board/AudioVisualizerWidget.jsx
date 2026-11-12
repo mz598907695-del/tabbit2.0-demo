@@ -2,16 +2,12 @@ import { Link2, RefreshCw } from 'lucide-react';
 import { WidgetShell, WidgetButton, Field, DotMatrixNumber } from './UnifiedWidgetKit';
 import { isNativeAudio, useAudioVisualizer } from './useAudioVisualizer';
 import './audio-visualizer.css';
+import { spectrumPaths } from './audio-spectrum';
 
 function Spectrum({ bands, clipping, label }) {
+  const paths = spectrumPaths(bands, clipping);
   return <svg className="av-spectrum" viewBox="0 0 320 150" preserveAspectRatio="xMidYMid meet" role="img" aria-label={label}>
-    {Array.from({ length: 32 }, (_, x) => {
-      const value = Math.max(0, Math.min(1, Number(bands[x]) || 0)), height = Math.ceil(value * 7);
-      return <g key={x}>{Array.from({ length: 15 }, (_, y) => {
-        const lit = height > 0 && Math.abs(y - 7) < height;
-        return <circle key={y} cx={5 + x * 10} cy={5 + y * 10} r={lit ? 2.6 : 1.8} className={lit ? `is-lit${clipping && Math.abs(y - 7) === 6 ? ' is-peak' : ''}` : y === 7 ? 'is-baseline' : ''}/>;
-      })}</g>;
-    })}
+    {Object.entries(paths).map(([key, d]) => d && <path key={key} d={d} className={key === 'dim' ? undefined : key === 'peak' ? 'is-lit is-peak' : `is-${key}`}/>)}
   </svg>;
 }
 const ERRORS = {

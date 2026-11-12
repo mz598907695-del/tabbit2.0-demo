@@ -101,7 +101,7 @@ function WeatherSymbol({ code, isDay = true }) {
   const scene = code === 0 ? isDay ? 'sun' : 'night' : code <= 3 || fog || snow ? 'cloud' : 'rain';
   const Icon = code === 0 ? isDay ? Sun : Moon : fog ? CloudFog : thunder ? CloudLightning : snow ? CloudSnow : code <= 3 ? Cloud : CloudRain;
   const [failedSource, setFailedSource] = useState('');
-  const src = `/personalized-home-2-0/asset/widgets/editorial/weather-${scene}.png`;
+  const src = `/personalized-home-2-0/asset/widgets/editorial/weather-${scene}.webp`;
   const failed = failedSource === src;
   return <span className={`iw-weather-symbol is-${scene}${fog ? ' has-fog' : ''}${thunder ? ' has-thunder' : ''}${snow ? ' has-snow' : ''}`} aria-hidden="true">
     {failed ? <Icon className="iw-weather-fallback" strokeWidth={1.15}/> : <img src={src} alt="" draggable="false" decoding="async" onError={() => setFailedSource(src)}/>}

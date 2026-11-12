@@ -1,7 +1,7 @@
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { tabAddressFor } from '../tabAddresses';
-import profileAvatar from '../assets/profile-avatar.png';
+import profileAvatar from '../assets/profile-avatar.webp';
 import { SpaceContext } from './SpaceContext';
 import { IconFont, SiteFavicon } from './BrowserIcons';
 import BrowserIdeasMenu from './BrowserIdeasMenu';

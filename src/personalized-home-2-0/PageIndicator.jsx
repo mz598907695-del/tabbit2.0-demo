@@ -1,6 +1,7 @@
 import { useVisibilityMotion } from './useVisibilityMotion';
 import { useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
-import { TextCursorInput, Plus, Controls, Trash2, X } from "./icons";
+import { TextCursorInput, Plus, Controls, Trash2 } from "./icons";
+import { NameDialog } from "./StandardDialog";
 import { BoardConfirm } from "./board/BoardDialogs";
 import { isPageGestureClick, pageDragPosition, pageEdgeVelocity, pagePreviewOffset } from "./page-reorder";
 import "./page-indicator.css";
@@ -319,7 +320,6 @@ export function PageIndicator({
   const inputRef = useRef(null);
   const menuRef = useRef(null);
   const actionTriggerRef = useRef(null);
-  const formId = useId();
   const tooltipId = useId();
   const menuId = useId();
   const reorderHelpId = useId();
@@ -520,6 +520,7 @@ export function PageIndicator({
     if (!isFormOpen && !pageMenu) return undefined;
 
     function onPointerDown(event) {
+      if (event.target.closest?.('dialog')) return;
       if (!rootRef.current?.contains(event.target)) {
         setEditingPageId(null);
         setAddingPage(false);
@@ -528,6 +529,7 @@ export function PageIndicator({
     }
 
     function onKeyDown(event) {
+      if (event.target.closest?.('dialog')) return;
       if (event.key !== "Escape") return;
       event.preventDefault();
       event.stopPropagation();
@@ -598,7 +600,7 @@ export function PageIndicator({
     setEditingPageId(null);
     setAddingPage(false);
     setAddError("");
-    (actionTriggerRef.current || addButtonRef.current)?.focus({ preventScroll: true });
+    requestAnimationFrame(() => (actionTriggerRef.current || addButtonRef.current)?.focus({ preventScroll: true }));
   }
 
   function renamePage(event) {
@@ -621,7 +623,7 @@ export function PageIndicator({
 
   return (
     <div
-      className={`page-indicator${isFormOpen ? " is-adding" : ""}${addMenuOpen ? " is-add-menu-open" : ""}${isReordering ? " is-reordering" : ""}${onReorder ? " can-reorder" : ""}`}
+      className={`page-indicator${addMenuOpen ? " is-add-menu-open" : ""}${isReordering ? " is-reordering" : ""}${onReorder ? " can-reorder" : ""}`}
       ref={rootRef}
       hidden={!indicatorPresent}
       inert={!visible}
@@ -764,36 +766,13 @@ export function PageIndicator({
         </div>
       )}
 
-      {isFormOpen && (
-        <form id={formId} className="page-indicator-form" aria-label={addingPage ? "添加看板" : "编辑看板名称"} onSubmit={renamePage}>
-          <div className="page-indicator-form-heading">
-            <label htmlFor={`${formId}-name`}>{addingPage ? '添加看板' : '看板名称'}</label>
-            <button type="button" className="page-indicator-form-close" aria-label={addingPage ? '取消添加看板' : '关闭编辑看板名称'} onClick={closeForm}>
-              <X size={13} />
-            </button>
-          </div>
-          <div className="page-indicator-form-fields">
-            <input
-              id={`${formId}-name`}
-              ref={inputRef}
-              type="text"
-              aria-label={addingPage ? '新看板名称' : undefined}
-              aria-invalid={Boolean(addingPage && addError)}
-              aria-describedby={addingPage && addError ? `${formId}-error` : undefined}
-              placeholder="输入看板名称"
-              value={name}
-              onChange={(event) => { setName(event.target.value); setAddError(''); }}
-              maxLength={24}
-              autoComplete="off"
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)) event.preventDefault();
-              }}
-            />
-            <button type="submit" className="page-indicator-confirm" disabled={!name.trim()}>{addingPage ? '添加' : '保存'}</button>
-          </div>
-          {addingPage && addError && <p id={`${formId}-error`} className="page-indicator-form-error" role="alert">{addError}</p>}
-        </form>
-      )}
+      {isFormOpen && <NameDialog
+        title={addingPage ? '添加看板' : '重命名看板'} value={name}
+        inputLabel={addingPage ? '新看板名称' : '看板名称'} inputRef={inputRef}
+        onChange={value => { setName(value); setAddError(''); }}
+        error={addingPage ? addError : ''} confirmLabel={addingPage ? '添加' : '保存'}
+        onSubmit={renamePage} onClose={closeForm}
+      />}
       {deletingPage && <BoardConfirm
         title={`删除看板“${deletingPage.name}”？`}
         description={`将移除此看板中的 ${deletingPage.items?.length || 0} 个项目，可在批量编辑中撤销。`}

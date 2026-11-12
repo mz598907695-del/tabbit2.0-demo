@@ -1,11 +1,11 @@
 import { createPortal } from "react-dom";
+import { beginBrowserLayoutChange } from '../browserLayoutMotion';
 import { invoke } from "@tauri-apps/api/core";
 import AIWorkspace from './ai-workspace/AIWorkspace';
 import { getHomeRoot } from "./home-host";
-import HomeBackground from './HomeBackground';
 import HomeContent from './HomeContent';
 import { ComposerWeatherContext } from './ComposerWeather';
-import HomeControls from './HomeControls';
+import HomeControls, { ThemeEntry } from './HomeControls';
 import { brands, initialShortcutPages, promotions } from './home-data';
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import WidgetAIChat from "./WidgetAIChat";
@@ -18,15 +18,13 @@ import { resolvePreferences } from "./preferences";
 import { spaceColors } from "../spaceColors";
 import { normalizeAppIcon } from "./appIcons";
 import { useBoardState, transferBoardItem, applyBoardPageChange } from "./board/state";
-import { getIllustratedTheme } from "./themes/catalog";
 import { getThemeBackground, getThemeSelectionAppearance } from "./themes/appearance";
 import { isWallpaperTheme } from "./themes/wallpapers";
-import { getExampleWallpaper } from "./themes/exampleWallpapers";
+import { getBundledWallpaper } from "./themes/officialWallpapers";
 import { useWallpapers } from "./themes/useWallpapers";
 import { applyLiquidGlassOpacity } from "./themes/liquidGlassMaterial";
 import { useLiquidGlassLens } from "./themes/useLiquidGlassLens";
 import { usePageSwipe } from "./usePageSwipe";
-import { isOceanTheme, OCEAN_THEME_ID } from './themes/ocean/catalog.js';
 import { baseGlassSettings, GLASS_THEME_EVENT, GLASS_SPACE_THEME_EVENT } from '../demoDefaults';
 import { readWindowAppearance, resolveWindowAppearance, watchExistingTokenMode, WINDOW_APPEARANCE_KEY } from '../windowAppearance';
 import { useSpaceWallpaperTransition } from './themes/useSpaceWallpaperTransition';
@@ -37,12 +35,11 @@ import { COLOR_WINDOW_APPEARANCE_KEY, resolveThemeSource } from '../themeSelecti
 
 function readPreferences() {
   const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const preview = new URLSearchParams(window.location.search).get('preview') === OCEAN_THEME_ID;
   try {
     const saved = JSON.parse(localStorage.getItem("personalized-home-2-0-preferences") || "{}");
-    return resolvePreferences(preview ? { ...resolvePreferences(saved, systemDark), theme: OCEAN_THEME_ID, appearance: 'light', liquidGlass: true, liquidGlassOpacity: 20, wallpaperBlur: false } : saved, systemDark);
+    return resolvePreferences(saved, systemDark);
   } catch {
-    return resolvePreferences(preview ? { theme: OCEAN_THEME_ID, appearance: 'light', liquidGlass: true, liquidGlassOpacity: 20 } : {}, systemDark);
+    return resolvePreferences({}, systemDark);
   }
 }
 
@@ -134,7 +131,7 @@ export function App({ hostActive = true } = {}) {
   }, []);
   useLiquidGlassLens(preferences.liquidGlass && preferences.shortcuts && !widgetAI);
   const wallpaperLibrary = useWallpapers();
-  const selectedWallpaper = getExampleWallpaper(preferences.theme)
+  const selectedWallpaper = getBundledWallpaper(preferences.theme)
     || wallpaperLibrary.wallpapers.find((item) => item.id === preferences.theme);
   const wallpaperTransition = useSpaceWallpaperTransition(preferences.theme, selectedWallpaper,
     wallpaperLibrary.wallpapers, targetAppearanceTheme, preferences.wallpaperBlur, spaceId);
@@ -148,9 +145,9 @@ export function App({ hostActive = true } = {}) {
   const [themeOpen, setThemeOpen] = useState(false);
   const [themePanelPresent, setThemePanelPresent] = useState(false);
   useEffect(() => {
-    if (themeOpen) { setThemePanelPresent(true); return; }
-    const timer = window.setTimeout(() => setThemePanelPresent(false), 240);
-    return () => window.clearTimeout(timer);
+    // Warm once after the first visit. Closed panels remain inert; repeatedly
+    // rebuilding all controls was competing with the sidebar's motion.
+    if (themeOpen) setThemePanelPresent(true);
   }, [themeOpen]);
   const [aiWorkspaceBusy, setAIWorkspaceBusy] = useState(false);
   const [themeGalleryRequest, setThemeGalleryRequest] = useState(0);
@@ -195,8 +192,6 @@ export function App({ hostActive = true } = {}) {
   useWindowWallpaperLayout(homeRef);
   const [themePortalHost, setThemePortalHost] = useState(null);
   useLayoutEffect(() => { setThemePortalHost(homeRef.current?.closest(".browser-content-row") || null); }, []);
-  const oceanRef = useRef(null);
-  const [oceanPhase, setOceanPhase] = useState('idle');
   const pageContextRef = useRef(null);
   const themeRef = useRef(null);
   const themeTriggerRef = useRef(null);
@@ -210,8 +205,6 @@ export function App({ hostActive = true } = {}) {
     index: shortcutPage,
     onSelect: setShortcutPage,
   });
-  const illustratedTheme = getIllustratedTheme(preferences.theme);
-  const oceanActive = isOceanTheme(preferences.theme);
   const darkAppearance = appearanceTheme === "dark";
   useEffect(() => {
     if (preferences.themeSource !== 'gallery' || (isWallpaperTheme(preferences.theme) && !selectedWallpaper)) return;
@@ -356,8 +349,6 @@ export function App({ hostActive = true } = {}) {
     document.documentElement.dataset.largeTabRadius = String(preferences.largeTabRadius);
   }, [preferences.largeTabRadius]);
   useEffect(() => {
-    // A direct art-review URL must not overwrite normal homepage preferences.
-    if (new URLSearchParams(window.location.search).get('preview') === OCEAN_THEME_ID) return;
     try {
       localStorage.setItem(
         "personalized-home-2-0-preferences",
@@ -406,6 +397,7 @@ export function App({ hostActive = true } = {}) {
     };
   }, [composerOpen, dialog, themeOpen, shortcutEditing, widgetAI, pageManagerOpen, aiWorkspaceBusy]);
   function closeThemePanel() {
+    beginBrowserLayoutChange(260);
     setThemeOpen(false);
     requestAnimationFrame(() => {
       themeTriggerRef.current?.focus({ preventScroll: true });
@@ -418,6 +410,7 @@ export function App({ hostActive = true } = {}) {
     }
     composerRef.current?.closeOverlays();
     setThemeGalleryRequest(0);
+    beginBrowserLayoutChange(260);
     setThemeOpen(true);
     requestAnimationFrame(() => {
       if (window.matchMedia("(max-width: 900px)").matches) {
@@ -477,9 +470,6 @@ export function App({ hostActive = true } = {}) {
     const item = await wallpaperLibrary.upload(file);
     // A later explicit theme choice wins over an in-flight upload.
     if (item && themeSelectionEpoch.current === epoch) await selectTheme(item.id, [item, ...wallpaperLibrary.wallpapers]);
-  }
-  function usePrompt(text) {
-    (widgetAI ? aiComposerRef : composerRef).current?.setPrompt(text);
   }
   function submit(payload) {
     setSubmitted(payload);
@@ -547,7 +537,7 @@ export function App({ hostActive = true } = {}) {
 
   return (
     <ComposerWeatherContext.Provider value={selectedWallpaper?.weather || null}>
-    <AIWorkspace wallpaper={selectedWallpaper} reflectionWallpaper={selectedWallpaper || { url:illustratedTheme?.scene ? `/personalized-home-2-0/asset/themes/previews/${illustratedTheme.scene.id}.webp` : undefined, color:getThemeBackground(preferences.theme, appearanceTheme), name:illustratedTheme?.name || '当前主题' }} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNavigatePage={() => setPageManagerOpen(false)} onNewChat={prompt => {
+    <AIWorkspace homeTools={<ThemeEntry triggerRef={themeTriggerRef} expanded={themeOpen} onClick={toggleThemePanel}/>} wallpaper={selectedWallpaper} reflectionWallpaper={selectedWallpaper || { color:getThemeBackground(preferences.theme, appearanceTheme), name:'当前主题' }} wallpaperTransition={wallpaperTransition} wallpaperBlur={preferences.wallpaperBlur} disabled={widgetAI} onActivityChange={setAIWorkspaceBusy} onNavigatePage={() => setPageManagerOpen(false)} onNewChat={prompt => {
       setWidgetAI(false); aiComposerRef.current?.closeOverlays();
       setDialog(null); setThemeOpen(false); setPageManagerOpen(false); boardRef.current?.dismissOverlays(); setBoardEditing(false);
       composerRef.current?.startNew(prompt);
@@ -556,7 +546,7 @@ export function App({ hostActive = true } = {}) {
     <main
       ref={homeRef}
       data-page-swipe-enabled={!pageSwipeBlocked && shortcutPages.length > 1 || undefined}
-      className={`home${oceanActive ? " has-ocean-theme" : ""}`}
+      className="home"
       aria-label="个性化首页 2.0"
       data-background-theme={preferences.theme}
       data-theme-source={preferences.themeSource}
@@ -564,19 +554,9 @@ export function App({ hostActive = true } = {}) {
       data-surface-theme-color={controlColorPreset?.color || undefined}
       data-shortcuts-visible={preferences.shortcuts ? "true" : "false"}
       data-shortcut-shape={preferences.shortcutShape}
-      data-artwork-background={Boolean(illustratedTheme || selectedWallpaper || oceanActive) || undefined}
+      data-artwork-background={Boolean(selectedWallpaper) || undefined}
       data-wallpaper-blur={preferences.wallpaperBlur || undefined}
     >
-      <HomeBackground
-        theme={preferences.theme}
-        illustratedTheme={illustratedTheme}
-        active={!widgetAI}
-        paused={Boolean(widgetAI || composerOpen || dialog || shortcutEditing || boardEditing || pageActionsOpen || pageManagerOpen || pageContextOpen)}
-        ocean={oceanActive ? {
-          ref: oceanRef, homeRef, pageKey: shortcutPages[shortcutPage].id,
-          onPhaseChange: setOceanPhase,
-        } : null}
-      />
       <div className="tb-composer-scroll-glass" aria-hidden="true"><span /></div>
       <HomeContent
         pageWidth={preferences.pageWidth}
@@ -585,10 +565,9 @@ export function App({ hostActive = true } = {}) {
         appIconIndex={selectedAppIcon}
         spaceColor={spaceColor}
         wallpaper={selectedWallpaper}
-        ocean={oceanActive ? {phase: oceanPhase, onCast: () => oceanRef.current?.cast()} : null}
         composerProps={{
-          ref: composerRef, onSubmit: submit, onVoice: () => setDialog('voice'),
-          externalOverlayOpen: !widgetAI && (dialog === 'voice' || dialog === 'result'),
+          ref: composerRef, onSubmit: submit,
+          externalOverlayOpen: !widgetAI && dialog === 'result',
           onOverlayChange: setComposerOpen,
         }}
         promotionProps={preferences.promotion && preferences.promotionStyle === 'inline' ? promotionProps : null}
@@ -609,7 +588,7 @@ export function App({ hostActive = true } = {}) {
             if (result.ok) setShortcutPages(result.pages);
             return {ok: result.ok, message: result.message};
           },
-          showLabels: preferences.shortcutLabels, appearanceTheme:surfaceAppearanceTheme,
+          showLabels: false, appearanceTheme:surfaceAppearanceTheme,
           shortcutSize: preferences.shortcutSize, shortcutShape: preferences.shortcutShape,
           onEditingChange: setShortcutEditing, onGenerateWidget: openWidgetAI,
           undo: boardState.undo, redo: boardState.redo,
@@ -618,7 +597,6 @@ export function App({ hostActive = true } = {}) {
       />
       <HomeControls
         promotionProps={preferences.promotion && preferences.promotionStyle === 'card' ? promotionProps : null}
-        themeButtonProps={{ref: themeTriggerRef, expanded: themeOpen, onClick: toggleThemePanel}}
         pageProps={!widgetAI ? {
           ref: pageIndicatorRef,
           visible: preferences.shortcuts,
@@ -668,7 +646,7 @@ export function App({ hostActive = true } = {}) {
     {widgetAIVisited && widgetAIEntries.map(entry => {
       const active = widgetAI && entry.id === widgetAIEntryId;
       return <div key={entry.id} hidden={!active} inert={!active}>
-        <WidgetAIChat active={active} initialDraft={entry.draft} composerRef={active ? aiComposerRef : undefined} onBack={returnFromWidgetAI} onSubmit={submit} onVoice={() => setDialog('voice')} onOverlayChange={active ? setComposerOpen : undefined} />
+        <WidgetAIChat active={active} initialDraft={entry.draft} composerRef={active ? aiComposerRef : undefined} onBack={returnFromWidgetAI} onSubmit={submit} onOverlayChange={active ? setComposerOpen : undefined} />
       </div>;
     })}
       {dialog && (
@@ -684,7 +662,6 @@ export function App({ hostActive = true } = {}) {
           skill={submitted.skill}
           returnLabel={widgetAI ? '返回对话' : '返回首页'}
           onClose={() => setDialog(null)}
-          onUsePrompt={usePrompt}
         />
       )}
     </ComposerWeatherContext.Provider>

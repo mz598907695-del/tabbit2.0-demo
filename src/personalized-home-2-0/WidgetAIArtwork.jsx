@@ -29,7 +29,7 @@ export default function WidgetAIArtwork({ className = '', animate = false, activ
       <PreviewStack className="widget-ai-artwork-stage">
         <PreviewStackItem className="widget-ai-artwork-card widget-ai-artwork-reminder" tilt={-12}>
           <div className="widget-ai-artwork-reminder-heading">
-            <img src={`${WIDGET_ASSETS}reminder.png`} alt="" draggable="false" />
+            <img src={`${WIDGET_ASSETS}reminder.webp`} alt="" draggable="false" />
             <div className="widget-ai-artwork-reminder-summary"><i /><i /></div>
           </div>
           <i className="widget-ai-artwork-reminder-line" />
@@ -43,7 +43,7 @@ export default function WidgetAIArtwork({ className = '', animate = false, activ
           </div>
         </PreviewStackItem>
         <PreviewStackItem className="widget-ai-artwork-card widget-ai-artwork-landscape" tilt={5}>
-          <img src={`${WIDGET_ASSETS}landscape.png`} alt="" draggable="false" />
+          <img src={`${WIDGET_ASSETS}landscape.webp`} alt="" draggable="false" />
         </PreviewStackItem>
         <PreviewStackItem className="widget-ai-artwork-card widget-ai-artwork-weather" tilt={12}>
           <div className="widget-ai-artwork-weather-heading">

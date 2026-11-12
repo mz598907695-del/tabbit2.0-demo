@@ -8,9 +8,11 @@ export function resolvePreferences(saved = {}, systemDark = false) {
   // Promote the saved comparison value once; legacy keys are not persisted again.
   const glassOpacity = Number.isFinite(saved.catpawGlassOpacity)
     ? saved.catpawGlassOpacity : saved.liquidGlassOpacity;
+  const themePreferences = resolveThemePreferences(saved, systemDark);
   return {
-    ...resolveThemePreferences(saved, systemDark),
-    themeSource:resolveThemeSource(saved.theme || 'light', saved.themeSource),
+    ...themePreferences,
+    themeSource:resolveThemeSource(themePreferences.theme,
+      themePreferences.theme === saved.theme ? saved.themeSource : undefined),
     liquidGlass: typeof saved.liquidGlass === 'boolean' ? saved.liquidGlass : saved.theme === LEGACY_LIQUID_GLASS_THEME,
     wallpaperBlur: saved.wallpaperBlur === true,
     largeTabRadius: saved.largeTabRadius !== false,
@@ -25,7 +27,7 @@ export function resolvePreferences(saved = {}, systemDark = false) {
     defaultBoardWidthVersion: 1,
     pageWidth: saved.defaultBoardWidthVersion === 1 && ['wide', 'full'].includes(saved.pageWidth) ? 'wide' : 'standard',
     shortcuts: saved.shortcuts !== false,
-    shortcutLabels: saved.shortcutLabels === true,
+    shortcutLabels: false,
     // Reveal the corner activity card once for existing demo preferences too.
     promotionDefaultVersion: 1,
     promotion: saved.promotionDefaultVersion === 1 ? saved.promotion !== false : true,

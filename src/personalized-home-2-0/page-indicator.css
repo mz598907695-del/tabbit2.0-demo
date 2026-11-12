@@ -248,7 +248,8 @@
   width: 152px;
   max-width: calc(calc(var(--home-viewport-width) * 1.0) - 32px);
   max-height: calc(calc(var(--home-viewport-height) * 1.0) - 64px);
-  transform: translateX(-50%);
+  /* Keep centering independent of the shared dropdown transform animation. */
+  translate: -50% 0;
 }
 
 /* Padding bridges the gap so moving from the plus into the menu stays hovered. */

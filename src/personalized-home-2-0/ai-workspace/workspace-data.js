@@ -33,7 +33,7 @@ export const INITIAL_DATA = {
   files: [
     { id: 'file-1', title: '首页 2.0 产品需求文档', description: '导航、主题与小组件的设计说明', type: 'doc', format: 'PDF', size: '2.4 MB', date: '今天 14:12', source: '首页信息架构，如何再简洁一点' },
     { id: 'file-2', title: '本周项目进展', description: '里程碑与行动清单', type: 'table', format: 'XLSX', size: '128 KB', date: '今天 10:30', source: '整理本周项目进展' },
-    { id: 'file-3', title: '山丘上的一阵风', description: '首页壁纸灵感', type: 'image', format: 'PNG', size: '1.8 MB', date: '昨天', image: '/personalized-home-2-0/asset/widgets/landscape.png', source: '下一次出发，去看海' },
+    { id: 'file-3', title: '山丘上的一阵风', description: '首页壁纸灵感', type: 'image', format: 'PNG', size: '1.8 MB', date: '昨天', image: '/personalized-home-2-0/asset/widgets/landscape.webp', source: '下一次出发，去看海' },
     { id: 'file-4', title: '让复杂的工具变得简单', description: '设计研究的网页摘录', type: 'web', format: '网页', size: '阅读 6 分钟', date: '昨天', source: 'AI 工具的交互方式对比' },
     { id: 'file-5', title: '国际时钟 AI 卡片', description: '三个时区的时钟配置', type: 'other', format: 'JSON', size: '8 KB', date: '10 月 20 日', source: 'AI 卡片创作' },
     { id: 'file-6', title: '会议纪要 · 体验优化', description: '评审结论与后续待办', type: 'doc', format: 'DOCX', size: '92 KB', date: '10 月 19 日', source: '把会议记录变成行动清单' },

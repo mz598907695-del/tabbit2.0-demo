@@ -101,7 +101,7 @@ if release is None:
     print('Preparing draft release:', TAG, flush=True)
     release = api('POST', '/repos/' + REPO + '/releases', {
         'tag_name':TAG, 'target_commitish':branch, 'name':'Tabbit 2 Demo ' + VERSION,
-        'body':'适用于 Apple Silicon Mac。\n\n本次更新优化壁纸切换：跨深浅模式时先进入目标基础主题，再以 1000ms 淡入壁纸；同时修复点击空间指示器切换不同壁纸时，AI 首页深浅模式与“更多主题”切换不一致的问题。\n\n首次安装：下载 DMG，将应用拖入「应用程序」。已安装旧版本的用户可通过应用内更新升级；更新不会清空本机的空间、壁纸或快捷方式设置。\n\n本仓库仅发布安装和更新文件。',
+        'body':manifest.get('notes', 'Tabbit 2 Demo ' + VERSION) + '\n\n适用于 Apple Silicon Mac。首次安装请下载 DMG，并将应用拖入「应用程序」。已有用户可通过应用内更新升级，保留本机空间、壁纸和快捷方式设置。\n\n本仓库仅发布安装和更新文件。',
         'draft':True, 'prerelease':False,
     })
 

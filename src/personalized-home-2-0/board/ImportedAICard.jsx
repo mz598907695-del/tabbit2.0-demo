@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { validateAICardPackage } from './ai-card-import';
 import './imported-ai-card.css';
+import '../standard-dialog.css';
 
 const encode = value => JSON.stringify(value).replace(/</g, '\\u003c');
 function iframeDocument(pkg, token) {
@@ -118,8 +119,8 @@ export default function ImportedAICard({ config = {}, onChange, size, preview = 
     {validation || error ? <div className="ai-card-fallback" role="status"><strong>{name}</strong><span>{validation || error}</span></div>
       : preview || !active ? <div className="ai-card-fallback"><strong>{name}</strong><span>{pkg.catalog.description}</span><small>AI 卡片 · JSON</small></div>
       : <><iframe key={token} ref={frameRef} title={name} sandbox="allow-scripts" referrerPolicy="no-referrer" srcDoc={source} />{!loaded && <div className="ai-card-loading" role="status">加载卡片…</div>}</>}
-    {expanded && <dialog ref={dialogRef} className="ai-card-detail" aria-label={`${name}详情`} onCancel={() => setExpanded(false)} onClick={event => { if (event.target === event.currentTarget) setExpanded(false); }}>
-      <header><strong>{name}</strong><button type="button" onClick={() => setExpanded(false)} aria-label="关闭 AI 卡片详情">×</button></header>
+    {expanded && <dialog ref={dialogRef} className="ai-card-detail standard-dialog" aria-label={`${name}详情`} onCancel={() => setExpanded(false)} onClick={event => { if (event.target === event.currentTarget) setExpanded(false); }}>
+      <header className="standard-dialog-header"><strong className="ai-card-detail-title">{name}</strong><button type="button" onClick={() => setExpanded(false)} className="standard-dialog-close" aria-label="关闭 AI 卡片详情">×</button></header>
       <iframe key={`${token}-modal`} ref={modalFrameRef} title={`${name}详情`} sandbox="allow-scripts" referrerPolicy="no-referrer" srcDoc={source} />
     </dialog>}
   </div>;

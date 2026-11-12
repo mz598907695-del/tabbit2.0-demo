@@ -125,6 +125,7 @@ uniform float uBevel;
 uniform float uGlare;
 uniform vec2 uPointer;
 uniform float uTheme;
+uniform float uLightness;
 
 const float VIEW = ${VIEW_DISTANCE.toFixed(1)};
 const float OVERSCAN = ${OVERSCAN.toFixed(2)};
@@ -289,6 +290,7 @@ void main() {
 
   vec3 dark = vec3(0.005, 0.005, 0.006) + uTint * (scene * 0.05 * uMetal + highlight * 0.36);
   vec3 light = uTint * (vec3(0.83, 0.83, 0.85) * (1.0 - 0.45 * uMetal * (1.0 - clamp(scene, 0.0, 1.0))) + highlight * 0.35);
+  light = mix(light, uTint, uLightness);
   vec3 color = mix(dark, light, uTheme);
   color = min(color, 0.7) + 0.3 * (1.0 - exp(-max(color - 0.7, 0.0) / 0.3));
   color = pow(clamp(color, 0.0, 1.0), vec3(1.0 / 2.2));
@@ -526,6 +528,7 @@ const createRenderer = canvas => {
     gl.uniform1f(u.uGlare, glare);
     gl.uniform2f(u.uPointer, pointerX, pointerY);
     gl.uniform1f(u.uTheme, settings.theme);
+    gl.uniform1f(u.uLightness, settings.lightness);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   };
 
@@ -545,11 +548,11 @@ const createRenderer = canvas => {
   return { upload, renderEnv, renderPlate, dispose };
 };
 
-export const MEMBERSHIP_CARD_DEFAULTS = { tint:'#ffffff', metalness:1, roughness:0.3, blurStrength:6, grayscale:1, warp:0.6, warpScale:1, shine:1, bevel:1, glare:0.5, enableTilt:true, tiltStrength:12, intro:true, radius:24, width:320, height:460, padding:28 };
+export const MEMBERSHIP_CARD_DEFAULTS = { tint:'#ffffff', lightness:0.25, metalness:1, roughness:0.3, blurStrength:6, grayscale:1, warp:0.6, warpScale:1, shine:1, bevel:1, glare:0.5, enableTilt:true, tiltStrength:12, intro:true, radius:24, width:320, height:460, padding:28 };
 
 const ReflectiveMembershipCard = ({ children, className = '', appearance = MEMBERSHIP_CARD_DEFAULTS, media = { type:'wallpaper' }, wallpaper }) => {
   const [theme, setTheme] = useState('light');
-  const { tint, metalness, roughness, blurStrength, grayscale, warp, warpScale, shine, bevel, glare, enableTilt, tiltStrength, intro, radius, width, height, padding } = { ...MEMBERSHIP_CARD_DEFAULTS, ...appearance };
+  const { tint, lightness, metalness, roughness, blurStrength, grayscale, warp, warpScale, shine, bevel, glare, enableTilt, tiltStrength, intro, radius, width, height, padding } = { ...MEMBERSHIP_CARD_DEFAULTS, ...appearance };
   const reflection = resolveMembershipReflection(media, wallpaper, theme);
   const videoSrc = reflection.type === 'video' ? reflection.url : '';
   const imageSrc = reflection.type === 'image' ? reflection.url : '';
@@ -576,6 +579,7 @@ const ReflectiveMembershipCard = ({ children, className = '', appearance = MEMBE
   const palette = theme === 'light' ? 'light' : 'dark';
   const settings = {
     tint: parseColor(tint).map(channel => Math.pow(channel, 2.2)),
+    lightness: clamp(lightness, 0, 1),
     metalness: clamp(metalness, 0, 1),
     roughness: clamp(roughness, 0, 1),
     blurStrength: clamp(blurStrength, 0, 40),

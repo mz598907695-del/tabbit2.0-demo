@@ -1,7 +1,8 @@
 import { useEffect, useId, useLayoutEffect, useImperativeHandle, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getHomeRoot } from '../home-host';
-import { Check, GripVertical, Pencil, Plus, Trash2, X } from "../icons";
+import { Check, GripVertical, Pencil, Plus, Trash2 } from "../icons";
+import { NameDialog } from '../StandardDialog';
 import { BoardConfirm } from './BoardDialogs';
 import { reorderPages } from './state';
 import PageOverviewThumbnail from './PageOverviewThumbnail';
@@ -250,34 +251,22 @@ export default function PageManager({ ref, pages, activePageId, onReorder, onRen
           <PageOverviewThumbnail page={entry}/>
           {entry.id === activePageId && <span className="page-overview-current"><Check size={12} aria-hidden="true"/>当前看板</span>}
         </button>
-        <form className="page-manager-row-main" onSubmit={event => {
-          event.preventDefault();
-          if (renaming === entry.id) saveName(event);
-        }}>
+        <div className="page-manager-row-main">
           <button ref={node => { if (node) handleRefs.current.set(entry.id, node); else handleRefs.current.delete(entry.id); }}
             type="button" className="page-manager-icon page-manager-grip" aria-label={`拖动排序：${entry.name}`}
             aria-describedby={`${helpId}-keyboard`} title="拖动排序 · Alt + 方向键"
             disabled={pages.length < 2 || Boolean(renaming || deleting || adding)} onPointerDown={event => startDrag(event, entry)}
             onKeyDown={event => keyboardReorder(event, entry, index)}><GripVertical size={16} aria-hidden="true" /></button>
           <div className="page-manager-name">
-            {renaming === entry.id
-              ? <input ref={nameRef} className="page-manager-name-input" aria-label="看板名称" value={name} maxLength={24} autoComplete="off"
-                onChange={event => setName(event.target.value)}
-                onKeyDown={event => { if (event.key === 'Enter' && (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)) event.preventDefault(); }} />
-              : <><span title={entry.name}>{entry.name}</span><small>{entry.items.length} 张卡片</small></>}
+            <span title={entry.name}>{entry.name}</span><small>{entry.items.length} 张卡片</small>
           </div>
           <div className="page-manager-actions">
-            {renaming === entry.id ? <>
-              <button key="save" type="submit" className="page-manager-icon" aria-label="保存看板名称" title="保存" disabled={!name.trim()}><Check size={16} aria-hidden="true" /></button>
-              <button key="cancel" type="button" className="page-manager-icon" aria-label="取消重命名" title="取消" onClick={cancelRename}><X size={16} aria-hidden="true" /></button>
-            </> : <>
               <button key="rename" ref={node => { if (node) renameRefs.current.set(entry.id, node); else renameRefs.current.delete(entry.id); }}
                 type="button" className="page-manager-icon" aria-label={`重命名看板：${entry.name}`} title="重命名" disabled={Boolean(drag?.moved)} onClick={event => { event.preventDefault(); startRename(entry); }}><Pencil size={15} aria-hidden="true" /></button>
               <button key="delete" ref={node => { if (node) deleteRefs.current.set(entry.id, node); else deleteRefs.current.delete(entry.id); }}
                 type="button" className="page-manager-icon" aria-label={`删除看板：${entry.name}`} title={pages.length < 2 ? '至少保留一个看板' : '删除'} disabled={pages.length < 2 || Boolean(drag?.moved)} onClick={() => { cancelDrag(); setAdding(false); setRenaming(null); setDeleting(entry.id); }}><Trash2 size={15} aria-hidden="true" /></button>
-            </>}
           </div>
-        </form>
+        </div>
       </li>)}
       {onAdd && <li className={`page-manager-row page-manager-add-row${adding ? ' is-adding' : ''}`}>
         <button ref={addRef} type="button" className="page-manager-add-trigger" aria-expanded={adding}
@@ -287,20 +276,12 @@ export default function PageManager({ ref, pages, activePageId, onReorder, onRen
           <span className="page-overview-add-icon"><Plus size={24} aria-hidden="true" /></span><strong>添加看板</strong>
           <small>{pages.length >= 20 ? '最多可添加 20 个看板' : '从一个空白看板开始'}</small>
         </button>
-        {adding && <form className="page-manager-add-form" onSubmit={addPage}>
-          <div className="page-manager-rename">
-            <input ref={addNameRef} aria-label="新看板名称" value={addName} placeholder="输入看板名称" maxLength={24} autoComplete="off"
-              aria-invalid={Boolean(addError)} aria-describedby={addError ? `${helpId}-add-error` : undefined}
-              onChange={event => { setAddName(event.target.value); setAddError(''); }}
-              onKeyDown={event => { if (event.key === 'Enter' && (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229)) event.preventDefault(); }} />
-            <button type="submit" className="page-manager-icon" aria-label="确认添加看板" title="添加" disabled={!addName.trim()}><Check size={16} aria-hidden="true" /></button>
-            <button type="button" className="page-manager-icon" aria-label="取消添加看板" title="取消" onClick={cancelAdd}><X size={16} aria-hidden="true" /></button>
-          </div>
-          {addError && <p id={`${helpId}-add-error`} className="page-manager-add-error" role="alert">{addError}</p>}
-        </form>}
       </li>}
 
     </ol>
+    {adding && <NameDialog title="添加看板" inputLabel="新看板名称" inputRef={addNameRef} value={addName}
+      onChange={value => { setAddName(value); setAddError(''); }} error={addError} confirmLabel="添加" onSubmit={addPage} onClose={cancelAdd}/>}
+    {renaming && <NameDialog title="重命名看板" inputRef={nameRef} value={name} onChange={setName} onSubmit={saveName} onClose={cancelRename}/>}
     {deletingPage && pages.length > 1 && <BoardConfirm
       title={`删除看板“${deletingPage.name}”？`}
       description="此看板中的快捷方式和小组件也会一并删除。"

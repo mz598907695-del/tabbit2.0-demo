@@ -76,6 +76,7 @@ export default function ComposerPopover({ anchor, kind, id, label, width, maxHei
   }, [Boolean(geometry)]);
   useEffect(() => {
     const outside = event => {
+      if (event.target.closest?.('dialog')) return;
       if (closing) return;
       if (layerRef.current?.contains(event.target) || anchor?.contains(event.target)) return;
       closeRef.current(false);

@@ -11,12 +11,21 @@
   z-index: 1;
   pointer-events: none;
 }
+/* Extend the snapshot window past the grid edges so rounded cards, labels
+   and shadows are not sliced at the first/last column during click paging. */
+.board-page-outgoing, .board-page-preview { left:-32px; right:-32px; }
+.board-page-outgoing > .board-grid, .board-page-preview > .board-grid { width:calc(100% - 64px); margin-left:32px; }
 .board-page-outgoing:empty, .board-page-preview:empty { display: none; }
 .board-page-outgoing > .board-grid, .board-page-preview > .board-grid { pointer-events: none; }
-.board-page-preview { min-height: 400px; visibility: hidden; }
+.board-page-preview { min-height: 0; visibility: hidden; }
+.board-page-preview > .board-grid { top:var(--board-preview-offset-y,0px); }
 .workspace-board > .board-grid,
 .board-page-outgoing > .board-grid,
 .board-page-preview { transform-origin: top center; }
+
+/* Fade artwork and labels, never the ancestors containing live glass. */
+[data-page-swiping] .board-card-content { transition:none; }
+.board-grid[data-motion-entering] .board-card-content { opacity:0; }
 
 .board-grid {
   position: relative;
@@ -37,7 +46,7 @@
   user-select: none;
   touch-action: none;
   border-radius: var(--board-card-radius, 24px);
-  transition: translate 240ms var(--board-ease), width 240ms var(--board-ease), height 240ms var(--board-ease), box-shadow 300ms var(--nine-motion-easing-standard);
+  transition: translate 240ms var(--board-ease), box-shadow 300ms var(--nine-motion-easing-standard);
 }
 /* Keep backfill close to the pointer instead of trailing the next grid cell. */
 .board-grid.is-dragging > .board-item:not(.is-dragging) { transition-duration: 120ms; }
@@ -56,25 +65,6 @@
 .board-item.is-widget { cursor: grab; }
 .board-item input, .board-item textarea { user-select: text; touch-action: auto; }
 .board-item > .shortcut { height: 50px; padding: 0; gap: 0; justify-content: flex-start; border-radius: var(--shortcut-radius, 50%); }
-.workspace-board .board-item-label {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: calc(var(--board-gap) / -2 + 2px);
-  width: calc(100% + var(--board-gap) - 4px);
-  height: 16px;
-  margin: 0;
-  line-height: 16px;
-  font-size: 11px;
-  font-weight: 400;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 160ms ease;
-}
-.workspace-board.labels-hidden .board-item-label { height: 16px; opacity: 0; visibility: visible; }
 .board-remove-button, .board-resize-visual {
   position: absolute;
   z-index: 4;
@@ -155,17 +145,8 @@
 @media (prefers-reduced-motion: reduce) { .board-batch-toolbar { animation: none; } }
 @media (prefers-reduced-transparency: reduce) { .board-batch-toolbar { background: var(--floating-surface-solid); backdrop-filter: none; -webkit-backdrop-filter: none; } }
 .board-context-menu { position: fixed; z-index: 50; width: 216px; max-width: calc(calc(var(--home-viewport-width) * 1.0) - 16px); max-height: calc(calc(var(--home-viewport-height) * 1.0) - 16px); }
-.board-group-dialog { padding: 24px; width: min(360px, calc(calc(var(--home-viewport-width) * 1.0) - 32px)); border: 1px solid var(--border); border-radius: 22px; background: var(--surface); color: var(--text); }
-.board-group-dialog::backdrop { background: #0005; backdrop-filter: blur(4px); }
-.board-group-dialog form { display: flex; flex-direction: column; gap: 20px; }
-.board-group-dialog h2 { font-size: 18px; }
-.board-group-dialog label { font-size: 12px; display: flex; flex-direction: column; gap: 8px; }
-.board-group-dialog input { font-size: 14px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
-.board-group-dialog form > div { display: flex; justify-content: flex-end; gap: 8px; }
-.board-group-dialog button { padding: 8px 14px; border-radius: 20px; font-size: 12px; background: var(--segmented); }
-.board-group-dialog button[type=submit] { background: var(--text); color: var(--surface); }
 @media (hover: none) { .board-resize-handle { opacity: 1; pointer-events: auto; } }
-@media (prefers-reduced-motion: reduce) { .board-item, .board-grid, .workspace-board .board-item-label, .board-resize-handle { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .board-item, .board-grid, .board-resize-handle { transition: none; } }
 .board-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .board-error { margin: 12px 0 0; color: var(--text); font-size: 12px; line-height: 1.6; }
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import warningIcon from "./assets/delete-space-warning.png";
+import warningIcon from "./assets/delete-space-warning.webp";
 import "./DeleteSpaceDialog.css";
 
 export default function DeleteSpaceDialog({ onCancel, onConfirm }: { onCancel: () => void; onConfirm: () => void }) {

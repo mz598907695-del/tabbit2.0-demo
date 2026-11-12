@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
+import { BROWSER_LAYOUT_SETTLED_EVENT, isBrowserLayoutChanging } from '../browserLayoutMotion';
 import { App } from './App';
 import './styles.css';
 import './themes/liquid-glass.css';
@@ -15,6 +16,7 @@ export default function PersonalizedHome({ hostActive = true } = {}) {
     const element = root.current;
     let width = -1, height = -1;
     const resize = () => {
+      if (isBrowserLayoutChanging()) return;
       const nextHeight = element.clientHeight, nextWidth = element.clientWidth;
       if (height !== nextHeight) element.style.setProperty('--home-viewport-height', `${nextHeight}px`);
       if (width !== nextWidth) element.style.setProperty('--home-viewport-width', `${nextWidth}px`);
@@ -23,7 +25,11 @@ export default function PersonalizedHome({ hostActive = true } = {}) {
     resize();
     const observer = new ResizeObserver(resize);
     observer.observe(element);
-    return () => observer.disconnect();
+    window.addEventListener(BROWSER_LAYOUT_SETTLED_EVENT, resize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener(BROWSER_LAYOUT_SETTLED_EVENT, resize);
+    };
   }, []);
   return <section ref={root} className="new-tab-page personalized-home"><App hostActive={hostActive}/></section>;
 }

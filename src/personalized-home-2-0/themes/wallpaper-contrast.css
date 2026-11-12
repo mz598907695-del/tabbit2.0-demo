@@ -1,15 +1,4 @@
 @scope (.personalized-home) {
-/* Keep external names as plain text, with no backing, outline or shadow.
-   Preserve inline truncation and the original 11px / 16px label geometry. */
-.home[data-artwork-background] .workspace-board .board-item-label {
-  color: #30363d;
-  text-shadow: none;
-}
-:scope[data-theme='dark'] .home[data-artwork-background] .workspace-board .board-item-label {
-  color: #f3f4f6;
-  text-shadow: none;
-}
-
 /* More transparent material needs stronger ink, not a hidden opacity floor.
    Only the clearest half of the slider strengthens secondary text. The midpoint
    and opaque endpoint retain their existing ink, and artwork stays untouched. */

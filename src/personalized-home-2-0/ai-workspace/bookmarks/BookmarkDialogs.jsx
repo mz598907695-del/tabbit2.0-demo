@@ -1,3 +1,4 @@
+import { ConfirmDialog } from '../../StandardDialog';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { Check, ChevronRight, Folder, FolderPlus, Search, X } from '../../icons';
 
@@ -71,11 +72,7 @@ export function BookmarkMoveDialog({ action, library, recentFolders, onClose, on
 
 export function BookmarkConfirmDialog({ action, onClose, onConfirm }) {
   const [error, setError] = useState('');
-  return <Dialog title={action.title} onClose={onClose}><p className="bkm-confirm-copy">{action.message}</p>
-    {action.detail && <p className="bkm-dialog-caption">{action.detail}</p>}
-    {error && <p className="bkm-error" role="alert">{error}</p>}
-    <div className="bkm-dialog-actions"><button data-autofocus className="bkm-button" onClick={onClose}>取消</button><button className={`bkm-button ${action.danger ? 'is-danger' : 'is-primary'}`} onClick={() => { try { onConfirm(); } catch (err) { setError(err.message); } }}>{action.confirmLabel}</button></div>
-  </Dialog>;
+  return <ConfirmDialog title={action.title} description={[action.message, action.detail].filter(Boolean).join('\n')} error={error} danger={Boolean(action.danger)} confirmLabel={action.confirmLabel} onClose={onClose} onConfirm={() => { try { onConfirm(); } catch (err) { setError(err.message); } }}/>;
 }
 
 export function BookmarkTextDialog({ title, value, onClose }) {

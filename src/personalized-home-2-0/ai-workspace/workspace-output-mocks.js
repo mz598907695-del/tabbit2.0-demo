@@ -15,8 +15,8 @@ export const OUTPUT_DEMO_FILES = [
 ].map(([title, type, index]) => ({
   id: `output-reference-${index}`, title, type,
   description: ({web:'网页',doc:'文档',image:'图片',table:'表格'})[type],
-  image: `/personalized-home-2-0/asset/outputs/reference-${index}.png`,
-  format: 'PNG', date: '今天', demo: true,
+  image: `/personalized-home-2-0/asset/outputs/reference-${index}.webp`,
+  format: 'WEBP', date: '今天', demo: true,
   sourceId: 'chat-1', source: '首页信息架构，如何再简洁一点',
 }));
 export const OUTPUT_DEMO_ASSETS = [];
@@ -27,7 +27,13 @@ export function mergeOutputDemoData(data) {
   const fixtures = new Map(OUTPUT_DEMO_FILES.map(item => [item.id, item]));
   const updatedFiles = files.map(item => {
     const fixture = fixtures.get(item.id);
-    return fixture && /^\d+$/.test(item.title) ? { ...item, title: fixture.title } : item;
+    if (!fixture) return item;
+    const legacyImage = item.image === fixture.image.replace(/\.webp$/, '.png');
+    return {
+      ...item,
+      ...(/^\d+$/.test(item.title) ? { title: fixture.title } : {}),
+      ...(legacyImage ? { image: fixture.image, format: fixture.format } : {}),
+    };
   });
   const ids = new Set(updatedFiles.map(item => item.id));
   return { ...data, files: [...updatedFiles, ...OUTPUT_DEMO_FILES.filter(item => !ids.has(item.id)).map(item => ({ ...item }))], assets };

@@ -1,10 +1,4 @@
 import { useLayoutEffect, useRef } from 'react';
-import ThemeBackground from './themes/ThemeBackground';
-import MonochromeThemeBackground from './themes/MonochromeThemeBackground';
-import ScrollThemeBackground from './themes/ScrollThemeBackground';
-import { getScrollTheme } from './themes/scroll-themes';
-import { getMonochromeTheme } from './themes/monochrome-themes';
-import OceanFishingTheme from './themes/ocean/OceanFishingTheme';
 import WallpaperMedia from './themes/WallpaperMedia';
 import { WALLPAPER_LAYOUT_EVENT, getWallpaperLayers } from '../windowWallpaper';
 
@@ -63,15 +57,4 @@ export function WallpaperTransitionBackground({ transition, wallpaper, blurred =
       {scene.url && <WindowAlignedWallpaper wallpaper={scene} blurred={scene.blurred ?? blurred}/>}
     </div>)}
   </div>;
-}
-
-// Uploaded/official media belongs to AIWorkspace's shared background behind
-// both the home and internal navigation. Only legacy scene renderers live here.
-export default function HomeBackground({ theme, illustratedTheme, active, paused, ocean }) {
-  return <>
-    <ThemeBackground theme={illustratedTheme} active={active}/>
-    {ocean && <OceanFishingTheme {...ocean} blocked={paused}/>}
-    <MonochromeThemeBackground theme={getMonochromeTheme(theme)} active={active && !paused}/>
-    <ScrollThemeBackground theme={getScrollTheme(theme)} active={active && !paused}/>
-  </>;
 }

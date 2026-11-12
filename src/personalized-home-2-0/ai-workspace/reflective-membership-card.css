@@ -3,6 +3,7 @@
 .reflective-membership-card { position:relative; width:var(--rc-width,320px); height:var(--rc-height,460px); min-width:0; max-width:100%; perspective:900px; touch-action:pan-y; }
 .reflective-membership-card__body { position:relative; width:100%; height:100%; overflow:hidden; border-radius:var(--rc-radius); background:var(--rc-base); box-shadow:var(--rc-shadow); transform:translate3d(0,var(--rc-lift,0px),0) rotateX(var(--rc-rotate-x,0deg)) rotateY(var(--rc-rotate-y,0deg)); opacity:var(--rc-presence,1); isolation:isolate; }
 .reflective-membership-card__canvas { position:absolute; inset:0; display:block; width:100%; height:100%; pointer-events:none; }
+:scope:has(.home[data-surface-theme-kind='color']) .reflective-membership-card__body::after { content:""; position:absolute; inset:0; z-index:0; border-radius:inherit; background:linear-gradient(145deg,color-mix(in srgb,var(--accent) 22%,transparent),color-mix(in srgb,var(--accent) 10%,transparent)); pointer-events:none; }
 .reflective-membership-card__content { position:relative; z-index:1; display:flex; flex-direction:column; height:100%; padding:var(--rc-padding,28px); }
 .reflective-membership-card__rim { position:absolute; inset:0; z-index:2; border-radius:inherit; box-shadow:inset 0 0 0 1px var(--rc-rim),inset 0 1px 0 var(--rc-rim-highlight); pointer-events:none; }
 .reflective-membership-card__media { position:absolute; top:0; left:0; width:1px; height:1px; opacity:0; pointer-events:none; }

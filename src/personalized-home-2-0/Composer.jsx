@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useId, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import ComposerPopover from './ComposerPopover';
-import { ArrowUp, ChevronDown, Cloud, Folder, Globe, Laptop, Lightbulb, Mic, Paperclip, Plus, Star, X } from "./icons";
+import { ArrowUp, ChevronDown, Cloud, Folder, Globe, Laptop, Lightbulb, Paperclip, Plus, Star, X } from "./icons";
 import { COMMAND_STORAGE_KEY, DEFAULT_COMMANDS, formatAttachmentSize, isPreviewableImage, partitionAttachments, readCustomCommands } from './composer-data';
 import { MIN_REPLY_MODELS, readModelSelection, setReplyModelMode, toggleReplyModel } from './composer-models';
 import { promoteProject, validateProjectName } from './composer-projects';
@@ -21,7 +21,7 @@ import './composer-scroll.css';
 
 const INLINE_PANEL_LABELS = { add: '添加参考内容' };
 
-export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVoice, onOverlayChange, externalOverlayOpen = false, initialSkill = null, initialQuery = '', initialDraft = null, simple = false }, ref) {
+export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onOverlayChange, externalOverlayOpen = false, initialSkill = null, initialQuery = '', initialDraft = null, simple = false }, ref) {
   const id = useId();
   const [query, setQuery] = useState(initialDraft?.query ?? initialQuery);
   const [skill, setSkill] = useState(initialDraft ? initialDraft.skill : initialSkill);
@@ -451,7 +451,6 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onVo
         </div>
         <div className="tb-composer-end">
           <button ref={node => { triggers.current.model = node; }} type="button" className={`tb-model-trigger${overlay === 'model' ? ' is-open' : ''}`} aria-label={`选择模型：${modelLabel}`} title={modelSummary || '选择模型'} aria-haspopup="menu" aria-expanded={overlay === 'model'} aria-controls={overlay === 'model' ? `${id}-model` : undefined} onClick={() => toggleOverlay('model')}><span>{modelLabel}</span><ChevronDown size={14} /></button>
-          <button type="button" className="tb-composer-icon tb-composer-voice" aria-label="语音输入" title="语音输入" onClick={() => { closeOverlays(); if (onVoice) onVoice(); else setFileError('语音输入尚未接入，可以直接输入小组件需求。'); }}><Mic size={18} aria-hidden="true" /></button>
           <button type="submit" className="tb-composer-send" aria-label="发送" title="发送"><ArrowUp size={18} aria-hidden="true" /></button>
         </div>
       </div>

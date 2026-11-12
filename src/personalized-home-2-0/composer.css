@@ -139,7 +139,6 @@
 .tb-model-trigger.is-open svg { transform:rotate(180deg); }
 .tb-composer-send { display: grid; flex: 0 0 32px; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: var(--nine-radius-full); background: var(--nine-color-fill-action-inverse); color: var(--nine-color-text-on-neutral); cursor: pointer; transition: transform var(--nine-motion-duration-fast), background var(--nine-motion-duration-fast); }
 .tb-composer-send:active { transform: scale(.94); }
-.tb-composer-voice { margin-inline: calc(var(--spacing-base) * 0.5); }
 .tb-composer-icon.is-open, .tb-model-trigger.is-open { background: var(--nine-color-fill-layer-strong); }
 .tb-composer :is(button, input):focus-visible, .tb-composer-popover :is(button, textarea):focus-visible, .tb-command-dialog :is(button, input, textarea):focus-visible { outline: 1px solid var(--nine-color-border-alpha-regular); outline-offset: -1px; }
 .tb-composer button, .tb-composer-popover button, .tb-command-dialog button { touch-action: manipulation; }

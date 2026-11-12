@@ -1,7 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronLeft, ImagePlus, RefreshCw, Trash2, X } from './icons';
 import { isWallpaperTheme, WALLPAPER_ACCEPT } from './themes/wallpapers';
-import { getExampleWallpaper } from './themes/exampleWallpapers';
+import { getBundledWallpaper } from './themes/officialWallpapers';
 import { officialWallpapers as officialThemes, communityWallpapers as communityThemes, isOfficialWallpaperTheme, isCommunityWallpaperTheme } from './themes/officialWallpapers';
 import WallpaperMedia from './themes/WallpaperMedia';
 import { BoardConfirm } from './board/BoardDialogs';
@@ -67,7 +67,7 @@ export function ThemePanel({
   const selectedAppIconPosition = Math.max(0, APP_ICON_OPTIONS.indexOf(selectedAppIcon));
   const [category, setCategory] = useState(getThemeCategory(theme));
   const { wallpapers = [], loading = false, uploading = false, deletingId = null, error = "" } = wallpaperLibrary || {};
-  const selectedGalleryTheme = gallerySelected && (getExampleWallpaper(theme) || wallpapers.find(item => item.id === theme));
+  const selectedGalleryTheme = gallerySelected && (getBundledWallpaper(theme) || wallpapers.find(item => item.id === theme));
   const [wallpaperToDelete, setWallpaperToDelete] = useState(null);
   const keepMineAfterDeleteRef = useRef(false);
   const wallpaperUploadRef = useRef(null);
@@ -248,9 +248,9 @@ export function ThemePanel({
             </div>
             <div className="overlay-appearance-options" role="group" aria-label="主题外观">
               {[
-                { value:'system', label:'自动', image:'/personalized-home-2-0/asset/images/appearance-auto.png' },
-                { value:'light', label:'浅色', image:'/personalized-home-2-0/asset/images/appearance-light.png' },
-                { value:'dark', label:'深色', image:'/personalized-home-2-0/asset/images/appearance-dark.png' },
+                { value:'system', label:'自动', image:'/personalized-home-2-0/asset/images/appearance-auto.webp' },
+                { value:'light', label:'浅色', image:'/personalized-home-2-0/asset/images/appearance-light.webp' },
+                { value:'dark', label:'深色', image:'/personalized-home-2-0/asset/images/appearance-dark.webp' },
               ].map(option => (
                 <button
                   key={option.value}
@@ -270,7 +270,7 @@ export function ThemePanel({
                 const selected = !gallerySelected && spaceColor.toLowerCase() === colorValue.toLowerCase();
                 return <button key={label} type="button" className="overlay-space-swatch" style={{ '--space-swatch':color }} aria-label={`空间颜色：${label}`} title={label} aria-pressed={selected} onClick={() => onSpaceColor?.(colorValue, { tint:resolvedAppearance === 'dark' ? darkTint : tint, clear:false, preset:true })}/>;
               })}
-              <button ref={themeEntryRef} type="button" className="overlay-space-swatch overlay-gallery-swatch" style={{ '--space-swatch':'var(--nine-color-action-primary)' }} aria-label={`更多主题，查看全部 ${officialThemes.length + wallpapers.length} 款主题`} title="更多主题" aria-pressed={gallerySelected} onClick={openThemes}>
+              <button ref={themeEntryRef} type="button" className="overlay-space-swatch overlay-gallery-swatch" style={{ '--space-swatch':'var(--nine-color-action-primary)' }} aria-label={`更多主题，查看全部 ${officialThemes.length + communityThemes.length + wallpapers.length} 款主题`} title="更多主题" aria-pressed={gallerySelected} onClick={openThemes}>
                 {selectedGalleryTheme ? <span className="overlay-gallery-swatch-preview"><GalleryPreview item={selectedGalleryTheme}/></span> : <ImagePlus size={18} />}
               </button>
             </div>
@@ -368,7 +368,7 @@ export function ThemePanel({
               {APP_ICON_OPTIONS.map((index, position) => (
                 <button key={index} type="button" className="overlay-app-icon-placeholder" aria-label={`应用图标 ${position + 1}`} aria-pressed={selectedAppIcon === index} onClick={() => onAppIcon?.(index)}>
                   <span className="overlay-app-icon-image-frame">
-                    <img className="overlay-app-icon-image" src={`/personalized-home-2-0/asset/images/app-icons/${index + 1}.png`} alt="" width="200" height="200" draggable="false" />
+                    <img className="overlay-app-icon-image" src={`/personalized-home-2-0/asset/images/app-icons/${index + 1}.webp`} alt="" width="200" height="200" draggable="false" />
                   </span>
                   <span className="overlay-app-icon-selected" aria-hidden="true" />
                 </button>
@@ -491,7 +491,7 @@ export function ThemePanel({
         </div>
         </div>
       </div>
-      {wallpaperToDelete && <BoardConfirm title={`删除壁纸“${wallpaperToDelete.name}”？`} description="仅从我的壁纸中移除，电脑中的原始图片不会被删除。" confirmLabel={deletingId ? "正在删除…" : "删除壁纸"} onClose={() => { if (!deletingId) setWallpaperToDelete(null); }} onConfirm={confirmWallpaperDelete} />}
+      {wallpaperToDelete && <BoardConfirm title={`删除壁纸“${wallpaperToDelete.name}”？`} description="仅从我的壁纸中移除，电脑中的原始图片不会被删除。" busy={Boolean(deletingId)} confirmLabel={deletingId ? "正在删除…" : "删除壁纸"} onClose={() => { if (!deletingId) setWallpaperToDelete(null); }} onConfirm={confirmWallpaperDelete} />}
     </section>
   );
 }

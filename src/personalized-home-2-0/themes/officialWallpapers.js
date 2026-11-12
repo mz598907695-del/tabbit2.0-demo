@@ -59,25 +59,25 @@ const bundledWallpapers = [
   wallpaper("wallpaper-78b4ff74-ee45-4f03-83d4-935f04879b47", "熔金回环", "抽象光影", "wallpaper-78b4ff74-ee45-4f03-83d4-935f04879b47.webp"),
   wallpaper("wallpaper-db1431d6-d55f-4637-8c1b-dc0f44576b0a", "钴蓝回环", "抽象光影", "wallpaper-db1431d6-d55f-4637-8c1b-dc0f44576b0a.webp"),
   wallpaper("wallpaper-69fe63dc-e1bc-41dc-900f-89275397be26", "熔金暮弧", "抽象光影", "wallpaper-69fe63dc-e1bc-41dc-900f-89275397be26.webp"),
-  wallpaper("wallpaper-26afb3f6-45b8-40f5-bbb1-ce6a843fe6a2", "日照山巅", "自然风景", "wallpaper-26afb3f6-45b8-40f5-bbb1-ce6a843fe6a2.jpg"),
-  wallpaper("wallpaper-631eb344-d546-4d85-8dad-c6ca35580c31", "旷野浮石", "品牌意象", "wallpaper-631eb344-d546-4d85-8dad-c6ca35580c31.jpg"),
-  wallpaper("wallpaper-478de1bd-4d92-41c8-bd64-72bd976ab3f9", "金穗海岬", "自然风景", "wallpaper-478de1bd-4d92-41c8-bd64-72bd976ab3f9.jpg"),
+  wallpaper("wallpaper-26afb3f6-45b8-40f5-bbb1-ce6a843fe6a2", "日照山巅", "自然风景", "wallpaper-26afb3f6-45b8-40f5-bbb1-ce6a843fe6a2.webp"),
+  wallpaper("wallpaper-631eb344-d546-4d85-8dad-c6ca35580c31", "旷野浮石", "品牌意象", "wallpaper-631eb344-d546-4d85-8dad-c6ca35580c31.webp"),
+  wallpaper("wallpaper-478de1bd-4d92-41c8-bd64-72bd976ab3f9", "金穗海岬", "自然风景", "wallpaper-478de1bd-4d92-41c8-bd64-72bd976ab3f9.webp"),
   wallpaper("wallpaper-71e830d1-94f5-402a-b8c4-8cf06cfc3cb9", "流金沙丘", "自然风景", "wallpaper-71e830d1-94f5-402a-b8c4-8cf06cfc3cb9.webp"),
-  wallpaper("wallpaper-332d88d4-0459-4e8b-a343-5f0035eb03ab", "向暮而行", "自然风景", "wallpaper-332d88d4-0459-4e8b-a343-5f0035eb03ab.jpg"),
-  wallpaper("wallpaper-e9ebdc5c-ec5b-4d87-b916-b1ad69fc2c0a", "幽蓝潮汐", "自然风景", "wallpaper-e9ebdc5c-ec5b-4d87-b916-b1ad69fc2c0a.jpg"),
+  wallpaper("wallpaper-332d88d4-0459-4e8b-a343-5f0035eb03ab", "向暮而行", "自然风景", "wallpaper-332d88d4-0459-4e8b-a343-5f0035eb03ab.webp"),
+  wallpaper("wallpaper-e9ebdc5c-ec5b-4d87-b916-b1ad69fc2c0a", "幽蓝潮汐", "自然风景", "wallpaper-e9ebdc5c-ec5b-4d87-b916-b1ad69fc2c0a.webp"),
   wallpaper("wallpaper-b52d186e-e328-4379-b715-37eb122c3dca", "冰湾孤舟", "自然风景", "wallpaper-b52d186e-e328-4379-b715-37eb122c3dca.webp", "image/webp"),
-  wallpaper("wallpaper-040c4db9-37e5-4f0f-a6ff-d5fbe51fb3e9", "暖丘独树", "自然风景", "wallpaper-040c4db9-37e5-4f0f-a6ff-d5fbe51fb3e9.jpg"),
+  wallpaper("wallpaper-040c4db9-37e5-4f0f-a6ff-d5fbe51fb3e9", "暖丘独树", "自然风景", "wallpaper-040c4db9-37e5-4f0f-a6ff-d5fbe51fb3e9.webp"),
   wallpaper("wallpaper-0af445ba-2bf4-4a34-886a-62aed9879bef", "赤沙雪岭", "自然风景", "wallpaper-0af445ba-2bf4-4a34-886a-62aed9879bef.webp"),
-  wallpaper("wallpaper-8c6413cf-e932-4f4d-940e-924d8600c484", "粉霞雪峰", "自然风景", "wallpaper-8c6413cf-e932-4f4d-940e-924d8600c484.jpg"),
+  wallpaper("wallpaper-8c6413cf-e932-4f4d-940e-924d8600c484", "粉霞雪峰", "自然风景", "wallpaper-8c6413cf-e932-4f4d-940e-924d8600c484.webp"),
   wallpaper("wallpaper-914b554f-53e8-40d6-ae8f-0d4576db336a", "云上雪峰", "自然风景", "wallpaper-914b554f-53e8-40d6-ae8f-0d4576db336a.webp"),
-  wallpaper("wallpaper-01a67213-86df-4270-abef-f0fe521671c9", "雪域印记", "品牌意象", "wallpaper-01a67213-86df-4270-abef-f0fe521671c9.jpg"),
+  wallpaper("wallpaper-01a67213-86df-4270-abef-f0fe521671c9", "雪域印记", "品牌意象", "wallpaper-01a67213-86df-4270-abef-f0fe521671c9.webp"),
   wallpaper("wallpaper-e3a448d2-084d-4724-a6ee-6b21a9440f1e", "绿雾遗迹", "巨石遗迹", "wallpaper-e3a448d2-084d-4724-a6ee-6b21a9440f1e.jpg"),
-  wallpaper("wallpaper-9402e2a8-2e52-409c-a48e-0459a96876e4", "青原遗迹", "巨石遗迹", "wallpaper-9402e2a8-2e52-409c-a48e-0459a96876e4.jpg"),
+  wallpaper("wallpaper-9402e2a8-2e52-409c-a48e-0459a96876e4", "青原遗迹", "巨石遗迹", "wallpaper-9402e2a8-2e52-409c-a48e-0459a96876e4.webp"),
   wallpaper("wallpaper-fff99ed7-a448-4379-aa98-1bc0e0cbffa1", "金沙遗迹", "巨石遗迹", "wallpaper-fff99ed7-a448-4379-aa98-1bc0e0cbffa1.jpg"),
   wallpaper("wallpaper-1536accc-25cb-4533-9894-029700d2731e", "霜蓝遗迹", "巨石遗迹", "wallpaper-1536accc-25cb-4533-9894-029700d2731e.jpg"),
   wallpaper("wallpaper-ada8a9d4-5749-4e74-b359-bca9a6a68551", "花海来信", "品牌意象", "wallpaper-ada8a9d4-5749-4e74-b359-bca9a6a68551.webp", "image/webp", "7ce008fc3c0f"),
   wallpaper("wallpaper-04aa9988-7d83-4863-9cc5-2fa5af1412b3", "蓝调霓虹", "品牌意象", "wallpaper-04aa9988-7d83-4863-9cc5-2fa5af1412b3.webp", "image/webp"),
-  wallpaper("wallpaper-dc3f84cd-17b1-4367-b246-022427e68fe0", "烈焰字迹", "品牌意象", "wallpaper-dc3f84cd-17b1-4367-b246-022427e68fe0.jpg"),
+  wallpaper("wallpaper-dc3f84cd-17b1-4367-b246-022427e68fe0", "烈焰字迹", "品牌意象", "wallpaper-dc3f84cd-17b1-4367-b246-022427e68fe0.webp"),
 ];
 
 // Official gallery order follows the curated selection; remaining bundled themes
@@ -88,16 +88,11 @@ export const communityWallpapers = bundledWallpapers.filter(item => !officialNam
 const communityWallpaperIds = new Set(communityWallpapers.map(item => item.id));
 export const isCommunityWallpaperTheme = id => communityWallpaperIds.has(id);
 
-// Saved spaces can still resolve retired themes; they are absent from the gallery.
-export const retiredOfficialWallpapers = [
-  wallpaper("wallpaper-2957e087-99e1-42ca-b27c-f7ac31f2a048", "紫境悬浮", "抽象光影", "wallpaper-2957e087-99e1-42ca-b27c-f7ac31f2a048.webp"),
-  wallpaper("wallpaper-202fd969-c0c3-41fa-bb47-682007a9b871", "钴蓝层峦", "抽象光影", "wallpaper-202fd969-c0c3-41fa-bb47-682007a9b871.webp"),
-  wallpaper("wallpaper-f89ae91b-7454-403e-b910-1cb548b9f00d", "琥珀序列", "抽象光影", "wallpaper-f89ae91b-7454-403e-b910-1cb548b9f00d.webp"),
-  wallpaper("wallpaper-78452d67-415d-4c92-ad58-47dbcda2b999", "冰蓝晨弧", "抽象光影", "wallpaper-78452d67-415d-4c92-ad58-47dbcda2b999.webp"),
-];
 
 export const officialWallpaperIds = new Set(officialWallpapers.map(item => item.id));
-export const bundledWallpaperIds = new Set([...bundledWallpapers, ...retiredOfficialWallpapers].map(item => item.id));
+export const bundledWallpaperIds = new Set(bundledWallpapers.map(item => item.id));
+export const getBundledWallpaper = id => bundledWallpapers.find(item => item.id === id);
+export const isBundledWallpaperTheme = id => bundledWallpaperIds.has(id);
 export const isOfficialWallpaperTheme = id => officialWallpaperIds.has(id);
 
 // Release builds keep wallpaper media outside the embedded frontend archive.
@@ -105,7 +100,7 @@ export const isOfficialWallpaperTheme = id => officialWallpaperIds.has(id);
 // does not have to resolve gallery images through the frontend protocol.
 export async function prepareOfficialWallpaperMedia() {
   if (import.meta.env.DEV || !isTauri()) return;
-  const wallpapers = [...bundledWallpapers, ...retiredOfficialWallpapers];
+  const wallpapers = bundledWallpapers;
   const videos = wallpapers.filter(item => item.mimeType.startsWith('video/'));
   const resolved = await Promise.all(videos.map(async item => {
     const source = new URL(item.url, window.location.origin);

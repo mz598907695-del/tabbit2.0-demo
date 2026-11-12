@@ -954,40 +954,9 @@
   margin-bottom: 24px;
   background: rgb(128 128 128 / 3%);
 }
-.overlay-voice-content,
 .overlay-result-content {
   padding-top: 36px;
   padding-bottom: 24px;
-}
-.overlay-voice-examples {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 23px;
-}
-.overlay-example-button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  background: transparent;
-  color: var(--text, #242424);
-  font: inherit;
-  font-size: 13px;
-  line-height: 1.6;
-  text-align: left;
-  width: 100%;
-  padding: 13px 14px;
-  border: 1px solid var(--border, #ececee);
-  border-radius: 12px;
-  cursor: pointer;
-}
-.overlay-example-button svg {
-  color: var(--muted, #888b92);
-  flex-shrink: 0;
-}
-.overlay-example-button:hover {
-  background: rgb(128 128 128 / 5%);
 }
 .overlay-query {
   padding: 15px 16px;

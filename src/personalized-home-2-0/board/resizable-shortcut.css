@@ -68,8 +68,6 @@
 }
 /* The inline name is card content, so the shared external-name switch does not
    remove it. Avoid repeating that name beneath the expanded navigation card. */
-.workspace-board .board-item.is-expanded-shortcut > .board-item-label {
-  display: none;
-}
+
 
 }

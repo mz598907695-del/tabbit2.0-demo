@@ -2,6 +2,10 @@
 .aiw-content { --aiw-content-soft: color-mix(in srgb,var(--text) 3%,var(--surface)); --aiw-content-hover: color-mix(in srgb,var(--text) 5%,var(--surface)); box-sizing:border-box; width:100%; max-width:1280px; min-width:0; margin:0 auto; padding:40px; color: var(--text); font-size: 14px; line-height: 1.5; }
 :scope:not([data-theme="dark"]) .aiw-content { --text:#111925; --aiwp-heading-color:#000; --muted:rgb(17 25 37 / 65%); --border:rgb(17 25 37 / 10%); --aiw-content-soft:rgb(17 25 37 / 3%); --aiw-content-hover:rgb(17 25 37 / 5%); }
 .aiw-content *, .aiw-content-dialog * { box-sizing: border-box; }
+/* Carry the available page height through the module wrapper so empty states
+   can center in the results area below the header and filters. */
+.aiw-page-host > div:has(> .aiw-content :is(.aiwt-empty,.aiwf-empty)) { display:flex; flex-direction:column; min-height:100%; }
+.aiw-page-host > div > .aiw-content:has(:is(.aiwt-empty,.aiwf-empty)) { flex:1; }
 
 /* Output pages have three layout sections: title, tools, and results. */
 :is(.aiw-content-files,.aiw-content-shares) > .aiw-content-primary { display:flex; flex-direction:column; gap:16px; }

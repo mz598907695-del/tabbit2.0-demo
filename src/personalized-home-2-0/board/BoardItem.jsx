@@ -1,14 +1,18 @@
 import { Minus, MoveDiagonal2 } from '../icons';
-import { BoardItemContent, BoardItemLabel, boardItemName } from './BoardItemContent';
+import { useCallback, useRef } from 'react';
+import { BoardItemContent, boardItemName } from './BoardItemContent';
 
 // One live board article: geometry, accessible interaction and editing controls.
 // The card's material and artwork are owned by BoardItemContent/home-surfaces.css.
 export default function BoardItem({
-  item, style, editing, selected, dragging, resizing, showLabels,
+  item, style, editing, selected, dragging, resizing,
   appearanceTheme, shortcutSize, shortcutShape, active,
   onSelect, onMoveKey, onPointerDown, onClickCapture, onContextMenu,
   onChange, onRemove, onResizeStart, onResize,
 }) {
+  const changeRef = useRef(onChange);
+  changeRef.current = onChange;
+  const change = useCallback(patch => changeRef.current?.(patch), []);
   const widget = item.type === 'widget';
   const name = boardItemName(item);
   const expanded = !widget && (item.w > 1 || item.h > 1);
@@ -29,9 +33,8 @@ export default function BoardItem({
     onPointerDown={onPointerDown} onClickCapture={onClickCapture} onContextMenu={onContextMenu}
   >
     <BoardItemContent item={item} appearanceTheme={appearanceTheme} shortcutSize={shortcutSize}
-      shortcutShape={shortcutShape} editing={editing} active={active} onChange={onChange}
+      shortcutShape={shortcutShape} editing={editing} active={active} onChange={change}
       onSelect={() => { if (editing) onSelect(); }} onKeyDown={event => { if (editing) onMoveKey(event); }}/>
-    <BoardItemLabel item={item} showLabels={showLabels}/>
     {editing && <button type="button" className="board-remove-button" aria-label={`删除${name}`} title={`删除${name}`}
       onClick={event => { event.stopPropagation(); onRemove(); }}>
       <Minus size={14} aria-hidden="true"/>

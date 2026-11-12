@@ -12,7 +12,7 @@ const list = value => Array.isArray(value) ? value.filter(item => item && typeof
 const integer = (value, fallback, min, max) => Math.round(boundedNumber(value, fallback, min, max));
 const words = locale => (zh, en) => locale.startsWith('en') ? en : zh;
 const titleFor = (config, fallback, en, locale) => locale.startsWith('en') && config === fallback ? en : text(config, locale.startsWith('en') ? en : fallback);
-const artwork = name => '/personalized-home-2-0/asset/widgets/editorial/' + name + '.png';
+const artwork = name => '/personalized-home-2-0/asset/widgets/editorial/' + name + '.webp';
 function EditorialArt({ name, className = '' }) { return <img className={'extra-editorial-art ' + className} src={artwork(name)} alt="" aria-hidden="true" draggable="false" decoding="async"/>; }
 function MiniButton({ children, ...props }) { return <WidgetButton className="extra-mini-button" {...props}>{children}</WidgetButton>; }
 function IconButton({ children, label, ...props }) { return <WidgetButton className="extra-icon-button" aria-label={label} title={label} {...props}>{children}</WidgetButton>; }

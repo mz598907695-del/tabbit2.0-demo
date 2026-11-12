@@ -25,7 +25,7 @@ function Workday({config,onChange,preview,active,locale}) {
 function Joke({config,onChange,preview,locale}) {
  const en=locale==='en-US',settings=normalizeJokeConfig(config,LINES.length),index=settings.index,text=settings.text.trim()||LINES[index][en?1:0];
  const next=()=>onChange?.({index:(index+1)%LINES.length,text:''});
- const artwork=<img className="lw-smile-art" src="/personalized-home-2-0/asset/widgets/editorial/quiet-smile.png" alt="" loading="lazy" decoding="async" draggable="false"/>;
+ const artwork=<img className="lw-smile-art" src="/personalized-home-2-0/asset/widgets/editorial/quiet-smile.webp" alt="" loading="lazy" decoding="async" draggable="false"/>;
  return <WidgetShell className="lw-joke" title={en?'A little smile':'轻松一刻'} icon={<Smile/>} preview={preview} footer={<WidgetButton disabled={preview} onClick={next}>{en?'One more':'换一句'} ↻</WidgetButton>} details={<div className="uw-stack"><section className="uw-detail-summary lw-joke-detail">{artwork}<blockquote>{text}</blockquote><WidgetButton onClick={next}>{en?'One more':'换一句'} ↻</WidgetButton></section><section className="uw-detail-section"><Field label={en?'Your own words':'写下自己的趣味文案'}><textarea value={settings.text} placeholder={en?'A thought to brighten the day':'给自己留一句轻松的话'} maxLength={2000} onChange={e=>onChange?.({text:e.target.value})}/></Field><p className="uw-detail-caption">{en?'Saved as you type. Leave blank to use the daily collection.':'输入自动保存，留空时使用内置文案。'}</p></section></div>}>{artwork}<p className="lw-joke-copy">{text}</p></WidgetShell>;
 }
 export function LeisureWidgetContent(props) { const Component={'workday-countdown':Workday,joke:Joke,image:DailyPictureWidget}[props.kind];return Component?<Component {...props}/>:null; }

@@ -30,8 +30,8 @@ test('theme changes lighting while preserving the current scene and refresh sele
   const dark = getDailyPicture(patch, now, 'dark');
   assert.equal(light.id, dark.id);
   assert.notEqual(light.src, dark.src);
-  assert.match(light.src, /-morning\.png$/);
-  assert.match(dark.src, /-dusk\.png$/);
+  assert.match(light.src, /-morning\.webp$/);
+  assert.match(dark.src, /-dusk\.webp$/);
 });
 
 test('legacy uploaded photos are retained and can be explicitly returned to the daily collection', () => {

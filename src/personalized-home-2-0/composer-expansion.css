@@ -3,7 +3,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
   min-width: 0;
 }
 .tb-composer-frame::before {
@@ -64,8 +64,10 @@
   height: 0;
   min-width: 0;
   overflow: hidden;
-  transition: height 320ms cubic-bezier(.22, 1, .36, 1);
+  margin-top: 0;
+  transition: height 320ms cubic-bezier(.22, 1, .36, 1), margin-top 320ms cubic-bezier(.22, 1, .36, 1);
 }
+.home-feed > .tb-composer-wrap > .tb-composer-frame > .tb-composer-expansion.is-expanded:not(.tb-composer-task-expansion) { margin-top: 6px; }
 .tb-composer-expansion-body {
   min-height: 0;
   overflow: auto;

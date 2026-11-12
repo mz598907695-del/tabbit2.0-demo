@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 import { WALLPAPER_LAYOUT_EVENT } from '../../windowWallpaper';
+import { BROWSER_LAYOUT_SETTLED_EVENT, isBrowserLayoutChanging } from '../../browserLayoutMotion';
 
 export function useWindowWallpaperLayout(homeRef) {
   useLayoutEffect(() => {
@@ -12,6 +13,7 @@ export function useWindowWallpaperLayout(homeRef) {
     const root = document.documentElement;
     let lastLayout = '';
     const sync = () => {
+      if (isBrowserLayoutChanging()) return;
       const content = anchor.getBoundingClientRect();
       const viewport = root.getBoundingClientRect();
       // Hidden persistent pages retain the last visible composition.
@@ -33,8 +35,10 @@ export function useWindowWallpaperLayout(homeRef) {
     const observer = new ResizeObserver(sync);
     observer.observe(anchor);
     observer.observe(root);
+    window.addEventListener(BROWSER_LAYOUT_SETTLED_EVENT, sync);
     return () => {
       observer.disconnect();
+      window.removeEventListener(BROWSER_LAYOUT_SETTLED_EVENT, sync);
       for (const property of ['left', 'top', 'width', 'height']) root.style.removeProperty(`--wallpaper-canvas-${property}`);
     };
   }, [homeRef]);

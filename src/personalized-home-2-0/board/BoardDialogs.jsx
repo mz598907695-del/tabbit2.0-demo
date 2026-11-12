@@ -3,6 +3,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Grid2X2, Pencil, Plus, Search, X } from "../icons";
 import './board-dialogs.css';
+import { ConfirmDialog } from '../StandardDialog';
 import ShortcutCatalog from './ShortcutCatalog';
 import FadeText from './FadeText';
 import { daysUntil } from './widget-data';
@@ -132,7 +133,7 @@ function BoardModal({ title, description, className = '', initialFocusRef, skipR
   return createPortal(
     <dialog
       ref={dialogRef}
-      className={`board-dialog ${className}`}
+      className={`board-dialog standard-dialog ${className}`}
       aria-labelledby={`${id}-title`}
       aria-describedby={description ? `${id}-description` : undefined}
       role={alert ? 'alertdialog' : undefined}
@@ -665,12 +666,6 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
   </BoardModal>;
 }
 
-export function BoardConfirm({ title, description, onConfirm, onClose, confirmLabel = '确认', className = '', anchorRef }) {
-  const cancelRef = useRef(null);
-  return <BoardModal title={title} description={description} className={`board-confirm-dialog ${className}`} initialFocusRef={cancelRef} anchorRef={anchorRef} onClose={onClose} alert>
-    <footer className="board-dialog-footer">
-      <button ref={cancelRef} type="button" className="board-dialog-secondary" onClick={onClose}>取消</button>
-      <button type="button" className="board-dialog-primary" onClick={onConfirm}>{confirmLabel}</button>
-    </footer>
-  </BoardModal>;
+export function BoardConfirm(props) {
+  return <ConfirmDialog {...props}/>;
 }

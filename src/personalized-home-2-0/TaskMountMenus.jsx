@@ -1,3 +1,4 @@
+import { ConfirmDialog } from './StandardDialog';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { ArrowLeft, Check, Cloud, Files, Folder, FolderCog, FolderPlus, Globe, Laptop, Pencil, Plus, Search, Table2, Trash2, X } from "./icons";
 import './task-mount-menus.css';
@@ -15,7 +16,6 @@ function ProjectChoices({ projects, selectedProjectId, onSelectProject, onCreate
   const nameRef = useRef(null);
   const editRef = useRef(null);
   const listRef = useRef(null);
-  const cancelDeleteRef = useRef(null);
   const [view, setView] = useState('picker');
   const [query, setQuery] = useState('');
   const [name, setName] = useState('');
@@ -37,9 +37,6 @@ function ProjectChoices({ projects, selectedProjectId, onSelectProject, onCreate
     }
   }, [editingId]);
 
-  useLayoutEffect(() => {
-    if (deletingId) cancelDeleteRef.current?.focus({ preventScroll: true });
-  }, [deletingId]);
 
   function showPicker() {
     setView('picker');
@@ -181,13 +178,9 @@ function ProjectChoices({ projects, selectedProjectId, onSelectProject, onCreate
             <button id={`${inputId}-rename-${project.id}`} type="button" className="tb-project-icon-button" aria-label={`重命名项目：${project.name}`} title="重命名" onClick={() => { setEditingId(project.id); setEditName(project.name); setDeletingId(null); setError(''); }}><Pencil size={15} aria-hidden="true" /></button>
             <button id={`${inputId}-delete-${project.id}`} type="button" className="tb-project-icon-button" aria-label={`删除项目：${project.name}`} title="删除" onClick={() => { setDeletingId(project.id); setEditingId(null); setError(''); }}><Trash2 size={15} aria-hidden="true" /></button>
           </div>}
-          {deletingId === project.id && <div className="tb-project-delete-confirm" role="group" aria-label={`确认删除项目：${project.name}`}>
-            <p>删除“{project.name}”？</p>
-            <div>
-              <button ref={cancelDeleteRef} type="button" className="tb-project-text-button" onClick={() => { setDeletingId(null); focusAction(project.id, 'delete'); }}>取消</button>
-              <button type="button" className="tb-project-text-button is-destructive" onClick={() => { onDeleteProject(project.id); setDeletingId(null); nameRef.current?.focus({ preventScroll: true }); }}>删除</button>
-            </div>
-          </div>}
+          {deletingId === project.id && <ConfirmDialog title={`删除项目“${project.name}”？`} description="将从任务项目列表中移除此项目。" confirmLabel="删除项目"
+            onClose={() => { setDeletingId(null); focusAction(project.id, 'delete'); }}
+            onConfirm={() => { onDeleteProject(project.id); setDeletingId(null); requestAnimationFrame(() => nameRef.current?.focus({ preventScroll: true })); }}/>}
         </div>)}
       </section>
     </>}

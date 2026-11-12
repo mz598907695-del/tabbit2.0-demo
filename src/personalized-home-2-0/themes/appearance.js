@@ -1,24 +1,17 @@
-import { getIllustratedTheme } from "./catalog.js";
-import { monochromeThemes, retiredShaderThemes } from "./monochrome-themes.js";
-import { scrollThemes } from "./scroll-themes.js";
 import { isWallpaperTheme } from "./wallpapers.js";
-import { isExampleWallpaperTheme } from "./exampleWallpapers.js";
-import { isOceanTheme } from './ocean/catalog.js';
+import { isBundledWallpaperTheme } from "./officialWallpapers.js";
 
-const isArtworkWallpaperTheme = theme => isWallpaperTheme(theme) || isExampleWallpaperTheme(theme) || isOceanTheme(theme);
+const isArtworkWallpaperTheme = theme => isWallpaperTheme(theme) || isBundledWallpaperTheme(theme);
 
 export const LEGACY_LIQUID_GLASS_THEME = "liquid-glass";
 
 export const officialBackgrounds = {
   light: "#ffffff", cream: "#f5f1e9", mint: "#edf5f0", dark: "#191a1c",
-  ...Object.fromEntries(monochromeThemes.map(theme => [theme.id, theme.color])),
-  ...Object.fromEntries(scrollThemes.map(theme => [theme.id, theme.color])),
 };
 
 export function getThemeBackground(theme, appearance = "light") {
   if (isArtworkWallpaperTheme(theme)) return officialBackgrounds[appearance === "dark" ? "dark" : "light"];
-  return Object.hasOwn(officialBackgrounds, theme) ? officialBackgrounds[theme]
-    : getIllustratedTheme(theme)?.scene.bg || officialBackgrounds.light;
+  return Object.hasOwn(officialBackgrounds, theme) ? officialBackgrounds[theme] : officialBackgrounds.light;
 }
 
 export function getThemeAppearance(theme) {
@@ -49,9 +42,8 @@ export function resolveThemePreferences(saved = {}, systemDark = false) {
     const appearance = ["system", "light", "dark"].includes(saved.appearance) ? saved.appearance : "light";
     saved = { ...saved, theme: matchThemeToAppearance(saved.theme, appearance, systemDark), appearance, appearanceVersion: 1 };
   }
-  if (Object.hasOwn(retiredShaderThemes, saved.theme)) saved = { ...saved, theme: retiredShaderThemes[saved.theme] };
   const systemAppearance = systemDark ? "dark" : "light";
-  const hasTheme = Object.hasOwn(officialBackgrounds, saved.theme) || Boolean(getIllustratedTheme(saved.theme)) || isArtworkWallpaperTheme(saved.theme);
+  const hasTheme = Object.hasOwn(officialBackgrounds, saved.theme) || isArtworkWallpaperTheme(saved.theme);
   // New visitors start in 白昼. A saved theme or explicit system preference is
   // still authoritative, so changing the default never overwrites a choice.
   let appearance = ["system", "light", "dark"].includes(saved.appearance)

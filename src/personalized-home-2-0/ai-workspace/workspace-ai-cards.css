@@ -1,6 +1,5 @@
 @scope (.personalized-home) {
 .aiw-content-files > .aiw-content-primary[hidden] { display:none; }
-.aiwc-empty-action { margin-top:16px; }
 .aiwc-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr)); gap:20px; align-items:start; align-content:start; }
 .aiwc-gallery-card { min-width:0; overflow:hidden; border:1px solid var(--border); border-radius:18px; background:var(--surface); box-shadow:0 1px 2px rgb(0 0 0 / 4%); }
 .aiwc-gallery-open { display:block; width:100%; min-width:0; padding:10px 10px 0; background:none; border:0; text-align:left; }

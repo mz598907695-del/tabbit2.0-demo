@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { pickSpaceIcon } from './spaceIcons';
+import { beginBrowserLayoutChange } from './browserLayoutMotion';
 import './styles/tokens.css';
 import './styles/semantic.css';
 import './iconfont.css';
@@ -154,7 +155,7 @@ function App() {
   </BrowserContent>;
 
   const verticalControls = <div className="vertical-topbar-controls">
-    <button className="vertical-mode-toggle" aria-label={verticalCollapsed ? '展开垂直标签栏' : '收起垂直标签栏'} aria-expanded={!verticalCollapsed} onClick={() => setVerticalCollapsed(value => !value)}>
+    <button className="vertical-mode-toggle" aria-label={verticalCollapsed ? '展开垂直标签栏' : '收起垂直标签栏'} aria-expanded={!verticalCollapsed} onClick={() => { beginBrowserLayoutChange(); setVerticalCollapsed(value => !value); }}>
       <VerticalToggleIcon/>
     </button>
     <button className="vertical-space-entry" aria-label="空间菜单" onClick={event => { event.stopPropagation(); showSpaceMenu(); }}>
@@ -164,7 +165,7 @@ function App() {
 
   return (
     <SpaceContext.Provider value={spaceContext}>
-      <main className={`glass-surface mode-${mode} ${verticalCollapsed ? 'vertical-collapsed' : ''}`} onClick={() => setMenuOpen(false)}>
+      <main className={`glass-surface mode-${mode} ${isNewTab ? 'has-new-tab' : ''} ${verticalCollapsed ? 'vertical-collapsed' : ''}`} onClick={() => setMenuOpen(false)}>
         <div className="container-fill" aria-hidden="true">
           {getWallpaperLayers(windowWallpaper.wallpaper, windowWallpaper.transition).filter(layer => layer.scene.url).map(({ scene, incoming, outgoing }) => (
             <div key={scene.id} className={`container-wallpaper-background${incoming ? ' is-incoming' : ''}${outgoing ? ' is-outgoing' : ''}`}>
@@ -195,7 +196,7 @@ function App() {
                 <div className="vertical-sidebar-stack">
                   {visibleSpaceIds.map(id => (
                     <div key={id} className="vertical-space-sidebar-layer" hidden={id !== selectedSpace} inert={id !== selectedSpace}>
-                      <VerticalSidebar spaceId={id} activeTab={activeTabs[id] ?? initialSpaceTab(id)} onTab={setVerticalActiveTab} collapsed={verticalCollapsed} active={id === selectedSpace}/>
+                      <VerticalSidebar spaceId={id} activeTab={activeTabs[id] ?? initialSpaceTab(id)} onTab={setVerticalActiveTab} collapsed={id === selectedSpace && verticalCollapsed} active={id === selectedSpace}/>
                     </div>
                   ))}
                 </div>

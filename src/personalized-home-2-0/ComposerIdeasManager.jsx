@@ -1,3 +1,4 @@
+import { ConfirmDialog } from './StandardDialog';
 import { getHomeRoot } from "./home-host";
 import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -10,7 +11,6 @@ export default function ComposerIdeasManager({ customCommands, onSave, onDelete,
   const createRef = useRef(null);
   const closeRef = useRef(null);
   const nameRef = useRef(null);
-  const cancelDeleteRef = useRef(null);
   const itemRefs = useRef(new Map());
   const backdropRef = useRef(false);
   const composingRef = useRef(false);
@@ -38,9 +38,7 @@ export default function ComposerIdeasManager({ customCommands, onSave, onDelete,
     if (editor) {
       nameRef.current?.focus({ preventScroll: true });
       if (editor.id) nameRef.current?.select();
-    } else if (deleteId) {
-      cancelDeleteRef.current?.focus({ preventScroll: true });
-    } else {
+    } else if (!deleteId) {
       const createdId = createdNameRef.current
         ? customCommands.find(command => command.name === createdNameRef.current)?.id
         : null;
@@ -118,7 +116,7 @@ export default function ComposerIdeasManager({ customCommands, onSave, onDelete,
 
   return createPortal(<dialog
     ref={dialogRef}
-    className="tb-command-dialog tb-ideas-manager"
+    className="tb-command-dialog tb-ideas-manager standard-dialog"
     data-composer-owner={owner}
     aria-labelledby={`${id}-title`}
     onCancel={event => { event.preventDefault(); event.stopPropagation(); dismissLayer(); }}
@@ -172,14 +170,7 @@ export default function ComposerIdeasManager({ customCommands, onSave, onDelete,
                 <button type="button" className="tb-composer-icon" aria-label={`删除妙招：${command.name}`} title="删除" onClick={() => { restoreItemRef.current = command.id; setDeleteId(command.id); setError(''); }}><Trash2 size={16} aria-hidden="true" /></button>
               </div>
             </div>
-            {deleteId === command.id && <div className="tb-ideas-manager-delete" role="group" aria-label={`确认删除妙招：${command.name}`}>
-              <p>删除「{command.name}」？</p>
-              {error && <p className="tb-composer-error" role="alert">{error}</p>}
-              <div>
-                <button ref={cancelDeleteRef} type="button" className="tb-composer-secondary" onClick={returnToList}>取消</button>
-                <button type="button" className="tb-composer-secondary tb-ideas-manager-danger" onClick={() => remove(command)}>删除</button>
-              </div>
-            </div>}
+            {deleteId === command.id && <ConfirmDialog title={`删除妙招“${command.name}”？`} description="删除后将不再出现在自定义妙招中。" confirmLabel="删除妙招" error={error} onClose={returnToList} onConfirm={() => remove(command)}/>}
           </li>)}
         </ul> : <div className="tb-ideas-manager-empty">
           <Lightbulb size={25} aria-hidden="true" />

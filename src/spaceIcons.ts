@@ -1,5 +1,5 @@
 // Original space artwork supplied in Desktop/download.
-const files = import.meta.glob<string>("./assets/space-picker/*.png", { eager: true, import: "default", query: "?url" });
+const files = import.meta.glob<string>("./assets/space-picker/*.{png,webp}", { eager: true, import: "default", query: "?url" });
 const names = [
   "汉堡", "鸡腿", "月饼", "米饭", "薯条", "苹果",
   "猴子", "熊猫", "狗", "狐狸", "牛", "考拉",
@@ -10,7 +10,7 @@ const names = [
   "大便", "笑脸", "庆祝", "恶魔", "发烧", "酷",
   "仙人掌", "树", "花", "蘑菇", "盆栽", "三叶草",
 ];
-export const spaceIconOptions = names.map((name) => ({ name, src: files[`./assets/space-picker/${name}.png`] }));
+export const spaceIconOptions = names.map((name) => ({ name, src: files[`./assets/space-picker/${name}.webp`] || files[`./assets/space-picker/${name}.png`] }));
 export const spaceIconByName = Object.fromEntries(spaceIconOptions.map((icon) => [icon.name, icon.src]));
 
 export function pickSpaceIcon(name: string) {

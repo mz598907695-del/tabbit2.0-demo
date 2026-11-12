@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { BROWSER_LAYOUT_SETTLED_EVENT, isBrowserLayoutChanging } from '../browserLayoutMotion';
 import { composerScrollFrame, composerScrollProgress, createComposerScrollRenderer, DOCK_HEIGHT, DOCK_TOP, followScrollProgress } from './composer-scroll';
 
 export function useComposerScroll(rootRef, { overlayOpen }) {
@@ -92,7 +93,7 @@ export function useComposerScroll(rootRef, { overlayOpen }) {
       else lastTime = 0;
     }
     function wake() { if (!frame) frame = requestAnimationFrame(tick); }
-    function resize() { measureNeeded = true; wake(); }
+    function resize() { if (!isBrowserLayoutChanging()) { measureNeeded = true; wake(); } }
     function pointerdown(event) {
       if (event.button !== 0 || !event.isPrimary) return;
       if (owns(event.target)) pressedPointer = event.pointerId;
@@ -144,6 +145,7 @@ export function useComposerScroll(rootRef, { overlayOpen }) {
     root.addEventListener('keydown', keydown);
     window.addEventListener('blur', windowBlur);
     window.addEventListener('resize', resize);
+    window.addEventListener(BROWSER_LAYOUT_SETTLED_EVENT, resize);
     motion.addEventListener('change', wake);
     wakeRef.current = wake;
     measure();
@@ -166,6 +168,7 @@ export function useComposerScroll(rootRef, { overlayOpen }) {
       root.removeEventListener('keydown', keydown);
       window.removeEventListener('blur', windowBlur);
       window.removeEventListener('resize', resize);
+      window.removeEventListener(BROWSER_LAYOUT_SETTLED_EVENT, resize);
       motion.removeEventListener('change', wake);
       wakeRef.current = null;
     };

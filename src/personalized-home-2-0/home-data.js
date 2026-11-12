@@ -1,12 +1,12 @@
 import { processedSiteIconFor } from '../siteIcons';
-import notionIcon from '../assets/favicons/notion.ico';
-import yangIcon from '../assets/favicons/yang.png';
-import purposetalentIcon from '../assets/favicons/purposetalent.png';
-import trickleIcon from '../assets/favicons/trickle.png';
-import grokIcon from '../assets/favicons/grok.png';
-import claudeIcon from '../assets/favicons/claude.ico';
-import nioIcon from '../assets/favicons/nio.ico';
-import onvoIcon from '../assets/favicons/onvo.ico';
+import notionIcon from '../assets/favicons/notion.webp';
+import yangIcon from '../assets/favicons/yang.webp';
+import purposetalentIcon from '../assets/favicons/purposetalent.webp';
+import trickleIcon from '../assets/favicons/trickle.webp';
+import grokIcon from '../assets/favicons/grok.webp';
+import claudeIcon from '../assets/favicons/claude.webp';
+import nioIcon from '../assets/favicons/nio.webp';
+import onvoIcon from '../assets/favicons/onvo.webp';
 export const asset = (name) => `/personalized-home-2-0/asset/icons/${name}.svg`;
 const originalBrands = {
   notion: { image: notionIcon, url: "https://www.notion.so", service: "Notion" },
@@ -88,7 +88,7 @@ export const promotions = [
     description: "设为默认浏览器，享受更佳体验，还可领取标准版会员。",
     action: "将 Tabbit 设为默认浏览器",
     inlineAction: "设为默认",
-    image: "/personalized-home-2-0/asset/images/default-browser.png",
+    image: "/personalized-home-2-0/asset/images/default-browser.webp",
     alt: "紫色光影中的速度表",
     kind: "default-browser",
     dialogEyebrow: "更顺手的浏览，从这里开始",
@@ -99,7 +99,7 @@ export const promotions = [
     description: "邀请新用户注册并完成对话，双方各得专业版会员",
     action: "去看看",
     inlineAction: "邀请好友",
-    image: "/personalized-home-2-0/asset/images/gift.jpg",
+    image: "/personalized-home-2-0/asset/images/gift.webp",
     alt: "暖红色光影中的礼盒",
     kind: "invite",
     dialogEyebrow: "把好用的，分享给好友",
@@ -109,7 +109,7 @@ export const promotions = [
     description: "完成学生认证，免费领取 30 天专业版会员",
     action: "领取开学福利",
     inlineAction: "领取福利",
-    image: "/personalized-home-2-0/asset/images/promotion-settings.jpg",
+    image: "/personalized-home-2-0/asset/images/promotion-settings.webp",
     alt: "紫色光影中的齿轮",
     kind: "promotion-preview",
     dialogEyebrow: "新学期，一起开启更多可能",

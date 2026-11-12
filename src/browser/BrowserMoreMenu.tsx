@@ -6,7 +6,7 @@ import {
   Lightbulb, MessageCircle, Minus, MonitorDown, PanelTopOpen, Plus, Printer,
   Puzzle, Scissors, Settings2, Share2, SquarePlus, Star, Wrench, ZoomIn,
 } from 'lucide-react';
-import profileAvatar from '../assets/profile-avatar.png';
+import profileAvatar from '../assets/profile-avatar.webp';
 import DropdownPanel from '../DropdownPanel';
 import './browser-more-menu.css';
 

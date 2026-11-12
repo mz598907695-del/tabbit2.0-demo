@@ -39,7 +39,7 @@ export default function OfficialSkills({ section, onOpen }) {
     <div className="aiws-official-rail" ref={railRef} data-left={scrolling && edges.left} data-right={scrolling && edges.right}>
       {section.items.map(item => <article className="aiwf-card aiws-official-card" key={item.id}>
         <button className="aiwf-card-open" aria-label={`查看 ${item.title}详情`} onClick={() => onOpen(item)}>
-          <img className="aiws-official-image" src={`/personalized-home-2-0/asset/official-skills/${item.officialIcon}.png?v=3`} alt="" width="48" height="48"/>
+          <img className="aiws-official-image" src={`/personalized-home-2-0/asset/official-skills/${item.officialIcon}.webp`} alt="" width="36" height="36"/>
           <span className="aiws-official-copy"><span className="aiwf-card-title" title={item.title}>{item.title}</span><span className="aiwf-card-description" title={item.description}>{item.description}</span></span>
         </button>
       </article>)}

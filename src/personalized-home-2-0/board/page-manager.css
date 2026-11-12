@@ -45,13 +45,6 @@
 .page-manager-rename input { width: 0; min-width: 0; flex: 1; height: 34px; padding: 6px 9px; border: 1px solid var(--border); border-radius: 8px; color: var(--text); background: var(--segmented); font: inherit; font-size: 13px; }
 .page-manager-add-error { margin: -4px 16px 14px; color: #bd4444; font-size: 12px; line-height: 18px; }
 :scope[data-theme='dark'] .page-manager-add-error { color: #f28b8b; }
-.board-dialog.page-manager-delete-dialog { width: min(380px, calc(var(--home-viewport-width) - 32px)); border-radius: 20px; }
-.page-manager-delete-dialog .board-dialog-header { padding: 22px 22px 18px; }
-.page-manager-delete-dialog .board-dialog-heading h2 { font-size: 16px; line-height: 24px; }
-.page-manager-delete-dialog .board-dialog-heading p { font-size: 13px; line-height: 21px; }
-.page-manager-delete-dialog .board-dialog-footer { padding: 0 22px 22px; border-top: 0; }
-.page-manager-delete-dialog .board-dialog-primary { background: #c14545; color: #fff; }
-:scope[data-theme='dark'] .page-manager-delete-dialog .board-dialog-primary { background: #d95757; }
 .page-manager :is(button, input):focus-visible { outline: 2px solid var(--focus-indicator, currentColor); outline-offset: -2px; }
 .page-manager-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 @container (max-width: 940px) { .page-manager-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; } }

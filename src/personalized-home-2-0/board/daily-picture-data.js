@@ -4,13 +4,13 @@ const BASE = '/personalized-home-2-0/asset/widgets/daily';
 export const DAILY_PICTURES = [
   {
     id: 'forest',
-    light: { src: `${BASE}/forest-morning.png`, title: '晨间花影', titleEn: 'Petals in morning light', alt: '白色花瓣迎着柔和晨光，在朦胧绿意中舒展。', altEn: 'White petals open into soft morning light and quiet green bokeh.', position: '60% 42%' },
-    dark: { src: `${BASE}/forest-dusk.png`, title: '暮色木兰', titleEn: 'Magnolia at dusk', alt: '木兰花映着暮色与微光，深绿背景宁静柔和。', altEn: 'Magnolia petals catch the last light against deep, quiet greens.' },
+    light: { src: `${BASE}/forest-morning.webp`, title: '晨间花影', titleEn: 'Petals in morning light', alt: '白色花瓣迎着柔和晨光，在朦胧绿意中舒展。', altEn: 'White petals open into soft morning light and quiet green bokeh.', position: '60% 42%' },
+    dark: { src: `${BASE}/forest-dusk.webp`, title: '暮色木兰', titleEn: 'Magnolia at dusk', alt: '木兰花映着暮色与微光，深绿背景宁静柔和。', altEn: 'Magnolia petals catch the last light against deep, quiet greens.' },
   },
   {
     id: 'lake',
-    light: { src: `${BASE}/lake-morning.png`, title: '晨雾湖心', titleEn: 'Morning mist on the lake', alt: '清晨的湖面映着柔和天光，远山在薄雾中舒展。', altEn: 'A calm lake reflects morning light beneath softly misted hills.' },
-    dark: { src: `${BASE}/lake-dusk.png`, title: '蓝调湖光', titleEn: 'Blue hour on the lake', alt: '蓝调暮色落在平静湖面，远处山影若隐若现。', altEn: 'Blue-hour light rests on a still lake and distant mountain silhouettes.' },
+    light: { src: `${BASE}/lake-morning.webp`, title: '晨雾湖心', titleEn: 'Morning mist on the lake', alt: '清晨的湖面映着柔和天光，远山在薄雾中舒展。', altEn: 'A calm lake reflects morning light beneath softly misted hills.' },
+    dark: { src: `${BASE}/lake-dusk.webp`, title: '蓝调湖光', titleEn: 'Blue hour on the lake', alt: '蓝调暮色落在平静湖面，远处山影若隐若现。', altEn: 'Blue-hour light rests on a still lake and distant mountain silhouettes.' },
   },
 ];
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ChevronDown, Copy, Paperclip, X } from '../icons';
+import { ChevronDown, Copy, Paperclip } from '../icons';
 import { Composer } from '../Composer';
 import { initialConversationMessages, makeConversationExchange, readConversationMessages, writeConversationMessages } from './workspace-conversation-data';
 import './workspace-conversation.css';
@@ -61,11 +61,10 @@ function AssistantDemo({ type }) {
   return null;
 }
 
-function ConversationSession({ conversation, active, blocked, onVoice, onOverlayChange }) {
+function ConversationSession({ conversation, active, blocked, onOverlayChange }) {
   const composerRef = useRef(null);
   const scrollRef = useRef(null);
   const [messages, setMessages] = useState(() => readConversationMessages(conversation, browserStorage()));
-  const [voiceNotice, setVoiceNotice] = useState(false);
   const sequence = useRef(0);
   const reportOverlay = useCallback(open => { if (active && !blocked) onOverlayChange?.(open); }, [active, blocked, onOverlayChange]);
 
@@ -103,8 +102,7 @@ function ConversationSession({ conversation, active, blocked, onVoice, onOverlay
       </div>
     </div>
     <div className="aiw-conversation-footer">
-      {voiceNotice && <div className="aiw-conversation-notice" role="status">语音输入尚未接入，可以直接输入内容。<button aria-label="关闭语音提示" onClick={() => setVoiceNotice(false)}><X size={14}/></button></div>}
-      <Composer ref={composerRef} onSubmit={sendMessage} onVoice={onVoice || (() => setVoiceNotice(true))} onOverlayChange={reportOverlay}/>
+      <Composer ref={composerRef} onSubmit={sendMessage} onOverlayChange={reportOverlay}/>
     </div>
   </section>;
 }
@@ -113,7 +111,7 @@ function ConversationSession({ conversation, active, blocked, onVoice, onOverlay
 // keeps its own Composer mounted, including drafts, files, models and task state.
 // Hidden sessions close their portals and are inert; the homepage Composer is
 // independent and is never moved, reset or remounted by this component.
-export default function WorkspaceConversation({ conversations, conversationId, active = true, blocked = false, onVoice, onOverlayChange }) {
+export default function WorkspaceConversation({ conversations, conversationId, active = true, blocked = false, onOverlayChange }) {
   const [visitedIds, setVisitedIds] = useState(() => conversationId ? [conversationId] : []);
   useEffect(() => {
     if (conversationId) setVisitedIds(previous => previous.includes(conversationId) ? previous : [...previous, conversationId]);
@@ -122,7 +120,7 @@ export default function WorkspaceConversation({ conversations, conversationId, a
   return <div className="aiw-page-host aiw-conversation-host" hidden={!active} inert={!active || blocked || undefined}>
     {renderedIds.map(id => {
       const conversation = conversations.find(item => item.id === id);
-      return conversation ? <ConversationSession key={id} conversation={conversation} active={active && id === conversationId} blocked={blocked} onVoice={onVoice} onOverlayChange={onOverlayChange}/> : null;
+      return conversation ? <ConversationSession key={id} conversation={conversation} active={active && id === conversationId} blocked={blocked} onOverlayChange={onOverlayChange}/> : null;
     })}
   </div>;
 }

@@ -1,4 +1,4 @@
-// Small WebGL2 helpers shared by the scroll-driven wallpapers.
+// Small WebGL2 helpers for the task shockwave overlay.
 const VERTEX = `#version 300 es
 in vec2 aPosition;
 out vec2 vUv;

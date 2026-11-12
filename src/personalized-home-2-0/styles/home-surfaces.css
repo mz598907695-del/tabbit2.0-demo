@@ -38,6 +38,15 @@
   overflow: hidden;
   border-radius: inherit;
 }
+/* Card geometry and the outer glass/rim stay present. Skip only clipped widget
+   contents below the scrollport, so containment cannot cut off card shadows. */
+.board-widget-card > .board-card-content {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 240px;
+}
+[data-page-swiping] .board-widget-card > .board-card-content {
+  content-visibility: visible;
+}
 
 :scope[data-theme='light'][data-material='liquid-glass'] .board-card {
   --home-surface-backdrop: blur(16px) saturate(var(--liquid-saturation));
@@ -45,7 +54,7 @@
 /* All dark homepage surfaces share the gradient, top light and bottom edge. */
 :scope[data-theme='dark'] :is(.board-card, :is(.home-feed, .aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap .tb-composer-surface, .home-feed > .promotion-inline-carousel, .corner-promotion .promotion-card) {
   --home-surface-brightness: 1.4;
-  --home-surface-dither: url('/personalized-home-2-0/asset/material-dither.png');
+  --home-surface-dither: url('/personalized-home-2-0/asset/material-dither.webp');
   --home-content-surface-fill: linear-gradient(#33333366, #3333334d);
   --home-surface-backdrop: blur(30px) saturate(100%);
   --home-surface-elevation: none;
@@ -88,6 +97,13 @@
   backdrop-filter: var(--home-surface-backdrop, var(--home-content-surface-backdrop));
   filter: brightness(var(--home-surface-brightness, 1));
   pointer-events: none;
+}
+/* Distant cards retain geometry but need no live backdrop sampling. The
+   observer restores the identical material before the card enters view. */
+:scope[data-theme] .board-widget-card[data-widget-near="false"]::before {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  filter: none;
 }
 /* One rim above the artwork, outside the inner content clip. */
 :scope[data-theme] .board-card::after,
@@ -137,7 +153,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   :scope[data-theme] .board-card,
-  :scope[data-theme] .board-card::after,
-  .home .workspace-board .board-item-label-text { transition: none; }
+  :scope[data-theme] .board-card::after { transition: none; }
 }
 }

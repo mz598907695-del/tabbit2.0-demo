@@ -2,7 +2,7 @@ import { isVideoWallpaper, waitForWallpaperMedia } from './wallpaper-video.js';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { SPACE_GESTURE_EVENT } from '../../spaceTransition';
 import { WINDOW_WALLPAPER_EVENT } from '../../windowWallpaper';
-import { getExampleWallpaper } from './exampleWallpapers';
+import { getBundledWallpaper } from './officialWallpapers';
 import { getThemeBackground, officialBackgrounds } from './appearance';
 import { useWallpaperSelectionTransition } from './useWallpaperSelectionTransition';
 
@@ -57,7 +57,7 @@ export function useSpaceWallpaperTransition(theme, wallpaper, wallpapers, appear
       const current = latest.current;
       const destinationTheme = localStorage.getItem(`tabbit-glass-theme:${detail.toSpaceId}`) || 'light';
       if (!active.current || active.current.toSpaceId !== detail.toSpaceId) {
-        const nextWallpaper = getExampleWallpaper(destinationTheme)
+        const nextWallpaper = getBundledWallpaper(destinationTheme)
           || current.wallpapers.find(item => item.id === destinationTheme);
         // Color-only gestures already have their native glass transition.
         if (!current.wallpaper && !nextWallpaper) return;
@@ -120,7 +120,7 @@ export function useSpaceWallpaperTransition(theme, wallpaper, wallpapers, appear
       const key = localStorage.key(i);
       if (!key?.startsWith('tabbit-glass-theme:')) continue;
       const id = localStorage.getItem(key);
-      const item = getExampleWallpaper(id) || wallpapers.find(image => image.id === id);
+      const item = getBundledWallpaper(id) || wallpapers.find(image => image.id === id);
       if (item) urls.add(isVideoWallpaper(item) ? item.posterUrl : item.url);
     }
     for (const url of urls) { if (!url) continue; const image = new Image(); image.src = url; }

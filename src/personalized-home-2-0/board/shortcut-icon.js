@@ -11,6 +11,9 @@ export function shortcutHostname(value) {
 }
 
 const localIcons = new Map(shortcutCatalog.map(item => [shortcutHostname(item.url), item.image]));
+const legacyIcons = new Map(shortcutCatalog.filter(item => item.image.endsWith('.webp'))
+  .map(item => [item.image.replace(/\.webp$/, '.png'), item.image]));
+const currentIcon = image => legacyIcons.get(image) || image;
 
 export function sanitizeShortcutCustomIcon(value) {
   return typeof value === 'string' && value.length <= 512 * 1024 && /^data:image\/(?:png|jpeg|webp);base64,[a-z\d+/]+={0,2}$/i.test(value)
@@ -25,7 +28,7 @@ export function shortcutIconFields(item, url, customIcon = item?.customIcon) {
   return {
     customIcon: sanitizeShortcutCustomIcon(customIcon),
     iconHostname: hostname,
-    image: sameSite ? item?.image || localIcons.get(hostname) : localIcons.get(hostname),
+    image: sameSite ? currentIcon(item?.image) || localIcons.get(hostname) : localIcons.get(hostname),
     darkImage: sameSite ? item?.darkImage : undefined,
     key: sameSite ? item?.key || 'custom' : 'custom',
   };
@@ -40,7 +43,7 @@ function canLookUpOnline(hostname) {
 export function getShortcutIconCandidates(item = {}, appearanceTheme = 'light') {
   const hostname = shortcutHostname(item.url);
   const matches = !item.iconHostname || item.iconHostname === hostname;
-  const storedImage = matches ? (appearanceTheme === 'dark' ? item.darkImage || item.image : item.image) : undefined;
+  const storedImage = matches ? currentIcon(appearanceTheme === 'dark' ? item.darkImage || item.image : item.image) : undefined;
   const candidates = [processedSiteIconFor(hostname, appearanceTheme), processedSiteIconFor(item.key, appearanceTheme), sanitizeShortcutCustomIcon(item.customIcon), storedImage, localIcons.get(hostname)];
   if (canLookUpOnline(hostname)) {
     // Ask for the highest useful resolution; providers return the best available source.

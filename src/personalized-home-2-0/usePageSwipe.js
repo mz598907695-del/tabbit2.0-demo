@@ -35,7 +35,7 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
     let swipeThreshold = 120;
     let swipeExtent = 240;
     const makeGesture = () => {
-      swipeExtent = latest.current.swipeWidth === 'root' ? root.clientWidth : root.querySelector('.workspace-board')?.clientWidth || 760;
+      swipeExtent = root.clientWidth;
       swipeThreshold = Math.max(80, swipeExtent / 2);
       const flickDistance = Math.min(72, Math.max(24, swipeThreshold * .25));
       // Native phase events own the lifetime. A stationary finger is not a new
@@ -58,6 +58,7 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
     let nativeCommitted = false;
     let nativeEnding = false;
     let nativeEndTimer = 0;
+    let pendingCommit = null;
     let thresholdHaptic = false;
     let traceTimer = 0;
     const traceRecords = [];
@@ -84,24 +85,25 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
       previewOrigin = null;
     };
     const clearTarget = () => { cachedTarget = null; };
-    const down = () => { pointerDown = true; clearTarget(); };
+    const down = () => { pendingCommit?.(); pointerDown = true; clearTarget(); };
     const up = () => { pointerDown = false; };
     const compositionStart = () => { composing = true; };
     const compositionEnd = () => { composing = false; };
-    const reset = () => { window.clearTimeout(idleTimer); window.clearTimeout(nativeEndTimer); nativeEnding = false; fingersDown = false; nativeCommitted = false; thresholdHaptic = false; clearPreview(); pointerDown = false; composing = false; clearTarget(); gesture.reset(); };
+    const reset = () => { pendingCommit?.(); window.clearTimeout(idleTimer); cancelAnimationFrame(nativeEndTimer); nativeEnding = false; fingersDown = false; nativeCommitted = false; thresholdHaptic = false; clearPreview(); pointerDown = false; composing = false; clearTarget(); gesture.reset(); };
     function scheduleNativeEnd() {
-      window.clearTimeout(nativeEndTimer);
-      nativeEndTimer = window.setTimeout(() => {
+      cancelAnimationFrame(nativeEndTimer);
+      nativeEndTimer = requestAnimationFrame(() => {
         nativeEnding = false;
         if (!nativeCommitted) settleGesture();
-      }, 80);
+      });
     }
     function trackpadPhase(event) {
       trace('phase', { phase: event.detail });
       nativePhases = true;
       window.clearTimeout(idleTimer);
       if (event.detail === 'began') {
-        window.clearTimeout(nativeEndTimer);
+        pendingCommit?.();
+        cancelAnimationFrame(nativeEndTimer);
         nativeEnding = false;
         clearPreview();
         gesture = makeGesture();
@@ -110,7 +112,8 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
         nativeCommitted = false;
         thresholdHaptic = false;
       } else if (event.detail === 'cancelled') {
-        window.clearTimeout(nativeEndTimer);
+        pendingCommit?.();
+        cancelAnimationFrame(nativeEndTimer);
         nativeEnding = false;
         fingersDown = false;
         clearPreview();
@@ -137,7 +140,7 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
       lastWheel = now;
       // Text focus alone must not disable swiping over the board or blank space.
       // The actual wheel target still protects the composer and nested controls.
-      const disabled = current.blocked || current.pages.length < 2 || pointerDown || composing
+      const disabled = Boolean(pendingCommit) || current.blocked || current.pages.length < 2 || pointerDown || composing
         || document.hidden || protectedTarget;
       // Reset even a rejected/poisoned browser stream after it becomes idle.
       // Native finger phases, when available, retain ownership through pauses.
@@ -188,14 +191,26 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
       const current = latest.current;
       const from = previewOrigin ?? current.index;
       const next = Math.max(0, Math.min(current.pages.length - 1, from + direction));
+      const hadPreview = previewPending;
       previewOrigin = null;
       previewPending = false;
       if (nativePhases) nativeCommitted = true;
       if (next === current.index) return;
-      trace('commit', { next });
-      current.onSelect(next);
-      setAnnouncement(`已切换到${current.pages[next].name}，第 ${next + 1} 个看板，共 ${current.pages.length} 个`);
+      const apply = () => {
+        pendingCommit = null;
+        trace('commit', { next });
+        latest.current.onSelect(next);
+        setAnnouncement(`已切换到${latest.current.pages[next].name}，第 ${next + 1} 个看板，共 ${latest.current.pages.length} 个`);
+      };
+      if (hadPreview) {
+        const detail = { commit: apply, finish: null };
+        const event = new CustomEvent('page-swipe-commit', { detail, cancelable: true });
+        root.dispatchEvent(event);
+        if (event.defaultPrevented) { pendingCommit = detail.finish; return; }
+      }
+      apply();
     }
+
     function settleGesture() {
       const result = gesture.finish();
       thresholdHaptic = false;
@@ -216,7 +231,7 @@ export function usePageSwipe(rootRef, { blocked, pages, index, onSelect, swipeWi
     document.addEventListener('visibilitychange', reset);
     return () => {
       window.clearTimeout(idleTimer);
-      window.clearTimeout(nativeEndTimer);
+      cancelAnimationFrame(nativeEndTimer);
       clearPreview();
       flushTrace();
       window.removeEventListener('tabbit-trackpad-phase', trackpadPhase);

@@ -17,6 +17,7 @@
 }
 
 .icon-jiantou-v-xiangxia::before { content: "\e00e"; }
+.icon-jiantou-xiangyoushang::before { content: "\e1a0"; }
 .icon-jiantou-v-xiangyou::before { content: "\e011"; }
 .icon-jiantou_fenxiang_shangchuan::before { content: "\e041"; }
 .icon-jiahao::before { content: "\e033"; }
