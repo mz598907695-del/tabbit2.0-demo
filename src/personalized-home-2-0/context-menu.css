@@ -50,33 +50,11 @@
 :scope[data-theme="dark"] .page-indicator-menu.home-context-menu > :is(button,a[role="menuitem"]):focus-visible { outline: none; }
 :scope[data-theme="dark"] .home-context-menu > [role="separator"] { background:var(--nine-color-border-alpha-regular); background-clip:content-box; }
 
-/* Match the browser space menu, scoped to the new-tab menu and its submenus. */
-.home-context-menu:is(.new-tab-context-menu,.new-tab-context-menu .context-submenu) {
-  gap:4px;
-  padding:4px;
-  border:0;
-  border-radius:12px;
-  background:var(--nine-color-fill-floating);
-  color:var(--nine-color-text-title);
-  backdrop-filter:blur(30px) saturate(100%);
-  -webkit-backdrop-filter:blur(30px) saturate(100%);
-  box-shadow:0 0 0 .5px rgb(0 0 0 / 10%),0 4px 12px rgb(0 0 0 / 6%),0 -1px 2px rgb(0 0 0 / 2%);
-  user-select:none;
-  -webkit-user-select:none;
-}
+/* Use the shared dropdown foundation for the space menu's surface and rows.
+   Separators retain the content-box clipping above so padding stays transparent. */
 .new-tab-context-menu { width:230px; }
-.home-context-menu:is(.new-tab-context-menu,.new-tab-context-menu .context-submenu) > button {
-  height:32px;
-  min-height:32px;
-  padding:0 8px;
-  border-radius:10px;
-  font-size:var(--nine-font-size-14);
-  line-height:var(--nine-font-line-height-14);
-  transition:background-color var(--nine-motion-duration-fast) var(--nine-motion-easing-standard);
-}
-.home-context-menu:is(.new-tab-context-menu,.new-tab-context-menu .context-submenu) > button:is(:hover,:focus-visible,[aria-expanded="true"]):not(:disabled) { background:var(--nine-color-fill-layer-strong); }
-.home-context-menu:is(.new-tab-context-menu,.new-tab-context-menu .context-submenu) > [role="separator"] { height:.5px; margin:2px 8px; background:var(--nine-color-border-alpha-regular); }
 .new-tab-context-menu .home-menu-trailing { color:var(--nine-color-text-quaternary); }
+.new-tab-context-menu :is(.home-menu-trailing,.home-menu-check-slot) > svg { flex:0 0 16px; width:16px; height:16px; }
 .new-tab-context-menu .home-menu-trailing > span { opacity:1; }
 .new-tab-context-menu [role="menuitemcheckbox"] .home-menu-trailing { color:inherit; }
 :scope[data-theme="dark"] .home-context-menu:is(.new-tab-context-menu,.new-tab-context-menu .context-submenu) {
