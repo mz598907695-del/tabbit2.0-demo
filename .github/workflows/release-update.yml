@@ -45,11 +45,11 @@ jobs:
           node scripts/prepare-release-version.mjs --version "$RELEASE_VERSION"
           node --input-type=module <<'NODE'
           import { compareReleaseVersions } from './scripts/prepare-release-version.mjs';
-          const response = await fetch('https://api.github.com/repos/mz598907695-del/tabbit-demo-updates/releases/latest', { signal: AbortSignal.timeout(30000) });
+          const response = await fetch('https://github.com/mz598907695-del/tabbit-demo-updates/releases/latest/download/latest.json', { signal: AbortSignal.timeout(30000) });
           if (!response.ok) throw new Error(`Cannot check latest release: HTTP ${response.status}`);
           const latest = await response.json();
-          if (compareReleaseVersions(process.env.RELEASE_VERSION, latest.tag_name.replace(/^v/, '')) <= 0) {
-            throw new Error(`Version must be greater than ${latest.tag_name}`);
+          if (compareReleaseVersions(process.env.RELEASE_VERSION, latest.version) <= 0) {
+            throw new Error(`Version must be greater than ${latest.version}`);
           }
           NODE
       - name: Check release credentials
