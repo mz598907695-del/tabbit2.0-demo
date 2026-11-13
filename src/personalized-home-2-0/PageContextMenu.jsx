@@ -92,7 +92,7 @@ export default function PageContextMenu({ ref, enabled, canEdit, canAddPage = tr
     const row = event.target.closest('button');
     if (row?.parentElement === menuRef.current) changeView(row.disabled ? null : row.dataset.settingKey || null);
   };
-  return createPortal(<div ref={menuRef} popover="manual" className="page-context-menu home-context-menu" role="menu" aria-label="看板菜单" onPointerOver={hoverRow}
+  return createPortal(<div ref={menuRef} popover="manual" className="page-context-menu home-context-menu new-tab-context-menu" role="menu" aria-label="看板菜单" onPointerOver={hoverRow}
     onFocusCapture={event => { if (event.target.parentElement === menuRef.current && menu.view && event.target.dataset.settingKey !== menu.view) closeSubmenu(); }}
     onContextMenu={event => { event.preventDefault(); event.stopPropagation(); }}
     onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()}

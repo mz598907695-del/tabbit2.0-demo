@@ -215,4 +215,21 @@
   .aiw-content-list .aiw-item-footer { flex:1; margin-left:48px; }
 }
 
+/* Keep share metadata with its title; reserve stable columns for status and action. */
+.aiw-content-shares .aiw-content-list .aiw-content-item { min-height:104px; padding:18px 0; gap:32px; }
+.aiw-content-shares .aiw-content-list .aiw-item-main { align-items:flex-start; }
+.aiw-content-shares .aiw-content-icon { margin-top:4px; }
+.aiw-share-meta { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; margin-top:6px; color:var(--nine-color-text-tertiary); font-size:12px; line-height:18px; }
+.aiw-share-meta > span { white-space:nowrap; }
+.aiw-content-shares .aiw-share-meta,.aiw-content-shares .aiw-status { font-weight:600; }
+.aiw-share-meta > span + span::before { content:"·"; margin-right:12px; color:var(--nine-color-text-quaternary,var(--muted)); }
+.aiw-content-shares .aiw-content-list .aiw-item-footer { flex:0 0 auto; display:grid; grid-template-columns:60px 88px; gap:24px; }
+.aiw-content-shares .aiw-item-footer > span { flex-wrap:nowrap; white-space:nowrap; }
+.aiw-content-shares .aiw-item-footer .aiw-inline-button { justify-content:center; min-height:32px; padding:4px 12px; border-radius:8px; background:var(--aiw-content-soft); white-space:nowrap; }
+.aiw-content-shares .aiw-item-footer .aiw-inline-button:hover { background:var(--aiw-content-hover); }
+@container workspace-results (max-width:600px) {
+  .aiw-content-shares .aiw-content-list .aiw-content-item { gap:12px; }
+  .aiw-content-shares .aiw-content-list .aiw-item-footer { margin-left:48px; flex:1; grid-template-columns:1fr 88px; gap:16px; }
+}
+
 }

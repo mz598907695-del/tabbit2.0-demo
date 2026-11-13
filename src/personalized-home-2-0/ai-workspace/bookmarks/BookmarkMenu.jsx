@@ -1,10 +1,9 @@
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { getHomeRoot } from '../../home-host';
 import { Check, ChevronRight } from '../../icons';
 
 import ContextSubmenu from '../../ContextSubmenu';
 import '../../context-menu.css';
+import './bookmark-menu.css';
 
 export default function BookmarkMenu({ menu, onClose }) {
   const ref = useRef(null), [submenu, setSubmenu] = useState(null), [toggles, setToggles] = useState({});
@@ -35,6 +34,7 @@ export default function BookmarkMenu({ menu, onClose }) {
   function row(item, index, child = false) {
     if (item.separator) return <div role="separator" key={`sep-${index}`}/>;
     const Icon = item.icon, checked = item.toggle ? toggles[item.label] ?? item.checked : item.checked;
+    const shortcutKeys = item.shortcut?.replace('⌘/Ctrl', /Mac|iPhone|iPad|iPod/.test(navigator.platform) ? '⌘' : 'Ctrl').split(' ');
     return <Fragment key={item.label}><button type="button" role={item.toggle ? 'menuitemcheckbox' : checked === undefined ? 'menuitem' : 'menuitemradio'} aria-checked={checked}
       disabled={item.disabled} title={item.hint} className={item.danger ? 'is-danger' : ''}
       data-setting-key={item.children ? String(index) : undefined} aria-haspopup={item.children ? 'menu' : undefined} aria-expanded={item.children ? submenu?.index === index : undefined}
@@ -42,10 +42,13 @@ export default function BookmarkMenu({ menu, onClose }) {
       onKeyDown={event => { if (item.children && event.key === 'ArrowRight') { event.preventDefault(); setSubmenu({ index, focus: true }); } }}
       onClick={() => item.children ? setSubmenu({ index, focus: true }) : act(item)}>
       {Icon && <Icon size={16}/>}<span>{item.label}</span>
-      {(item.children || item.checked !== undefined || item.shortcut) && <span className="home-menu-trailing">{item.toggle ? <span className={`bkm-menu-switch${checked ? ' is-on' : ''}`} aria-hidden="true"><i/></span> : item.children ? <ChevronRight size={14}/> : checked ? <Check size={14}/> : item.shortcut ? <span>{item.shortcut}</span> : null}</span>}
+      {(item.children || item.checked !== undefined) && <span className="home-menu-trailing">{item.toggle ? <span className={`bkm-menu-switch${checked ? ' is-on' : ''}`} aria-hidden="true"><i/></span> : item.children ? <ChevronRight size={16}/> : checked ? <Check size={16}/> : null}</span>}
+      {shortcutKeys && <span className="dropdown-shortcut bkm-menu-shortcut">{shortcutKeys.map(key => <kbd key={key}>{key}</kbd>)}</span>}
     </button>{item.preview?.(checked)}</Fragment>;
   }
-  return createPortal(<div ref={ref} role="menu" aria-label={menu.label} popover="manual" className="home-context-menu page-context-menu bkm-menu"
+  // Keep the menu in its owning bookmark page; the native popover escapes clipping.
+  // A global home-root lookup can select a hidden browser tab.
+  return <div ref={ref} role="menu" aria-label={menu.label} popover="manual" className="home-context-menu page-context-menu bkm-menu"
     onContextMenu={event => event.preventDefault()} onKeyDown={event => {
       event.stopPropagation();
       if (event.key === 'Escape' || event.key === 'Tab') { event.preventDefault(); onClose(true); }
@@ -61,5 +64,5 @@ export default function BookmarkMenu({ menu, onClose }) {
       onBack={() => { ref.current?.querySelector(`[data-setting-key="${submenu.index}"]`)?.focus(); setSubmenu(null); }} onDismiss={() => onClose(true)}>
       {menu.items[submenu.index].children.map((item, index) => row(item, index, true))}
     </ContextSubmenu>}
-  </div>, getHomeRoot().querySelector('.bkm-app') || getHomeRoot());
+  </div>;
 }

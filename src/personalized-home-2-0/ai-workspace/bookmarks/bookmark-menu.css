@@ -1,0 +1,28 @@
+@scope (.personalized-home) {
+/* Use the space menu's shared surface and keycaps; keep sizing local to bookmarks. */
+.bkm-menu.home-context-menu { width:230px; min-width:230px; }
+.bkm-menu.home-context-menu,
+.bkm-menu .context-submenu {
+  gap:4px;
+  padding:4px;
+  border-radius:12px;
+  overflow-x:hidden;
+  scrollbar-width:none;
+}
+.bkm-menu.home-context-menu::-webkit-scrollbar,
+.bkm-menu .context-submenu::-webkit-scrollbar { display:none; }
+.bkm-menu.home-context-menu > button,
+.bkm-menu .context-submenu > button {
+  height:32px;
+  min-height:32px;
+  padding:0 8px;
+  border-radius:10px;
+  font-size:var(--nine-font-size-13);
+  font-weight:400;
+  line-height:var(--nine-font-line-height-13);
+}
+.bkm-menu.home-context-menu > button:has(> .dropdown-shortcut) { padding-right:5px; }
+.bkm-menu .home-menu-trailing > svg { width:16px; height:16px; }
+.bkm-menu .bkm-menu-shortcut { padding-left:8px; }
+.bkm-menu .bkm-menu-shortcut kbd { min-width:22px; width:auto; flex-basis:auto; padding:0 3px; }
+}

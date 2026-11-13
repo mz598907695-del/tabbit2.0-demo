@@ -15,6 +15,7 @@
 .aiw-home { height:100%; }
 .aiw-home > .home-layout { height:100%; }
 .aiw-page-host { --aiw-content-gutter:40px; position:absolute; inset:0; overflow:auto; overscroll-behavior:contain; scroll-padding-top:200px; background:var(--aiw-bg); }
+.aiw-content-mount { height:100%; min-height:0; }
 @media(max-width:650px) { .aiw-page-host { --aiw-content-gutter:16px; } }
 .aiw-navigation,.aiw-page-host,.aiw-dialog { --aiw-bg:#f8f8f8; --bg:#f4f4f4; --surface:#fff; --text:#191a1c; --muted:#777c84; --border:rgb(0 0 0 / 8%); --segmented:#ededee; --hover:rgb(0 0 0 / 4%); color:var(--text); }
 .aiw-page-host { --aiw-bg:var(--default-home-background) #fff; }
