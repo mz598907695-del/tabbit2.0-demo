@@ -44,17 +44,16 @@ function RemoteStatus({ state, locale, source, preview }) {
 
 function ClockWidget({ config, onChange, preview, active, locale }) {
   const now = useWidgetNow(active && !preview), t = (zh, en) => infoText(locale, zh, en);
-  const parts = clockParts(now, infoString(config.timeZone), locale), seconds = Number(parts.seconds);
+  const parts = clockParts(now, infoString(config.timeZone), locale);
   const title = infoString(config.city).trim() || t('时钟', 'Clock');
   const zones = [['', t('系统时区', 'System time zone')], ['Asia/Shanghai', t('北京 / 上海', 'Beijing / Shanghai')], ['Asia/Tokyo', t('东京', 'Tokyo')], ['Europe/London', t('伦敦', 'London')], ['Europe/Paris', t('巴黎', 'Paris')], ['America/New_York', t('纽约', 'New York')], ['America/Los_Angeles', t('洛杉矶', 'Los Angeles')], ['Australia/Sydney', t('悉尼', 'Sydney')], ['UTC', 'UTC']];
   const display = config.seconds ? `${parts.time}:${parts.seconds}` : parts.time;
   const zoneLabel = new Intl.DateTimeFormat(locale, { ...(parts.timeZone ? { timeZone: parts.timeZone } : {}), timeZoneName: 'short' }).formatToParts(now).find(part => part.type === 'timeZoneName')?.value || '';
   return <WidgetShell title={title} preview={preview} className="iw-widget iw-clock" footer={<div className="iw-clock-footer"><span>{parts.date}</span><span className="iw-zone-pill">{zoneLabel}</span></div>} details={<div className="iw-detail uw-stack"><section className="uw-detail-summary iw-clock-summary"><div className="iw-detail-clock"><DotMatrixNumber value={display} label={display}/></div><p className="iw-muted">{parts.date} · {parts.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone}</p></section><section className="uw-detail-section"><h3>{t('显示设置', 'Display settings')}</h3><Field label={t('时区', 'Time zone')}><select value={parts.timeZone} onChange={e => onChange?.({ timeZone: e.target.value })}>{zones.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field><Field label={t('显示秒数', 'Show seconds')}><select value={config.seconds ? 'yes' : 'no'} onChange={e => onChange?.({ seconds: e.target.value === 'yes' })}><option value="no">{t('时与分', 'Hours and minutes')}</option><option value="yes">{t('时、分与秒', 'Hours, minutes and seconds')}</option></select></Field><Field label={t('卡片名称', 'Card title')}><Input maxLength={30} placeholder={t('时钟', 'Clock')} value={infoString(config.city)} onChange={e => onChange?.({ city: e.target.value })}/></Field></section></div>}>
     <div className="nv-clock-main">
-      <time className="nv-clock-time" aria-label={display}><span className="nv-clock-full">{display}</span><span className="nv-clock-tiny" aria-hidden="true"><span>{parts.time.split(':')[0]}</span><span>{parts.time.split(':')[1]}</span></span></time>
-      <div className="nv-clock-phase"><span>{t('此时此刻', 'RIGHT NOW')}</span><span>{parts.seconds} <small>{t('秒', 'sec')}</small></span></div>
-      <div className="nv-clock-track" role="meter" aria-label={t('本分钟进度', 'Seconds this minute')} aria-valuemin={0} aria-valuemax={60} aria-valuenow={seconds}><i style={{ width: `${seconds / 60 * 100}%` }}/></div>
-      <div className="nv-clock-scale" aria-hidden="true"><span>00</span><span>30</span><span>60</span></div>
+      <time className={`nv-clock-time${config.seconds ? ' has-seconds' : ''}`} aria-label={display}>
+        <span>{parts.time}</span>{config.seconds && <span className="nv-clock-seconds" aria-hidden="true">:{parts.seconds}</span>}
+      </time>
     </div>
   </WidgetShell>;
 }
@@ -93,13 +92,37 @@ function QuoteWidget({ config, onChange, preview, active, locale }) {
 }
 
 function UsageWidget({ config, onChange, preview, locale }) {
-  const t = (zh, en) => infoText(locale, zh, en), reading = usageReading(config), provider = infoString(config.provider).trim() || 'AI', [detailsOpen, setDetailsOpen] = useState(false);
+  const t = (zh, en) => infoText(locale, zh, en), reading = usageReading(config), provider = infoString(config.provider).trim() || 'AI';
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const save = value => onChange?.({ usedPercent: value, updatedAt: new Date().toISOString() });
-  return <WidgetShell title={t('AI 余量', 'AI allowance')} preview={preview} className="iw-widget iw-usage" detailOpen={detailsOpen} onDetailOpenChange={setDetailsOpen} footer={<div className="iw-footer-row"><span>{t('手动记录', 'Manual record')}</span><button type="button" className="iw-text-button" data-board-interactive="true" disabled={preview} onClick={() => reading.hasValue ? save(Math.min(100, reading.used + 5)) : setDetailsOpen(true)}>{reading.hasValue ? t('+5% 已用', '+5% used') : t('开始记录', 'Start')}</button></div>} details={<div className="iw-detail uw-stack"><section className="uw-detail-summary iw-usage-detail-hero"><Metric value={reading.hasValue ? Number(reading.remaining.toFixed(1)) : '—'} unit={t('% 剩余', '% left')}/><DotGrid value={reading.hasValue ? reading.remaining : 0} max={100} columns={20} rows={5} label={t('剩余额度', 'Remaining allowance')}/></section><section className="uw-detail-section"><h3>{t('用量记录', 'Your allowance record')}</h3><Field label={t('AI 产品', 'AI product')}><Input maxLength={40} value={provider} onChange={e => onChange?.({ provider: e.target.value })}/></Field><Field label={t('已用比例（%）', 'Used allowance (%)')}><Input type="number" min="0" max="100" step="1" value={reading.hasValue ? reading.used : ''} onChange={e => save(e.target.value === '' ? null : clampNumber(e.target.value, 0, 100))}/></Field><Field label={t('重置日期', 'Reset date')}><Input type="date" value={infoString(config.resetDate)} onChange={e => onChange?.({ resetDate: e.target.value })}/></Field><div className="uw-row"><WidgetButton onClick={() => save(0)}>{t('记录为全部可用', 'Mark fully available')}</WidgetButton><WidgetButton onClick={() => save(null)}>{t('清除记录', 'Clear record')}</WidgetButton></div></section><p className="uw-detail-caption">{t('由你手动记录，不读取 AI 服务账号，也不会自动推测用量。', 'Manually recorded by you. This does not read an AI account or estimate its usage.')}{config.updatedAt && ` ${t('上次记录', 'Last recorded')}: ${dateLabel(config.updatedAt, locale)}`}</p></div>}>
-    <div className="nv-usage-top"><span title={provider}>{provider}</span><span>{t('剩余', 'LEFT')}</span></div>
-    <div className="nv-usage-amount"><DotMatrixNumber value={reading.hasValue ? String(Math.round(reading.remaining)) : '—'} label={reading.hasValue ? `${reading.remaining}%` : t('尚未记录', 'Not recorded')}/><span>%</span></div>
-    <div className={`nv-usage-track${reading.hasValue ? '' : ' is-empty'}`} role="meter" aria-label={t('剩余额度', 'Remaining allowance')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={reading.hasValue ? reading.remaining : 0}><i style={{ width: `${reading.hasValue ? reading.remaining : 0}%` }}/><span/><span/><span/></div>
-    <div className="nv-usage-bottom"><span>{reading.hasValue ? `${t('已用', 'Used')} ${Math.round(reading.used)}%` : t('手动记录你的额度', 'Record your allowance')}</span><span>{config.resetDate ? `${t('重置', 'Reset')} ${config.resetDate.slice(5).replace('-', '/')}` : ''}</span></div>
+  const remaining = reading.hasValue ? Number(reading.remaining.toFixed(1)) : null;
+  const details = <div className="iw-detail uw-stack">
+    {reading.hasValue && <section className="uw-detail-summary iw-usage-detail-hero">
+      <Metric value={remaining} unit={t('% 剩余', '% left')}/>
+      <DotGrid value={reading.remaining} max={100} columns={20} rows={5} label={`${t('剩余额度', 'Remaining allowance')} ${remaining}%`}/>
+    </section>}
+    <section className="uw-detail-section">
+      <h3>{t('用量记录', 'Your allowance record')}</h3>
+      {!reading.hasValue && <p className="uw-detail-caption">{t('填入已用比例，开始记录剩余额度。', 'Enter the used percentage to track your remaining allowance.')}</p>}
+      <Field label={t('AI 产品', 'AI product')}><Input maxLength={40} value={provider} onChange={e => onChange?.({ provider: e.target.value })}/></Field>
+      <Field label={t('已用比例（%）', 'Used allowance (%)')}><Input type="number" min="0" max="100" step="1" value={reading.hasValue ? reading.used : ''} onChange={e => save(e.target.value === '' ? null : clampNumber(e.target.value, 0, 100))}/></Field>
+      <Field label={t('重置日期', 'Reset date')}><Input type="date" value={infoString(config.resetDate)} onChange={e => onChange?.({ resetDate: e.target.value })}/></Field>
+      <div className="uw-row"><WidgetButton onClick={() => save(0)}>{t('记录为全部可用', 'Mark fully available')}</WidgetButton><WidgetButton onClick={() => save(null)}>{t('清除记录', 'Clear record')}</WidgetButton></div>
+    </section>
+    <p className="uw-detail-caption">{t('由你手动记录，不读取 AI 服务账号，也不会自动推测用量。', 'Manually recorded by you. This does not read an AI account or estimate its usage.')}{config.updatedAt && ` ${t('上次记录', 'Last recorded')}: ${dateLabel(config.updatedAt, locale)}`}</p>
+  </div>;
+  return <WidgetShell title={t('AI 余量', 'AI allowance')} preview={preview} className={`iw-widget iw-usage${reading.hasValue ? '' : ' is-unconfigured'}`} detailOpen={detailsOpen} onDetailOpenChange={setDetailsOpen} details={details}>
+    {reading.hasValue ? <>
+      <div className="nv-usage-top"><span title={provider}>{provider}</span><span>{t('剩余', 'LEFT')}</span></div>
+      <div className="nv-usage-amount"><DotMatrixNumber value={String(remaining)} label={`${t('剩余额度', 'Remaining allowance')} ${remaining}%`}/><span>%</span></div>
+      <div className="nv-usage-track" role="meter" aria-label={t('剩余额度', 'Remaining allowance')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={reading.remaining}><i style={{ width: `${reading.remaining}%` }}/></div>
+      <div className="nv-usage-bottom"><span>{config.resetDate ? `${t('重置', 'Reset')} ${config.resetDate.slice(5).replace('-', '/')}` : t('手动记录', 'Manual record')}</span></div>
+      <button type="button" className="iw-text-button nv-usage-record" data-board-interactive="true" disabled={preview} onClick={() => save(Math.min(100, reading.used + 5))} aria-label={t('增加 5% 已用额度', 'Add 5% to used allowance')}>{t('+5% 已用', '+5% used')}</button>
+    </> : <div className="nv-usage-empty">
+      <span className="nv-usage-empty-label">{t('尚未记录', 'Not recorded yet')}</span>
+      <p>{t('记录你的 AI 额度，随时查看余量。', 'Keep track of your AI allowance.')}</p>
+      <WidgetButton className="nv-usage-setup" disabled={preview} onClick={() => setDetailsOpen(true)}>{t('记录额度', 'Record allowance')}</WidgetButton>
+    </div>}
   </WidgetShell>;
 }
 

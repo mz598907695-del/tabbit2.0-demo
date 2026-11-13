@@ -26,6 +26,13 @@ const spectrumSurface = {
   '--board-card-outline': '0',
   '--board-card-lighting': 'none',
 };
+const spectrumLightSurface = {
+  ...spectrumSurface,
+  '--home-content-surface-fill': '#ffffff',
+  '--board-card-outline': '1px solid rgb(31 36 44 / 8%)',
+  '--board-card-resting-shadow': '0 2px 6px -3px rgb(31 36 44 / 10%)',
+  '--board-card-hover-shadow': '0 4px 12px -4px rgb(31 36 44 / 12%)',
+};
 /** The board owns the frame and placement; each widget owns its actual task. */
 export const WidgetCard = memo(function WidgetCard({ kind, item = {}, size, onChange, inert = false, preview = false, active = true, appearanceTheme = 'light' }) {
   const ref = useRef(null);
@@ -46,7 +53,7 @@ export const WidgetCard = memo(function WidgetCard({ kind, item = {}, size, onCh
   const Content = spectrum ? SpectrumWidget : resolvedKind === 'ai-card' ? ImportedAICard : resolvedKind === 'audio-visualizer' ? AudioVisualizerWidget : coreKinds.has(resolvedKind) ? CoreWidgetContent : extraKinds.has(resolvedKind) ? ExtraWidgetContent : LeisureWidgetContent;
   const locale = config.locale === 'en-US' ? 'en-US' : 'zh-CN';
   const mounted = visible || near || retained || runningTask || resolvedKind === 'ai-card';
-  return <BoardCard ref={ref} className={`board-widget-card widget-unified${spectrum ? ' widget-spectrum' : ''}`} style={spectrum ? spectrumSurface : undefined} inert={inert} data-widget-kind={resolvedKind} data-widget-style={spectrum ? 'spectrum' : 'classic'}
+  return <BoardCard ref={ref} className={`board-widget-card widget-unified${spectrum ? ' widget-spectrum' : ''}`} style={spectrum ? (appearanceTheme === 'dark' ? spectrumSurface : spectrumLightSurface) : undefined} inert={inert} data-widget-kind={resolvedKind} data-widget-style={spectrum ? 'spectrum' : 'classic'}
     data-widget-active={visible && active && !preview && !inert} data-widget-mounted={mounted} data-widget-near={near || visible}
     onPointerDownCapture={() => setRetained(true)} onFocusCapture={() => setRetained(true)}
     data-widget-width={size?.w} data-widget-height={size?.h} aria-label={item.title || definition?.title || 'AI 卡片'}>

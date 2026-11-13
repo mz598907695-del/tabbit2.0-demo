@@ -1,3 +1,5 @@
+import { normalizeSpectrumSize } from './spectrum/widget-size.js';
+
 export const WIDGET_VISUAL_STYLES = [
   { id: 'classic', label: '经典版' },
   { id: 'spectrum', label: '光谱版' },
@@ -21,6 +23,8 @@ export function createLibraryWidgetItem(definition, { id, size, visualStyle = 'c
   else delete config.visualStyle;
   return {
     id, type: 'widget', kind: definition.kind, title: definition.title,
-    config, size: size || definition.defaultSize || { w: 2, h: 2 },
+    config, size: visualStyle === 'spectrum'
+      ? normalizeSpectrumSize(definition.kind, size || definition.defaultSize)
+      : size || definition.defaultSize || { w: 2, h: 2 },
   };
 }

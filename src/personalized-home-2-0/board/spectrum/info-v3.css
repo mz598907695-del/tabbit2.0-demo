@@ -1,35 +1,24 @@
 /* V3 information instruments: isolated from the shipped widget styles. */
 .v3-scope .iw-widget { --iw-warm:var(--v3-accent); }
 .v3-scope .iw-widget .uw-main { min-width:0;min-height:0; }
-.v3-scope .iw-mini-button { border:0;background:#ffffff0b;color:var(--v3-accent);border-radius:50%; }
+.v3-scope .iw-mini-button { border:0;background:var(--v3-control-bg);color:var(--v3-accent);border-radius:50%; }
 .v3-scope .iw-text-button { color:var(--v3-accent);border:0;background:var(--v3-soft);padding:3px 8px; }
-.v3-scope .iw-remote-status { color:var(--uw-muted);font-size:10px; }
+.v3-scope .iw-remote-status { color:var(--uw-muted);font-size:11px; }
 .v3-scope .iw-remote-status > i { background:var(--v3-accent);opacity:1; }
 .v3-scope .iw-clock .uw-main { align-items:stretch;justify-content:center; }
-.v3-scope .nv-clock-main { width:100%;display:flex;flex-direction:column;min-width:0;gap:10px; }
-.v3-scope .nv-clock-time { display:block;font-size:clamp(32px,21cqw,66px);font-weight:350;letter-spacing:-.065em;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--v3-accent); }
-.v3-scope .nv-clock-tiny { display:none; }
-.v3-scope .nv-clock-phase { display:flex;justify-content:space-between;align-items:baseline;font-size:10px;color:var(--uw-muted); }
-.v3-scope .nv-clock-phase > span:last-child { color:var(--v3-accent);font-variant-numeric:tabular-nums;font-size:13px; }
-.v3-scope .nv-clock-phase small { font-size:10px;opacity:.6; }
-.v3-scope .nv-clock-track { display:block;position:relative;height:9px;border-radius:99px;background:var(--v3-soft);overflow:hidden; }
-.v3-scope .nv-clock-track > i { display:block;height:100%;min-width:4px;border-radius:inherit;background:var(--v3-accent); }
-.v3-scope .nv-clock-scale { display:flex;justify-content:space-between;font-size:9px;line-height:1;color:var(--uw-muted);opacity:.72; }
-.v3-scope .iw-clock-footer { display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:10px; }
-.v3-scope .iw-zone-pill { padding:0;border:0;background:none;color:var(--v3-accent);font-size:9px; }
 .v3-scope .iw-clock .uw-footer { text-align:left; }
 .v3-scope .iw-detail-clock .v3-number { --v3-number-size:64px; }
 
 .v3-scope .iw-calendar .uw-main { gap:8px; }
 .v3-scope .iw-calendar-nav { gap:6px; }
 .v3-scope .iw-month-label { font-weight:400;color:var(--v3-accent);font-size:12px; }
-.v3-scope .iw-month-year { color:var(--uw-muted);font-size:10px;font-weight:400; }
+.v3-scope .iw-month-year { color:var(--uw-muted);font-size:11px;font-weight:400; }
 .v3-scope .iw-month-name { font-size:13px;font-weight:400; }
 .v3-scope .iw-calendar-grid { gap:3px; }
 .v3-scope .iw-calendar-grid > span { font-size:11px;font-weight:400; }
-.v3-scope .iw-calendar-grid .iw-weekday { color:var(--uw-muted);font-size:9px; }
-.v3-scope .iw-calendar-grid .is-weekend { color:var(--v3-accent);opacity:.8; }
-.v3-scope .iw-calendar-grid .is-today { color:#090a0b;font-weight:550;opacity:1; }
+.v3-scope .iw-calendar-grid .iw-weekday { color:var(--uw-muted);font-size:11px; }
+.v3-scope .iw-calendar-grid .is-weekend { color:var(--v3-accent);opacity:1; }
+.v3-scope .iw-calendar-grid .is-today { color:var(--v3-on-accent);font-weight:550;opacity:1; }
 .v3-scope .iw-calendar-grid .is-today::before { background:var(--v3-accent);border-radius:7px;max-width:24px;max-height:24px; }
 .v3-scope .iw-calendar-tiny .v3-number { --v3-number-size:46px;color:var(--v3-accent); }
 .v3-scope .iw-calendar-grid.is-detail > span { font-size:15px; }
@@ -37,40 +26,28 @@
 
 .v3-scope .iw-quote .uw-main { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px; }
 .v3-scope .nv-quote-mark { color:var(--v3-accent);font-family:Georgia,serif;font-weight:400;font-size:52px;height:25px;line-height:1; }
-.v3-scope .iw-quote-text { color:var(--uw-fg,#f6f6f7);font-family:inherit;font-size:clamp(15px,7.7cqw,22px);font-weight:350;line-height:1.5;letter-spacing:.02em;-webkit-line-clamp:4;text-wrap:pretty; }
+.v3-scope .iw-quote-text { color:var(--uw-fg);font-family:inherit;font-size:clamp(15px,7.7cqw,22px);font-weight:350;line-height:1.5;letter-spacing:.02em;-webkit-line-clamp:4;text-wrap:pretty; }
 .v3-scope .nv-quote-line { display:block;width:32px;height:3px;border-radius:9px;background:var(--v3-accent);margin-top:3px; }
 .v3-scope .iw-quote-author { color:var(--v3-accent); }
 .v3-scope .iw-detail-quote { font-family:inherit;font-weight:350;font-size:24px;line-height:1.65;color:var(--v3-accent); }
-
-.v3-scope .iw-usage .uw-main { display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:12px; }
-.v3-scope .nv-usage-top { display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;font-size:10px;color:var(--uw-muted); }
-.v3-scope .nv-usage-top > span:first-child { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.v3-scope .nv-usage-top > span:last-child { flex:none;color:var(--v3-accent);font-size:9px; }
-.v3-scope .nv-usage-amount { display:flex;align-items:baseline;gap:5px;min-width:0;color:var(--v3-accent); }
-.v3-scope .nv-usage-amount .v3-number { --v3-number-size:clamp(35px,22cqw,62px);font-weight:350;line-height:1; }
-.v3-scope .nv-usage-amount > span:last-child { font-size:18px;line-height:1;font-weight:350; }
-.v3-scope .nv-usage-track { display:flex;position:relative;justify-content:space-evenly;align-items:center;flex:none;height:16px;border-radius:99px;background:var(--v3-soft);overflow:hidden; }
-.v3-scope .nv-usage-track > i { position:absolute;inset:0 auto 0 0;border-radius:inherit;background:var(--v3-accent); }
-.v3-scope .nv-usage-track > span { position:relative;width:5px;height:5px;border-radius:50%;background:#05060580; }
-.v3-scope .nv-usage-bottom { display:flex;justify-content:space-between;gap:6px;font-size:9px;color:var(--uw-muted); }
-.v3-scope .nv-usage-bottom > span { min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .v3-scope .iw-usage-detail-hero .uw-metric { color:var(--v3-accent); }
 .v3-scope .iw-usage-detail-hero .uw-dot-grid { color:var(--v3-accent); }
 
 .v3-scope .iw-weather .uw-main { display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:14px; }
 .v3-scope .nv-weather-hero { display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:0; }
 .v3-scope .nv-weather-copy { min-width:0;display:flex;flex-direction:column;gap:4px; }
-.v3-scope .iw-weather-city { display:block;color:var(--uw-fg,#f7f7f8);font-weight:400;font-size:12px;max-width:100%; }
+.v3-scope .iw-weather-city { display:block;color:var(--uw-fg);font-weight:400;font-size:12px;max-width:100%; }
 .v3-scope .nv-weather-temperature { display:flex;align-items:flex-start;gap:1px;min-width:0;color:var(--v3-accent); }
 .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:clamp(36px,20cqw,60px);line-height:1; }
 .v3-scope .nv-weather-temperature > span:last-child { font-size:29px;line-height:1; }
-.v3-scope .nv-weather-condition { font-size:10px;line-height:14px;color:var(--uw-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.v3-scope .nv-weather-condition { font-size:11px;line-height:14px;color:var(--uw-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .v3-scope .nv-weather-hero .iw-weather-symbol { display:grid;width:66px;height:66px;flex:none;opacity:1; }
 .v3-scope .nv-weather-timeline { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none;min-width:0; }
 .v3-scope .nv-weather-timeline > div { display:flex;flex-direction:column;align-items:center;gap:5px;border-radius:14px;padding:6px 4px;background:var(--v3-soft); }
-.v3-scope .nv-weather-timeline > div:first-child { background:color-mix(in srgb,var(--v3-accent) 22%,#0b0c0e); }
-.v3-scope .nv-weather-timeline > div > span { font-size:9px;color:var(--uw-muted); }
+.v3-scope .nv-weather-timeline > div:first-child { background:var(--v3-soft); }
+.v3-scope .nv-weather-timeline > div > span { font-size:11px;color:var(--uw-muted); }
 .v3-scope .nv-weather-timeline b { font-size:15px;font-weight:400;line-height:1.2;color:var(--v3-accent); }
+.v3-scope .iw-weather-symbol.has-snow .iw-weather-state { color:var(--v3-accent); }
 .v3-scope .iw-weather-summary .uw-metric { color:var(--v3-accent); }
 .v3-scope .iw-weather-summary .uw-sparkline { color:var(--v3-accent); }
 .v3-scope .iw-weather-summary .uw-sparkline polyline { stroke-width:3; }
@@ -78,36 +55,23 @@
 .v3-scope .iw-news .uw-main { justify-content:flex-start; }
 .v3-scope .iw-news-headlines { --iw-headline-row-height:29px;--iw-headline-line-height:18px;--iw-headline-line-limit:1;--iw-headline-row-padding:0;--iw-headline-max-count:20;flex:1;width:100%; }
 .v3-scope .iw-news-headlines > li { align-items:center;gap:9px;border:0; }
-.v3-scope .iw-news-headlines .iw-headline-index { color:var(--v3-accent);font-size:9px;line-height:1;width:18px;flex:none;letter-spacing:.025em; }
-.v3-scope .iw-news-headlines a { color:var(--uw-fg,#f3f4f6);font-weight:400;font-size:12px;line-height:18px; }
-.v3-scope .iw-news-headlines > li:first-child a { color:var(--v3-accent); }
+.v3-scope .iw-news-headlines .iw-headline-index { color:var(--v3-accent);font-size:11px;line-height:1;width:18px;flex:none;letter-spacing:.025em; }
+.v3-scope .iw-news-headlines a { color:var(--uw-fg);font-weight:400;font-size:12px;line-height:18px; }
 .v3-scope .iw-news-detail-list > li > span { color:var(--v3-accent); }
 .v3-scope .iw-news-masthead { color:var(--v3-accent); }
 .v3-scope .iw-news-empty p { font-size:15px;font-weight:400; }
-.v3-scope .iw-news-detail-list > li { border-color:#ffffff0a; }
+.v3-scope .iw-news-detail-list > li { border-color:var(--uw-line); }
 
 /* Broad tiles turn time and forecast into horizontal instruments. */
 @container uw (min-width:300px) and (min-height:151px) {
- .v3-scope .nv-clock-main { gap:11px; }
- .v3-scope .nv-clock-time { font-size:62px; }
- .v3-scope .nv-clock-track { height:11px; }
  .v3-scope .nv-weather-hero .iw-weather-symbol { width:88px;height:88px; }
  .v3-scope .nv-weather-timeline > div { flex-direction:row;justify-content:space-between;padding:9px 12px;border-radius:99px; }
- .v3-scope .nv-usage-track { height:19px; }
- .v3-scope .iw-usage .uw-main { gap:6px; }
- .v3-scope .iw-usage .nv-usage-top,.v3-scope .iw-usage .nv-usage-bottom { line-height:12px; }
- .v3-scope .nv-usage-amount .v3-number.uw-dot-number { line-height:1; }
  .v3-scope .iw-quote-text { font-size:22px; }
  .v3-scope .iw-calendar-grid { max-height:none; }
 }
 /* Wide, shallow cards retain one datum and one visual cue. */
 @container uw (min-width:240px) and (max-height:190px) and (min-height:91px) {
  .v3-scope .iw-clock .uw-main { justify-content:center; }
- .v3-scope .nv-clock-main { display:grid;grid-template-columns:auto minmax(60px,1fr);gap:8px 18px;align-items:center; }
- .v3-scope .nv-clock-time { grid-row:1 / span 2;font-size:40px; }
- .v3-scope .nv-clock-phase { font-size:9px; }
- .v3-scope .nv-clock-scale { display:none; }
- .v3-scope .nv-clock-track { height:8px; }
  .v3-scope .iw-weather .uw-main { flex-direction:row;align-items:center;gap:12px; }
  .v3-scope .nv-weather-hero { flex:1;gap:4px; }
  .v3-scope .nv-weather-hero .iw-weather-symbol { width:43px;height:43px; }
@@ -116,30 +80,12 @@
  .v3-scope .nv-weather-timeline > div:nth-child(2) { display:none; }
  .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:36px; }
  .v3-scope .nv-weather-temperature > span:last-child { font-size:22px; }
- .v3-scope .iw-usage .uw-main { display:grid;grid-template-columns:auto minmax(60px,1fr);align-content:center;gap:7px 15px; }
- .v3-scope .nv-usage-top { grid-column:1 / -1; }
- .v3-scope .nv-usage-amount { grid-row:2 / span 2; }
- .v3-scope .nv-usage-amount .v3-number { --v3-number-size:40px; }
- .v3-scope .nv-usage-track { align-self:end;height:13px; }
- .v3-scope .nv-usage-bottom { align-self:start; }
- .v3-scope .nv-usage-bottom > span:last-child { display:none; }
  .v3-scope .iw-quote .uw-main { display:grid;grid-template-columns:18px minmax(0,1fr);gap:10px;align-content:center;align-items:start; }
  .v3-scope .nv-quote-mark { font-size:38px;height:22px; }
  .v3-scope .nv-quote-line { display:none; }
  .v3-scope .iw-quote-text { font-size:17px;-webkit-line-clamp:3; }
 }
 @container uw (max-width:190px) and (min-height:91px) {
- .v3-scope .nv-clock-time { font-size:clamp(24px,24cqw,40px); }
- .v3-scope .nv-clock-main { gap:9px; }
- .v3-scope .nv-clock-phase > span:first-child { display:none; }
- .v3-scope .nv-clock-phase { justify-content:flex-end; }
- .v3-scope .nv-clock-track { height:7px; }
- .v3-scope .iw-clock-footer { flex-wrap:wrap; }
- .v3-scope .iw-zone-pill { display:none; }
- .v3-scope .nv-usage-amount .v3-number { --v3-number-size:36px; }
- .v3-scope .nv-usage-top > span:last-child,.v3-scope .nv-usage-bottom > span:last-child { display:none; }
- .v3-scope .iw-usage .uw-main { gap:10px; }
- .v3-scope .nv-usage-track { height:11px; }
  .v3-scope .nv-weather-hero { align-items:flex-start; }
  .v3-scope .nv-weather-hero .iw-weather-symbol { width:35px;height:35px; }
  .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:35px; }
@@ -153,25 +99,24 @@
  .v3-scope .nv-quote-mark { font-size:38px;height:18px; }
 }
 @container uw (max-width:140px) and (max-height:190px) and (min-height:91px) {
- .v3-scope .nv-clock-phase,.v3-scope .nv-clock-scale,.v3-scope .nv-weather-timeline,.v3-scope .nv-weather-condition,.v3-scope .nv-usage-top,.v3-scope .nv-usage-bottom,.v3-scope .nv-quote-mark,.v3-scope .nv-quote-line { display:none; }
+ .v3-scope .nv-weather-timeline,.v3-scope .nv-weather-condition,.v3-scope .nv-quote-mark,.v3-scope .nv-quote-line { display:none; }
  .v3-scope .nv-weather-hero .iw-weather-symbol { width:24px;height:24px; }
  .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:27px; }
- .v3-scope .nv-usage-amount .v3-number { --v3-number-size:31px; }
- .v3-scope .nv-usage-track { height:7px; }
  .v3-scope .iw-quote-text { font-size:12px;line-height:1.5;-webkit-line-clamp:3; }
  .v3-scope .iw-news-headlines { --iw-headline-row-height:25px;--iw-headline-line-height:16px; }
  .v3-scope .iw-news-headlines a { font-size:11px;line-height:16px; }
  .v3-scope .iw-news-headlines .iw-headline-index { display:none; }
 }
+/* Short quote cards use their height for two readable lines of the thought. */
+@container uw (min-height:91px) and (max-height:140px) {
+ .v3-scope .iw-quote .uw-main { display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:0;overflow:hidden; }
+ .v3-scope .iw-quote :is(.nv-quote-mark,.nv-quote-line,.uw-footer) { display:none; }
+ .v3-scope .iw-quote .iw-quote-text { flex:none;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:40px;overflow:hidden;font-size:14px;line-height:20px;letter-spacing:0;white-space:normal; }
+}
 /* Summary strips: core value only, no repeated title or secondary ornament. */
 @container uw (max-height:90px) {
- .v3-scope .iw-clock .uw-main,.v3-scope .iw-usage .uw-main,.v3-scope .iw-weather .uw-main,.v3-scope .iw-quote .uw-main { display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:9px; }
- .v3-scope .nv-clock-main { width:auto;display:flex;flex-direction:row;align-items:center;gap:8px; }
- .v3-scope .nv-clock-time { font-size:28px;letter-spacing:-.05em; }
- .v3-scope .nv-clock-phase,.v3-scope .nv-clock-scale,.v3-scope .nv-clock-track,.v3-scope .nv-usage-top,.v3-scope .nv-usage-bottom,.v3-scope .nv-usage-track,.v3-scope .nv-quote-mark,.v3-scope .nv-quote-line,.v3-scope .nv-weather-timeline,.v3-scope .nv-weather-condition { display:none; }
- .v3-scope .nv-usage-amount { gap:3px; }
- .v3-scope .nv-usage-amount .v3-number { --v3-number-size:28px; }
- .v3-scope .nv-usage-amount > span:last-child { font-size:13px; }
+ .v3-scope .iw-clock .uw-main,.v3-scope .iw-weather .uw-main,.v3-scope .iw-quote .uw-main { display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:9px; }
+ .v3-scope .nv-quote-mark,.v3-scope .nv-quote-line,.v3-scope .nv-weather-timeline,.v3-scope .nv-weather-condition { display:none; }
  .v3-scope .nv-weather-hero { width:100%;align-items:center;justify-content:flex-start;gap:9px; }
  .v3-scope .nv-weather-copy { display:flex;flex-direction:row;align-items:center;gap:8px; }
  .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:27px; }
@@ -184,13 +129,7 @@
  .v3-scope .iw-news-headlines .iw-headline-index { display:none; }
 }
 @container uw (max-width:80px) {
- .v3-scope .nv-clock-time { font-size:22px;white-space:normal;line-height:1.2;letter-spacing:-.04em; }
- .v3-scope .nv-clock-full { display:none; }
- .v3-scope .nv-clock-tiny { display:flex;flex-direction:column;gap:5px; }
- .v3-scope .nv-clock-phase,.v3-scope .nv-clock-track,.v3-scope .nv-clock-scale,.v3-scope .nv-usage-top,.v3-scope .nv-usage-bottom,.v3-scope .nv-usage-track,.v3-scope .nv-weather-timeline,.v3-scope .nv-weather-condition,.v3-scope .nv-quote-mark,.v3-scope .nv-quote-line,.v3-scope .nv-weather-hero .iw-weather-symbol,.v3-scope .iw-weather-city { display:none; }
- .v3-scope .nv-usage-amount { flex-direction:column;gap:2px;align-items:flex-start; }
- .v3-scope .nv-usage-amount .v3-number { --v3-number-size:22px; }
- .v3-scope .nv-usage-amount > span:last-child { font-size:10px; }
+ .v3-scope .nv-weather-timeline,.v3-scope .nv-weather-condition,.v3-scope .nv-quote-mark,.v3-scope .nv-quote-line,.v3-scope .nv-weather-hero .iw-weather-symbol,.v3-scope .iw-weather-city { display:none; }
  .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:22px; }
  .v3-scope .nv-weather-temperature > span:last-child { font-size:13px; }
  .v3-scope .iw-quote-text { font-size:11px;line-height:1.5;-webkit-line-clamp:6; }
@@ -199,16 +138,7 @@
  .v3-scope .iw-news-headlines .iw-headline-index { display:none; }
 }
 /* Compact bounds use fewer rows rather than squeezing the same stack. */
-@container uw (min-width:141px) and (max-width:190px) and (min-height:91px) and (max-height:190px) {
- .v3-scope .iw-usage .uw-main { gap:6px; }
- .v3-scope .nv-usage-top,.v3-scope .nv-usage-bottom { font-size:9px;line-height:12px; }
-}
 @container uw (min-width:191px) and (max-height:140px) and (min-height:91px) {
- .v3-scope .iw-usage .uw-main { display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;align-content:center;gap:12px; }
- .v3-scope .nv-usage-top,.v3-scope .nv-usage-bottom { display:none; }
- .v3-scope .nv-usage-amount { grid-row:auto; }
- .v3-scope .nv-usage-amount .v3-number { --v3-number-size:32px; }
- .v3-scope .nv-usage-track { align-self:center;height:11px; }
  .v3-scope .iw-weather .uw-main { flex-direction:row;align-items:center;gap:8px; }
  .v3-scope .nv-weather-hero { align-items:center;width:100%;gap:8px; }
  .v3-scope .nv-weather-copy { flex-direction:row;align-items:center;gap:8px; }
@@ -222,4 +152,69 @@
  .v3-scope .iw-calendar-tiny .v3-number { --v3-number-size:22px;max-width:100%; }
  .v3-scope .iw-calendar-tiny { width:100%;min-width:0; }
  .v3-scope .iw-calendar-tiny-day { width:100%;min-width:0; }
+}
+
+/* Time is the primary information. Extra space adds context, never a decorative ruler. */
+.v3-scope .iw-clock .uw-main { justify-content:center; }
+.v3-scope .nv-clock-main { min-width:0;width:100%; }
+.v3-scope .nv-clock-time { display:flex;align-items:baseline;white-space:nowrap;font-size:clamp(32px,21cqw,66px);font-weight:350;line-height:1.1;letter-spacing:-.065em;font-variant-numeric:tabular-nums;color:var(--v3-accent); }
+.v3-scope .nv-clock-seconds { font-size:.46em;letter-spacing:-.025em;color:var(--uw-muted); }
+.v3-scope .iw-clock-footer { display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;line-height:16px; }
+.v3-scope .iw-zone-pill { padding:0;border:0;background:none;color:var(--uw-muted);font-size:11px; }
+
+/* Quota has a clear setup state; an unknown reading is never a zero-value meter. */
+.v3-scope .iw-usage .uw-main { display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr auto auto;align-content:center;align-items:center;gap:8px; }
+.v3-scope .nv-usage-top { grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;line-height:16px;color:var(--uw-muted);min-width:0; }
+.v3-scope .nv-usage-top > span:first-child { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.v3-scope .nv-usage-top > span:last-child { flex:none; }
+.v3-scope .nv-usage-amount { grid-column:1 / -1;display:flex;align-items:baseline;gap:5px;min-width:0;color:var(--v3-accent); }
+.v3-scope .nv-usage-amount .v3-number { --v3-number-size:clamp(32px,22cqw,60px);line-height:1; }
+.v3-scope .nv-usage-amount > span:last-child { font-size:16px;line-height:1; }
+.v3-scope .nv-usage-track { grid-column:1 / -1;position:relative;height:7px;border-radius:99px;background:var(--v3-soft);overflow:hidden; }
+.v3-scope .nv-usage-track > i { display:block;height:100%;border-radius:inherit;background:var(--v3-accent); }
+.v3-scope .nv-usage-bottom { min-width:0;font-size:11px;line-height:16px;color:var(--uw-muted); }
+.v3-scope .nv-usage-bottom > span { display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.v3-scope .nv-usage-record { justify-self:end;white-space:nowrap;font-size:11px;min-height:28px;padding:4px 9px; }
+.v3-scope .nv-usage-empty { grid-column:1 / -1;grid-row:1 / -1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:12px;min-width:0;height:100%; }
+.v3-scope .nv-usage-empty-label { font-size:20px;line-height:1.3;color:var(--uw-fg); }
+.v3-scope .nv-usage-empty p { font-size:12px;line-height:1.6;color:var(--uw-muted);max-width:24em; }
+.v3-scope .nv-usage-empty .nv-usage-setup { flex:none;max-width:100%; }
+@container uw (max-width:190px) {
+ .v3-scope .nv-clock-time { font-size:clamp(24px,23cqw,40px); }
+ .v3-scope .nv-clock-seconds,.v3-scope .iw-zone-pill { display:none; }
+ .v3-scope .nv-usage-amount .v3-number { --v3-number-size:36px; }
+ .v3-scope .nv-usage-top > span:last-child { display:none; }
+ .v3-scope .nv-usage-bottom { grid-column:1 / -1; }
+ .v3-scope .nv-usage-record { grid-column:1 / -1;justify-self:start; }
+ .v3-scope .iw-usage .uw-main { grid-template-rows:auto 1fr auto auto auto;gap:6px; }
+ .v3-scope .nv-usage-empty-label { font-size:16px; }
+}
+@container uw (max-width:190px) and (max-height:190px) {
+ .v3-scope .nv-usage-track,.v3-scope .nv-usage-bottom { display:none; }
+ .v3-scope .iw-usage .uw-main { grid-template-rows:auto 1fr auto; }
+ .v3-scope .nv-usage-empty p { display:none; }
+}
+@container uw (max-height:170px) {
+ .v3-scope .nv-clock-time { font-size:clamp(28px,17cqw,40px); }
+ .v3-scope .nv-usage-track,.v3-scope .nv-usage-top,.v3-scope .nv-usage-bottom { display:none; }
+ .v3-scope .iw-usage .uw-main { display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px; }
+ .v3-scope .nv-usage-amount .v3-number { --v3-number-size:32px; }
+ .v3-scope .nv-usage-empty { gap:8px; }
+ .v3-scope .nv-usage-empty p { display:none; }
+ .v3-scope .nv-usage-empty-label { font-size:14px; }
+}
+@container uw (max-height:90px) {
+ .v3-scope .nv-clock-time { font-size:28px; }
+ .v3-scope .nv-clock-seconds { display:none; }
+ .v3-scope .nv-usage-amount .v3-number { --v3-number-size:27px; }
+ .v3-scope .nv-usage-amount > span:last-child { font-size:12px; }
+ .v3-scope .nv-usage-empty { flex-direction:row;align-items:center;justify-content:flex-start; }
+ .v3-scope .nv-usage-empty-label { display:none; }
+}
+@container uw (max-width:140px) and (max-height:170px) {
+ .v3-scope .iw-usage .uw-main { flex-direction:column;justify-content:center;gap:4px; }
+ .v3-scope .nv-usage-amount .v3-number { --v3-number-size:24px; }
+ .v3-scope .nv-usage-record { min-height:24px;font-size:11px;padding:2px 6px; }
+ .v3-scope .nv-usage-empty-label { display:none; }
+ .v3-scope .nv-usage-empty { justify-content:center; }
 }

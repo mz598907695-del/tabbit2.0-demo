@@ -18,6 +18,7 @@ import { readShortcutIcon, SHORTCUT_ICON_ACCEPT } from './shortcut-icon-upload';
 import { MAX_BOARD_ITEMS } from './state';
 import { normalizeCodexUsageConfig, normalizeWorkdayConfig } from './utility-widget-data';
 import { normalizeDailyPictureConfig } from './daily-picture-data';
+import { spectrumLibrarySizes } from './spectrum/widget-size';
 
 const DEFAULT_SIZES = [
   { w: 2, h: 1, label: '横卡' },
@@ -612,7 +613,7 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
         {visibleCatalog.map(item => {
           const itemKey = item.libraryKey || item.kind;
           const accessibleTitle = `${item.title}${item.variantLabel ? ` · ${item.variantLabel}` : ''}`;
-          const choices = DEFAULT_SIZES;
+          const choices = item.visualStyle === 'spectrum' ? spectrumLibrarySizes(item.kind, DEFAULT_SIZES) : DEFAULT_SIZES;
           const selectedSize = choices.find(size => `${size.w}-${size.h}` === sizeKeys[item.kind])
             || choices.find(size => size.w === item.defaultSize?.w && size.h === item.defaultSize?.h)
             || choices[1];

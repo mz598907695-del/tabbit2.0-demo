@@ -19,6 +19,7 @@ import { BoardLibrary, BoardItemDialog, BoardConfirm } from './BoardDialogs';
 import { movePackedBoardItem, resizeItem, resizePackedBoardItem, getBoardRows } from './layout';
 import { boardAlignmentOffset, boardDragPosition, boardResizeMaxWidth } from './drag-geometry';
 import { normalizeWidgetSize } from './widget-size';
+import { normalizeSpectrumSize } from './spectrum/widget-size';
 import { normalizeShortcutSize, SHORTCUT_SIZE_PRESETS } from './shortcut-size';
 import useBatchEditJiggle from './useBatchEditJiggle';
 import { addBoardItemToPage, boardColumns, updateBoardMeasurement, boardReadingOrder, gridProfile, layoutKey, projectPage, savePositions, patchBoardWidgetConfig } from './state';
@@ -26,7 +27,8 @@ import './workspace-board.css';
 import '../context-menu.css';
 
 const normalizeItemSize=(item,size,options)=>item.type==='shortcut'
-  ? normalizeShortcutSize(size) : normalizeWidgetSize(size,options);
+  ? normalizeShortcutSize(size) : item.config?.visualStyle==='spectrum'
+    ? normalizeSpectrumSize(item.kind,size,options) : normalizeWidgetSize(size,options);
 
 const widgetDefaults = new Map(widgetCatalog.map(item => [item.kind, item.defaultSize || { w:2, h:2 }]));
 const libraryVariants = widgetLibraryVariants(widgetCatalog);
