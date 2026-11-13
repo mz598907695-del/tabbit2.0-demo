@@ -1,11 +1,10 @@
 /* V3 information instruments: isolated from the shipped widget styles. */
 .v3-scope .iw-widget { --iw-warm:var(--v3-accent); }
 .v3-scope .iw-widget .uw-main { min-width:0;min-height:0; }
-.v3-scope .iw-mini-button { border:0;background:var(--v3-control-subtle);color:var(--v3-accent);border-radius:50%; }
+.v3-scope .iw-mini-button { border:0;background:#ffffff0b;color:var(--v3-accent);border-radius:50%; }
 .v3-scope .iw-text-button { color:var(--v3-accent);border:0;background:var(--v3-soft);padding:3px 8px; }
 .v3-scope .iw-remote-status { color:var(--uw-muted);font-size:10px; }
 .v3-scope .iw-remote-status > i { background:var(--v3-accent);opacity:1; }
-.v3-scope .iw-remote-status.is-error > i { background:var(--v3-error); }
 .v3-scope .iw-clock .uw-main { align-items:stretch;justify-content:center; }
 .v3-scope .nv-clock-main { width:100%;display:flex;flex-direction:column;min-width:0;gap:10px; }
 .v3-scope .nv-clock-time { display:block;font-size:clamp(32px,21cqw,66px);font-weight:350;letter-spacing:-.065em;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--v3-accent); }
@@ -30,7 +29,7 @@
 .v3-scope .iw-calendar-grid > span { font-size:11px;font-weight:400; }
 .v3-scope .iw-calendar-grid .iw-weekday { color:var(--uw-muted);font-size:9px; }
 .v3-scope .iw-calendar-grid .is-weekend { color:var(--v3-accent);opacity:.8; }
-.v3-scope .iw-calendar-grid .is-today { color:var(--v3-on-accent);font-weight:550;opacity:1; }
+.v3-scope .iw-calendar-grid .is-today { color:#090a0b;font-weight:550;opacity:1; }
 .v3-scope .iw-calendar-grid .is-today::before { background:var(--v3-accent);border-radius:7px;max-width:24px;max-height:24px; }
 .v3-scope .iw-calendar-tiny .v3-number { --v3-number-size:46px;color:var(--v3-accent); }
 .v3-scope .iw-calendar-grid.is-detail > span { font-size:15px; }
@@ -38,7 +37,7 @@
 
 .v3-scope .iw-quote .uw-main { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px; }
 .v3-scope .nv-quote-mark { color:var(--v3-accent);font-family:Georgia,serif;font-weight:400;font-size:52px;height:25px;line-height:1; }
-.v3-scope .iw-quote-text { color:var(--uw-fg);font-family:inherit;font-size:clamp(15px,7.7cqw,22px);font-weight:350;line-height:1.5;letter-spacing:.02em;-webkit-line-clamp:4;text-wrap:pretty; }
+.v3-scope .iw-quote-text { color:var(--uw-fg,#f6f6f7);font-family:inherit;font-size:clamp(15px,7.7cqw,22px);font-weight:350;line-height:1.5;letter-spacing:.02em;-webkit-line-clamp:4;text-wrap:pretty; }
 .v3-scope .nv-quote-line { display:block;width:32px;height:3px;border-radius:9px;background:var(--v3-accent);margin-top:3px; }
 .v3-scope .iw-quote-author { color:var(--v3-accent); }
 .v3-scope .iw-detail-quote { font-family:inherit;font-weight:350;font-size:24px;line-height:1.65;color:var(--v3-accent); }
@@ -52,7 +51,7 @@
 .v3-scope .nv-usage-amount > span:last-child { font-size:18px;line-height:1;font-weight:350; }
 .v3-scope .nv-usage-track { display:flex;position:relative;justify-content:space-evenly;align-items:center;flex:none;height:16px;border-radius:99px;background:var(--v3-soft);overflow:hidden; }
 .v3-scope .nv-usage-track > i { position:absolute;inset:0 auto 0 0;border-radius:inherit;background:var(--v3-accent); }
-.v3-scope .nv-usage-track > span { position:relative;width:5px;height:5px;border-radius:50%;background:var(--v3-track-marker); }
+.v3-scope .nv-usage-track > span { position:relative;width:5px;height:5px;border-radius:50%;background:#05060580; }
 .v3-scope .nv-usage-bottom { display:flex;justify-content:space-between;gap:6px;font-size:9px;color:var(--uw-muted); }
 .v3-scope .nv-usage-bottom > span { min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .v3-scope .iw-usage-detail-hero .uw-metric { color:var(--v3-accent); }
@@ -61,7 +60,7 @@
 .v3-scope .iw-weather .uw-main { display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:14px; }
 .v3-scope .nv-weather-hero { display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;min-height:0; }
 .v3-scope .nv-weather-copy { min-width:0;display:flex;flex-direction:column;gap:4px; }
-.v3-scope .iw-weather-city { display:block;color:var(--uw-fg);font-weight:400;font-size:12px;max-width:100%; }
+.v3-scope .iw-weather-city { display:block;color:var(--uw-fg,#f7f7f8);font-weight:400;font-size:12px;max-width:100%; }
 .v3-scope .nv-weather-temperature { display:flex;align-items:flex-start;gap:1px;min-width:0;color:var(--v3-accent); }
 .v3-scope .nv-weather-temperature .v3-number { --v3-number-size:clamp(36px,20cqw,60px);line-height:1; }
 .v3-scope .nv-weather-temperature > span:last-child { font-size:29px;line-height:1; }
@@ -69,29 +68,23 @@
 .v3-scope .nv-weather-hero .iw-weather-symbol { display:grid;width:66px;height:66px;flex:none;opacity:1; }
 .v3-scope .nv-weather-timeline { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none;min-width:0; }
 .v3-scope .nv-weather-timeline > div { display:flex;flex-direction:column;align-items:center;gap:5px;border-radius:14px;padding:6px 4px;background:var(--v3-soft); }
-.v3-scope .nv-weather-timeline > div:first-child { background:color-mix(in srgb,var(--v3-accent) 22%,var(--v3-surface)); }
+.v3-scope .nv-weather-timeline > div:first-child { background:color-mix(in srgb,var(--v3-accent) 22%,#0b0c0e); }
 .v3-scope .nv-weather-timeline > div > span { font-size:9px;color:var(--uw-muted); }
 .v3-scope .nv-weather-timeline b { font-size:15px;font-weight:400;line-height:1.2;color:var(--v3-accent); }
 .v3-scope .iw-weather-summary .uw-metric { color:var(--v3-accent); }
 .v3-scope .iw-weather-summary .uw-sparkline { color:var(--v3-accent); }
 .v3-scope .iw-weather-summary .uw-sparkline polyline { stroke-width:3; }
-.v3-scope .iw-weather-symbol.has-snow .iw-weather-state { color:var(--v3-accent); }
 
 .v3-scope .iw-news .uw-main { justify-content:flex-start; }
 .v3-scope .iw-news-headlines { --iw-headline-row-height:29px;--iw-headline-line-height:18px;--iw-headline-line-limit:1;--iw-headline-row-padding:0;--iw-headline-max-count:20;flex:1;width:100%; }
 .v3-scope .iw-news-headlines > li { align-items:center;gap:9px;border:0; }
 .v3-scope .iw-news-headlines .iw-headline-index { color:var(--v3-accent);font-size:9px;line-height:1;width:18px;flex:none;letter-spacing:.025em; }
-.v3-scope .iw-news-headlines a { color:var(--uw-fg);font-weight:400;font-size:12px;line-height:18px; }
+.v3-scope .iw-news-headlines a { color:var(--uw-fg,#f3f4f6);font-weight:400;font-size:12px;line-height:18px; }
 .v3-scope .iw-news-headlines > li:first-child a { color:var(--v3-accent); }
 .v3-scope .iw-news-detail-list > li > span { color:var(--v3-accent); }
 .v3-scope .iw-news-masthead { color:var(--v3-accent); }
 .v3-scope .iw-news-empty p { font-size:15px;font-weight:400; }
-.v3-scope .iw-news-detail-list > li { border-color:var(--v3-line-subtle); }
-
-/* Keep small supporting text legible on the light material. */
-.v3-scope[data-theme=light] :is(.nv-clock-phase small,.nv-clock-scale,.iw-calendar-grid .is-weekend) { opacity:1; }
-.v3-scope[data-theme=light] .nv-weather-timeline > div:first-child { background:var(--v3-soft); }
-.v3-scope[data-theme=light] .nv-weather-timeline > div > span { color:var(--v3-key-utility-foreground); }
+.v3-scope .iw-news-detail-list > li { border-color:#ffffff0a; }
 
 /* Broad tiles turn time and forecast into horizontal instruments. */
 @container uw (min-width:300px) and (min-height:151px) {
