@@ -8,13 +8,6 @@
   backdrop-filter: none;
 }
 
-/* The library has one stationary blurred shell. Its nested icon/widget
-   previews keep their material fills and lighting without a second sample. */
-:scope[data-material='liquid-glass'] .board-library-dialog .board-card::before {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
 /* Text already fades through its span mask; no extra filtered strip is needed. */
 :scope[data-material='liquid-glass'] .board-fade-line.is-overflowing::after { content: none; }
 

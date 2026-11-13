@@ -250,13 +250,13 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .window-chevron .iconfont { font-size: 16px; }
 
 .horizontal-browser { display: grid; grid-template-rows: auto auto 1fr; width: 100%; height: calc(100% - 40px); margin-top: 40px; overflow: hidden; }
-.address-row { display: flex; align-items: center; gap: 8px; padding: 6px; background: transparent; border-bottom: 0; backdrop-filter: none; }
-.address-actions-left, .address-actions-right { flex: 0 0 auto; }
+.address-row { --toolbar-control-height: 30px; display: flex; align-items: center; gap: 8px; padding: 6px; background: transparent; border-bottom: 0; backdrop-filter: none; }
+.address-actions-left, .address-actions-right { flex: 0 0 auto; height: var(--toolbar-control-height); }
 .nav-actions, .toolbar-actions { display: flex; align-items: center; gap: 4px; }
-.nav-actions button { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; color: var(--nine-color-text-secondary); }
+.nav-actions button { display: grid; place-items: center; width: var(--toolbar-control-height); height: var(--toolbar-control-height); border-radius: 10px; color: var(--nine-color-text-secondary); }
 .nav-actions button:disabled { color: var(--nine-color-text-disabled); }
 .nav-actions .iconfont { font-size: 16px; }
-.address-field { display: flex; align-items: center; flex: 1; min-width: 0; height: 30px; padding: 0 3px 0 12px; border-radius: 999px; background: transparent; transition: background-color 200ms ease; }
+.address-field { display: flex; align-items: center; flex: 1; min-width: 0; height: var(--toolbar-control-height); padding: 0 3px 0 12px; border-radius: 999px; background: transparent; transition: background-color 200ms ease; }
 .address-field:hover { background: var(--color-fill-a3); }
 .address-field:focus-within { background:var(--nine-color-border-alpha-subtle); }
 .address-field:hover { transition-delay: 0s; }
@@ -270,14 +270,14 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .address-field-actions button { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border-radius: 20px; color: var(--nine-color-text-tertiary); cursor: pointer; }
 .address-field-actions .iconfont { font-size: 14px; }
 .toolbar-actions { gap: 6px; }
-.toolbar-primary { display: flex; align-items: center; gap: 4px; }
-.toolbar-icon-button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border-radius: 10px; color: var(--nine-color-text-secondary); cursor: pointer; }
+.toolbar-primary { display: flex; align-items: center; gap: 4px; height: var(--toolbar-control-height); }
+.toolbar-icon-button { display: grid; place-items: center; width: var(--toolbar-control-height); height: var(--toolbar-control-height); padding: 0; border-radius: 10px; color: var(--nine-color-text-secondary); cursor: pointer; }
 .nav-actions button, .address-field-actions button, .toolbar-icon-button { transition: background-color 100ms ease; }
 .nav-actions button:not(:disabled), .address-field-actions button:not(:disabled) { cursor: pointer; }
 .nav-actions button:not(:disabled):hover, .address-field-actions button:not(:disabled):hover, .toolbar-icon-button:not(:disabled):hover { background: var(--color-fill-a3); }
 .toolbar-icon-button .iconfont { font-size: 16px; }
 .toolbar-avatar { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
-.chat-button { height: 28px; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border-radius: 10px; background: var(--color-fill-a3); color: var(--nine-color-text-title); font-size: 12px; line-height: 16px; font-weight: 500; cursor: pointer; }
+.chat-button { height: var(--toolbar-control-height); display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border-radius: 10px; background: var(--color-fill-a3); color: var(--nine-color-text-title); font-size: 12px; line-height: 16px; font-weight: 500; cursor: pointer; }
 .chat-button-icon { width:16px; height:16px; flex:0 0 16px; background:currentColor; -webkit-mask:url('./assets/new-tab.svg') center / contain no-repeat; mask:url('./assets/new-tab.svg') center / contain no-repeat; }
 .chat-button { transition: background-color 100ms ease 100ms; }
 .chat-button:hover { background: var(--color-border-a2); }
@@ -379,7 +379,8 @@ html[data-mode="dark"] img[data-site="pinterest"] { content:url('/site-icons/pin
 .mode-vertical .browser-window { grid-template-rows:auto minmax(0,1fr); }
 .vertical-topbar { grid-column:1 / -1; grid-row:1; min-width:0; }
 .vertical-topbar .address-row { padding:6px 6px 6px 110px; }
-.vertical-topbar-controls { display:flex; flex:none; align-items:center; gap:4px; }
+.vertical-topbar-controls { display:flex; flex:none; align-items:center; gap:4px; height:var(--toolbar-control-height); }
+.vertical-topbar-controls > button { width:var(--toolbar-control-height); height:var(--toolbar-control-height); flex-basis:var(--toolbar-control-height); }
 .mode-vertical .vertical-sidebar { grid-column:1; grid-row:2; }
 .mode-vertical .vertical-browser-container { grid-column:2; grid-row:2; padding:0; }
 

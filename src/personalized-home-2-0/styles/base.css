@@ -12,11 +12,7 @@
   --bg: var(--nine-color-bg-page);
   --default-home-background: transparent;
   --surface: var(--nine-color-fill-layer-base);
-  --tile-surface: color-mix(in srgb, var(--surface) 70%, transparent);
-  --home-card-surface: var(--tile-surface);
-  --home-card-outline: var(--nine-border-thin) solid var(--nine-color-border-alpha-regular);
   --home-card-radius: var(--nine-radius-md);
-  --home-card-resting-shadow: 0 2px 4px -2px rgba(0, 0, 0, 0.04);
   /* 新鲸语 5106:51739 / 5106:49602: 悬浮容器, 90% fill + 30px background blur. */
   --floating-surface-solid: var(--nine-color-fill-layer-base);
   --floating-surface-glass: var(--nine-color-fill-floating);
@@ -24,7 +20,6 @@
   --text: var(--nine-color-text-title);
   --muted: var(--nine-color-text-tertiary);
   --border: var(--nine-color-border-alpha-subtle);
-  --tile-hover-shadow: 0 8px 24px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0);
   --hover: var(--nine-color-fill-layer-strong);
   --segmented: var(--nine-color-fill-layer-muted);
   --accent: var(--nine-color-action-primary);

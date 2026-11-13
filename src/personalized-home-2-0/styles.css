@@ -1,5 +1,5 @@
 /* Homepage stylesheet entry. Geometry stays with its component; shared
-   materials are applied once in styles/home-surfaces.css after theme styles. */
+   card materials live in board/board-card-surface.css; input materials in composer-surface.css. */
 @import './styles/base.css';
 @import './styles/home-layout.css';
 @import './styles/home-background.css';

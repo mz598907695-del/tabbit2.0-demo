@@ -51,7 +51,7 @@
 }
 
 /* A single static reflection, with no pointer tracking or animation loop. */
-:scope[data-material='liquid-glass'][data-theme] :is(.tb-composer-surface, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
+:scope[data-material='liquid-glass'][data-theme] :is(.page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
   --liquid-light: var(--glass-light);
   --liquid-rim: inset 0 0 0 .5px rgb(var(--glass-edge) / var(--glass-edge-alpha)), inset 0 .5px .5px rgb(var(--glass-edge) / var(--glass-top-alpha));
   --liquid-shadow: var(--liquid-rim), 0 5px 18px rgb(var(--glass-shadow) / .09), 0 1px 3px rgb(var(--glass-shadow) / .045);

@@ -7,6 +7,7 @@ import { IconFont, SiteFavicon } from './BrowserIcons';
 import BrowserIdeasMenu from './BrowserIdeasMenu';
 import BrowserMoreMenu from './BrowserMoreMenu';
 import ProfileMenu from './ProfileMenu';
+import BrowserExtensions from './BrowserExtensions';
 
 const bookmarks: { label: string; folder?: boolean; site?: string }[] = [
   { label: "美团", folder: true }, { label: "个人收藏", folder: true },
@@ -68,7 +69,8 @@ export default function WindowToolbar({ isNewTab, tabId, leading, showBookmarks 
       </div>
       <div className="toolbar-actions address-actions-right" data-tauri-drag-region>
         <div className="toolbar-primary" data-tauri-drag-region>
-          <button className="toolbar-icon-button" aria-label="应用"><IconFont name="xingzhuang_zhengfangxing_sanjiaoxing_yua"/></button>
+          <BrowserExtensions/>
+          <span className="toolbar-extensions-divider" aria-hidden="true"/>
           <button ref={profileButtonRef} className="toolbar-icon-button" aria-label="个人资料" aria-haspopup="dialog" aria-expanded={profileOpen} onClick={() => { setMoreOpen(false); setIdeasOpen(false); setProfileOpen(open => !open); }}><img className="toolbar-avatar" src={profileAvatar} alt="" draggable={false}/></button>
           <button ref={moreButtonRef} className="toolbar-icon-button" aria-label="更多" aria-haspopup="menu" aria-expanded={moreOpen} onClick={() => { setProfileOpen(false); setIdeasOpen(false); setMoreOpen(open => !open); }}><IconFont name="dian_shenglvehao"/></button>
         </div>

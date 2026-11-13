@@ -1,19 +1,16 @@
 @scope (.personalized-home) {
 /* Shared Liquid Glass scope and interaction; the material is defined in liquid-glass-macos.css. */
 /* Each surface owns its light, preventing nested previews from inheriting it. */
-:scope[data-material='liquid-glass'] :is(.tb-composer-surface, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
+:scope[data-material='liquid-glass'] :is(.page-indicator-capsule, .page-indicator-action, .board-empty > :where(button), .shortcut-catalog-card, .board-library-shortcut-card, .widget-ai-artwork-card) {
   --liquid-light: linear-gradient(transparent, transparent);
 }
-:scope[data-material='liquid-glass'] :is(.tb-composer-surface, .page-indicator-capsule) {
+:scope[data-material='liquid-glass'] .page-indicator-capsule {
   background: var(--liquid-light), var(--liquid-fill);
   border-color: transparent;
   box-shadow: var(--liquid-shadow);
   -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness, 1));
   backdrop-filter: blur(var(--liquid-blur)) saturate(var(--liquid-saturation)) brightness(var(--liquid-brightness, 1));
 }
-:scope[data-material='liquid-glass'] .tb-composer:focus-within .tb-composer-surface { border-color: transparent; box-shadow: var(--liquid-shadow); }
-:scope[data-material='liquid-glass'] .board-item.is-widget { background: transparent; }
-:scope[data-material='liquid-glass'] .board-widget-card :is(.widget-countdown-content, .widget-draw-content, .widget-quote-content) { background: transparent; }
 :scope[data-material='liquid-glass'] :is(.page-indicator-action, .board-empty > :where(button)) {
   background: var(--liquid-light), var(--liquid-control-fill);
   box-shadow: var(--liquid-control-shadow);
@@ -50,7 +47,7 @@
 }
 @media (prefers-reduced-transparency: reduce) {
   :scope[data-material='liquid-glass'][data-theme] { --liquid-fill: linear-gradient(var(--liquid-solid), var(--liquid-solid)); --liquid-control-fill: var(--liquid-fill); --liquid-hover-fill: var(--liquid-fill); --liquid-blur: 0px; }
-  :scope[data-material='liquid-glass'] :is(.tb-composer-surface, .page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  :scope[data-material='liquid-glass'] :is(.page-indicator-capsule, .page-indicator-action, .board-empty > :where(button)) { -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
 
 }

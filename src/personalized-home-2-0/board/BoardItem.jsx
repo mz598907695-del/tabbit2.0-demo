@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { BoardItemContent, boardItemName } from './BoardItemContent';
 
 // One live board article: geometry, accessible interaction and editing controls.
-// The card's material and artwork are owned by BoardItemContent/home-surfaces.css.
+// The card's material and artwork are owned by BoardItemContent/board-card-surface.css.
 export default function BoardItem({
   item, style, editing, selected, dragging, resizing,
   appearanceTheme, shortcutSize, shortcutShape, active,

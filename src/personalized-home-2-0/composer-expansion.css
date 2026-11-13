@@ -6,38 +6,6 @@
   gap: 0;
   min-width: 0;
 }
-.tb-composer-frame::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  bottom: calc(var(--dock-expanded-height, 0px) - var(--dock-surface-height, 0px));
-  box-sizing: border-box;
-  border: .5px solid rgb(from var(--nine-color-border-alpha-subtle) r g b / 5%);
-  border-radius: var(--nine-radius-xl);
-  background: var(--composer-frame-fill, var(--nine-color-fill-layer-strong));
-  -webkit-backdrop-filter: blur(30px);
-  backdrop-filter: blur(30px);
-  opacity: 0;
-  visibility: hidden;
-  transition: inset 320ms cubic-bezier(.22, 1, .36, 1), border-radius 320ms cubic-bezier(.22, 1, .36, 1), opacity 200ms var(--nine-motion-easing-standard), visibility 0s linear 320ms;
-  pointer-events: none;
-}
-.tb-composer-wrap[data-expansion] > .tb-composer-frame::before {
-  inset: -6px;
-  top: calc(-6px - var(--composer-task-height, 0px));
-  bottom: calc(var(--dock-expanded-height, 0px) - var(--dock-surface-height, 0px) - 6px);
-  border-radius: calc(var(--nine-radius-xl) + 6px);
-  opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
-}
-.tb-composer-wrap[data-docked='true'] > .tb-composer-frame::before { opacity: 0; }
-.tb-composer-wrap[data-expansion][data-task-mode] > .tb-composer-frame::before {
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
-.tb-composer-wrap[data-mode-switch-instant] > .tb-composer-frame::before,
 .tb-composer-wrap[data-mode-switch-instant] .tb-composer-expansion,
 .tb-composer-wrap[data-mode-switch-instant] .tb-composer-modes::before {
   transition: none;
@@ -49,9 +17,6 @@
   inset-inline: 0;
 }
 /* Conversation pickers stack above the task controls; homepage pickers stay below. */
-:where(.aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap[data-expansion] > .tb-composer-frame::before {
-  top: calc(-6px - var(--composer-task-height, 0px) - var(--composer-expansion-height, 0px));
-}
 :where(.aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap > .tb-composer-frame > .tb-composer-expansion:not(.tb-composer-task-expansion) {
   position: absolute;
   bottom: calc(100% + var(--composer-task-height, 0px));
@@ -86,13 +51,6 @@
 .tb-composer-plus > svg { transition: transform 240ms var(--nine-motion-easing-standard); }
 .tb-composer-plus.is-open > svg { transform: rotate(45deg); }
 @media (prefers-reduced-motion: reduce) {
-  .tb-composer-wrap > .tb-composer-frame::before, .tb-composer-expansion, .tb-composer-plus > svg { transition: none; }
-}
-@media (prefers-reduced-transparency: reduce) {
-  .tb-composer-frame::before {
-    background: var(--nine-color-fill-container-muted);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+  .tb-composer-expansion, .tb-composer-plus > svg { transition: none; }
 }
 }

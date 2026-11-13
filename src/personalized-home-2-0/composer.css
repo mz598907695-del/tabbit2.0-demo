@@ -9,14 +9,9 @@
   width: 100%;
   min-height: 120px;
   padding: var(--nine-space-sm);
-  border: .5px solid transparent;
-  border-radius: var(--nine-radius-xl);
-  background: transparent;
   color: var(--nine-color-text-title);
-  box-shadow: none;
   pointer-events: none;
   box-sizing: border-box;
-  transition: border-color var(--nine-motion-duration-fast), box-shadow var(--nine-motion-duration-fast);
 }
 .tb-composer .tb-composer-input {
   display: block;
@@ -263,7 +258,7 @@
   .tb-composer-end { gap: calc(var(--spacing-base) * 0.5); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tb-composer, .tb-composer-send, .tb-model-trigger svg { transition: none; }
+  .tb-composer-send, .tb-model-trigger svg { transition: none; }
   .tb-composer-send:active { transform: none; }
 }
 

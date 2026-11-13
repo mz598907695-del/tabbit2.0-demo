@@ -1,0 +1,29 @@
+.toolbar-extensions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: var(--toolbar-control-height);
+  box-sizing: border-box;
+  padding: .5px;
+  border: .5px solid transparent;
+  border-radius: 999px;
+  transition: border-color 100ms ease;
+}
+@media (hover: hover) {
+  .toolbar-extensions:hover { border-color: rgb(from var(--nine-color-border-alpha-regular) r g b / 15%); }
+}
+.toolbar-extensions > .toolbar-icon-button { flex: none; width: 28px; height: 28px; }
+.toolbar-extensions > .toolbar-icon-button > svg { width: 16px; height: 16px; stroke-width: 1.8; }
+.toolbar-extension-note {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  color: #251600;
+  background: #ff9e24;
+}
+.toolbar-extension-note > svg { width: 12px; height: 13px; stroke-width: 1.8; }
+.toolbar-extensions > .toolbar-icon-button > .toolbar-extension-crystal { width: 16px; height: 16px; }
+.toolbar-extensions-divider { flex: none; width: 1px; height: 16px; margin: 0 3px; background: var(--nine-color-border-alpha-regular); }

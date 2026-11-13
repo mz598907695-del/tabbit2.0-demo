@@ -1,0 +1,119 @@
+@scope (.personalized-home) {
+/* Single owner of shortcut/widget card geometry, material, rim and shadows.
+   Keep --home-content-surface-fill: space appearance gestures interpolate it.
+   Widget/shortcut styles only lay out the artwork and text inside this shell. */
+.board-card {
+  --home-content-surface-fill: rgba(255, 255, 255, .8);
+  --board-card-noise: none;
+  --board-card-backdrop: var(--nine-backdrop-blur-30);
+  --board-card-brightness: 1;
+  --board-card-outline: var(--nine-border-thin) solid var(--nine-color-border-alpha-regular);
+  --board-card-resting-shadow: 0 2px 4px -2px rgba(0, 0, 0, .04);
+  --board-card-hover-shadow: 0 8px 24px rgba(0, 0, 0, .05);
+  --board-card-inner-shadow: inset 0 4px 10px rgba(255, 255, 255, .04);
+  --board-card-lighting: var(--board-card-inner-shadow);
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow: visible;
+  border: 0;
+  border-radius: var(--board-card-radius, 24px);
+  isolation: isolate;
+  background: transparent;
+  box-shadow: var(--board-card-resting-shadow);
+  transition: box-shadow 300ms var(--nine-motion-easing-standard);
+}
+.board-card[data-card-size='icon'] { width: 50px; height: 50px; }
+.board-card[data-card-shape='circle'] { border-radius: 50%; }
+.board-card[data-card-shape='square'] { border-radius: var(--home-card-radius); }
+.board-card-content {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: inherit;
+}
+/* Skip distant widget contents without clipping the material or its rim. */
+.board-widget-card > .board-card-content {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 240px;
+}
+[data-page-swiping] .board-widget-card > .board-card-content { content-visibility: visible; }
+:scope[data-theme='light'][data-material='liquid-glass'] .board-card {
+  --board-card-backdrop: blur(16px) saturate(var(--liquid-saturation));
+}
+:scope[data-theme='dark'] .board-card {
+  --home-content-surface-fill: rgba(51, 51, 51, .35);
+  --board-card-noise: url('/personalized-home-2-0/asset/material-dither.webp');
+  --board-card-backdrop: blur(60px) saturate(100%);
+  --board-card-brightness: 1.4;
+  --board-card-outline: 0;
+  --board-card-resting-shadow: none;
+  --board-card-lighting: var(--board-card-inner-shadow), inset 0 .5px 0 rgba(255, 255, 255, .3), inset 0 -.5px 0 rgba(255, 255, 255, .06);
+}
+/* Material below content; brightness never filters icons, photos or text. */
+.board-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--board-card-noise) 0 0 / 64px 64px repeat, var(--home-content-surface-fill);
+  -webkit-backdrop-filter: var(--board-card-backdrop);
+  backdrop-filter: var(--board-card-backdrop);
+  filter: brightness(var(--board-card-brightness));
+  pointer-events: none;
+}
+/* Put the rim and soft inset above the artwork so neither is covered by the
+   material plane or opaque widget images. Hover only changes the outer shadow. */
+.board-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: var(--board-card-outline);
+  border-radius: inherit;
+  box-shadow: var(--board-card-lighting);
+  pointer-events: none;
+}
+.home .workspace-board .board-item:not(.is-dragging):is(:focus-visible, :focus-within) .board-card {
+  box-shadow: var(--board-card-hover-shadow);
+}
+@media (hover: hover) {
+  .home .workspace-board .board-item:not(.is-dragging):hover .board-card { box-shadow: var(--board-card-hover-shadow); }
+}
+.home .workspace-board .board-item.is-dragging .board-card { box-shadow: none; }
+/* Material sampling exceptions live with the material, not in theme overrides. */
+:scope[data-theme='light'][data-material='liquid-glass'][data-material-opaque='true'] .board-card {
+  --board-card-backdrop: none;
+}
+:scope[data-material='liquid-glass'] .board-library-dialog .board-card::before {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.board-widget-card[data-widget-near='false']::before {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  filter: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+  .board-card::before {
+    background: var(--nine-color-fill-container-base);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .board-card { transition: none; }
+}
+}

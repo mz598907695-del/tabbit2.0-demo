@@ -18,6 +18,7 @@ import { useTaskShockwave } from './useTaskShockwave';
 import './composer.css';
 import './task-mount.css';
 import './composer-scroll.css';
+import './composer-surface.css';
 
 const INLINE_PANEL_LABELS = { add: '添加参考内容' };
 
@@ -399,7 +400,7 @@ export const Composer = forwardRef(function Composer({ onSubmit, onHandoff, onOv
       </div>
     </ComposerExpansion>
     <form className="tb-composer" onSubmit={submit}>
-      <div className="tb-composer-surface" aria-hidden="true" onClick={() => focusInput()}/>
+      <div className="tb-composer-surface" aria-hidden="true" onClick={() => focusInput()}></div>
       <ComposerWeather />
       <input ref={fileInputRef} type="file" multiple hidden onChange={addFiles} aria-label="选择本地文件" />
       <input ref={folderInputRef} type="file" multiple webkitdirectory="" hidden onChange={addFiles} aria-label="选择本地文件夹" />

@@ -1,0 +1,122 @@
+@scope (.personalized-home) {
+/* Single owner of composer fill, blur, rim and shadow, including the task
+   expansion backing. Geometry and scroll transforms remain with their components.
+   Keep --home-content-surface-fill: space appearance gestures interpolate it. */
+.tb-composer {
+  border: 0;
+  border-radius: var(--nine-radius-xl);
+  background: transparent;
+}
+.tb-composer-surface {
+  --home-content-surface-fill: rgba(255,255,255,.8);
+  --composer-surface-noise: none;
+  --composer-surface-blur: blur(30px) saturate(100%);
+  --composer-surface-brightness: 1;
+  --composer-surface-edge: inset 0 0 0 .5px rgba(0,0,0,.15);
+  --composer-surface-shadow: 0 2px 4px -2px rgba(0,0,0,.04);
+  --composer-surface-active-shadow: 0 4px 20px rgba(0,0,0,.04);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--dock-surface-height, 100%);
+  box-sizing: border-box;
+  border: 0;
+  border-radius: calc(var(--nine-radius-xl) + var(--nine-radius-xxs) * var(--dock-progress,0));
+  isolation: isolate;
+  background: transparent;
+  box-shadow: var(--composer-surface-shadow);
+  pointer-events: auto;
+  z-index: -1;
+  transition: box-shadow 300ms var(--nine-motion-easing-standard);
+}
+/* Dark: uniform material, top/bottom highlights, no external shadow. */
+:scope[data-theme='dark'] .tb-composer-surface {
+  --home-content-surface-fill: rgba(51,51,51,.35);
+  --composer-surface-blur: blur(60px) saturate(100%);
+  --composer-surface-noise: url('/personalized-home-2-0/asset/material-dither.webp');
+  --composer-surface-brightness: 1.4;
+  --composer-surface-edge: inset 0 .5px 0 rgba(255,255,255,.3),inset 0 -.5px 0 rgba(255,255,255,.06);
+  --composer-surface-shadow: none;
+  --composer-surface-active-shadow: none;
+}
+.tb-composer:focus-within .tb-composer-surface,
+.tb-composer-wrap[data-editing='true'] .tb-composer-surface {
+  --composer-surface-shadow: var(--composer-surface-active-shadow);
+}
+/* Fill below content; visible rim above it. They never share a shadow layer. */
+.tb-composer-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--composer-surface-noise) 0 0 / 64px 64px repeat,var(--home-content-surface-fill);
+  -webkit-backdrop-filter: var(--composer-surface-blur);
+  backdrop-filter: var(--composer-surface-blur);
+  filter: brightness(var(--composer-surface-brightness));
+  pointer-events: none;
+}
+.tb-composer-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  border-radius: inherit;
+  box-shadow: var(--composer-surface-edge);
+  pointer-events: none;
+}
+/* The component-library preview has its own compact geometry. */
+.board-library-ai-card .tb-composer-surface { border-radius:16px; }
+/* This is a separate backing around task controls/inline panels, not a
+   second outline on the input. It is hidden until an expansion opens. */
+.tb-composer-frame::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  bottom: calc(var(--dock-expanded-height, 0px) - var(--dock-surface-height, 0px));
+  box-sizing: border-box;
+  border: .5px solid rgb(from var(--nine-color-border-alpha-subtle) r g b / 5%);
+  border-radius: var(--nine-radius-xl);
+  background: var(--composer-frame-fill, var(--nine-color-fill-layer-strong));
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+  opacity: 0;
+  visibility: hidden;
+  transition: inset 320ms cubic-bezier(.22, 1, .36, 1), border-radius 320ms cubic-bezier(.22, 1, .36, 1), opacity 200ms var(--nine-motion-easing-standard), visibility 0s linear 320ms;
+  pointer-events: none;
+}
+.tb-composer-wrap[data-expansion] > .tb-composer-frame::before {
+  inset: -6px;
+  top: calc(-6px - var(--composer-task-height, 0px));
+  bottom: calc(var(--dock-expanded-height, 0px) - var(--dock-surface-height, 0px) - 6px);
+  border-radius: calc(var(--nine-radius-xl) + 6px);
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.tb-composer-wrap[data-docked='true'] > .tb-composer-frame::before { opacity: 0; }
+.tb-composer-wrap[data-expansion][data-task-mode] > .tb-composer-frame::before {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+:where(.aiw-conversation-footer, .widget-ai-chat-compose) > .tb-composer-wrap[data-expansion] > .tb-composer-frame::before {
+  top: calc(-6px - var(--composer-task-height, 0px) - var(--composer-expansion-height, 0px));
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .tb-composer-frame::before {
+    background: var(--nine-color-fill-container-muted);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+.tb-composer-wrap[data-mode-switch-instant] > .tb-composer-frame::before { transition:none; }
+@media (prefers-reduced-motion:reduce) {
+  .tb-composer-surface,.tb-composer-wrap > .tb-composer-frame::before { transition:none; }
+}
+}
