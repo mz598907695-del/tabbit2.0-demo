@@ -12,6 +12,7 @@ const { values } = parseArgs({ options:{
   'base-url':{ type:'string' },
   'notes':{ type:'string', default:'支持自动检查更新、后台下载和重启安装。' },
   'no-dmg':{ type:'boolean', default:false },
+  'bundled-defaults':{ type:'boolean', default:false },
 } });
 if (process.platform !== 'darwin') throw new Error('This release script builds the macOS package');
 const config = JSON.parse(readFileSync(join(root, 'src-tauri/tauri.conf.json'), 'utf8'));
@@ -24,7 +25,12 @@ const run = (command, args, options = {}) => {
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`${command} exited with ${result.status}`);
 };
-if (!values['skip-build']) run('npm', ['run','tauri','build','--','--bundles','app']);
+if (!values['skip-build']) {
+  const buildArgs = ['run','tauri','build','--','--bundles','app'];
+  // Team releases use reviewed defaults, never a runner's personal WebKit data.
+  if (values['bundled-defaults']) buildArgs.push('--config', JSON.stringify({ build:{ beforeBuildCommand:'npm run build:tauri' } }));
+  run('npm', buildArgs);
+}
 const sourceApp = join(root, 'src-tauri/target/release/bundle/macos/tabbit-2-demo.app');
 const plistVersion = spawnSync('/usr/libexec/PlistBuddy', ['-c','Print :CFBundleShortVersionString',join(sourceApp,'Contents/Info.plist')], { encoding:'utf8' });
 if (plistVersion.status !== 0 || plistVersion.stdout.trim() !== version) throw new Error('Built application version does not match release configuration');

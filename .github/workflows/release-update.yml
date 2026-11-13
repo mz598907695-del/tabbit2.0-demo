@@ -1,4 +1,4 @@
-name: Release macOS
+name: Release desktop update
 run-name: Release ${{ inputs.version }} · ${{ inputs.publish && 'publish' || 'verify only' }}
 
 on:
@@ -16,7 +16,7 @@ on:
       publish:
         description: '验证通过后公开发布；取消勾选则只构建验证'
         required: true
-        default: true
+        default: false
         type: boolean
 
 permissions:
@@ -47,6 +47,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TABBIT_RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
           SHOULD_PUBLISH: ${{ inputs.publish }}
+          RELEASE_APP_ID: ${{ vars.TABBIT_RELEASE_APP_ID }}
+          RELEASE_APP_PRIVATE_KEY: ${{ secrets.TABBIT_RELEASE_APP_PRIVATE_KEY }}
         run: |
           python3 - <<'PY'
           import os, platform
@@ -54,7 +56,10 @@ jobs:
               raise SystemExit('Apple Silicon runner required')
           required = ['TAURI_SIGNING_PRIVATE_KEY']
           if os.environ['SHOULD_PUBLISH'] == 'true':
-              required.append('TABBIT_RELEASE_TOKEN')
+              if os.environ.get('RELEASE_APP_ID'):
+                  required.append('RELEASE_APP_PRIVATE_KEY')
+              else:
+                  required.append('TABBIT_RELEASE_TOKEN')
           for name in required:
               if not os.environ.get(name):
                   raise SystemExit('Missing repository secret: ' + name)
@@ -71,18 +76,31 @@ jobs:
             src-tauri/target
           key: macos-arm64-release-${{ hashFiles('src-tauri/Cargo.lock') }}
       - name: Prepare release version
-        env:
-          TABBIT_RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
-        run: node scripts/prepare-ci-release.mjs "$RELEASE_VERSION"
+        run: |
+          node --input-type=module <<'JS'
+          import { compareReleaseVersions, prepareReleaseVersion } from './scripts/prepare-release-version.mjs';
+          const version=process.env.RELEASE_VERSION;
+          compareReleaseVersions(version,version);
+          const response=await fetch('https://api.github.com/repos/mz598907695-del/tabbit-demo-updates/releases/latest',{
+            headers:{Accept:'application/vnd.github+json','User-Agent':'Tabbit-team-release'},
+          });
+          if(!response.ok)throw new Error(`Cannot verify latest public version: HTTP ${response.status}`);
+          const release=await response.json();
+          const latest=release.tag_name.replace(/^v/,'');
+          if(compareReleaseVersions(version,latest)<=0)throw new Error(`Version must be newer than published ${latest}`);
+          const result=prepareReleaseVersion({version});
+          console.log(`Prepared ${result.previousVersion} → ${result.version}; latest public version is ${latest}.`);
+          JS
       - name: Check source, tests and frontend build
         run: |
           npm run check
-          python3 -m unittest discover -s scripts/tests -p 'test_release_*.py'
       - name: Build and sign update artifacts
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npm run release:update -- --notes "$RELEASE_NOTES"
+        run: npm run release:update -- --bundled-defaults --notes "$RELEASE_NOTES"
+      - name: Verify signed release artifacts
+        run: node scripts/verify-update-artifacts.mjs --version "$RELEASE_VERSION"
       - name: Verify real native updater
         run: python3 scripts/test-updater-native.py
       - name: Save signed build artifacts
@@ -90,18 +108,49 @@ jobs:
         with:
           name: tabbit-${{ inputs.version }}-arm64
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
           path: |
             release/${{ inputs.version }}/*.dmg
             release/${{ inputs.version }}/*.app.tar.gz
             release/${{ inputs.version }}/*.app.tar.gz.sig
             release/${{ inputs.version }}/latest.json
+      - name: Create update-repository App token
+        id: release-app
+        if: inputs.publish && vars.TABBIT_RELEASE_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TABBIT_RELEASE_APP_ID }}
+          private-key: ${{ secrets.TABBIT_RELEASE_APP_PRIVATE_KEY }}
+          owner: mz598907695-del
+          repositories: tabbit-demo-updates
+          permission-contents: write
       - name: Publish verified update
         if: inputs.publish
         env:
-          TABBIT_RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
-          TABBIT_SOURCE_TOKEN: ${{ github.token }}
+          TABBIT_RELEASE_TOKEN: ${{ steps.release-app.outputs.token || secrets.TABBIT_RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: python3 scripts/publish-update.py --publish
+      - name: Verify public update endpoint
+        if: inputs.publish
+        run: |
+          python3 - <<'PY'
+          import json, os, time
+          from urllib.request import Request, urlopen
+          endpoint='https://github.com/mz598907695-del/tabbit-demo-updates/releases/latest/download/latest.json'
+          for attempt in range(12):
+              try:
+                  request=Request(endpoint+'?verify='+os.environ['GITHUB_RUN_ID']+'-'+str(attempt),headers={'Cache-Control':'no-cache'})
+                  with urlopen(request,timeout=30) as response:
+                      manifest=json.load(response)
+                  if manifest.get('version') == os.environ['RELEASE_VERSION']:
+                      print('Public update endpoint verified:', manifest['version'])
+                      break
+              except (OSError, ValueError):
+                  pass
+              time.sleep(5)
+          else:
+              raise SystemExit('Public update endpoint did not return the published version; inspect the release before retrying.')
+          PY
       - name: Write release summary
         env:
           SHOULD_PUBLISH: ${{ inputs.publish }}
