@@ -37,18 +37,24 @@ expected_url = f'https://github.com/{REPO}/releases/download/{TAG}/{ARCHIVE}'
 if manifest['platforms']['darwin-aarch64']['url'] != expected_url:
     raise SystemExit('Manifest download URL does not match the approved update repository')
 
-result = subprocess.run(['git', 'credential', 'fill'], input='protocol=https\nhost=github.com\n\n', capture_output=True, text=True, env={**os.environ, 'GIT_TERMINAL_PROMPT':'0'})
-credential = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
-token = os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN') or credential.get('password')
+token = os.environ.get('TABBIT_RELEASE_TOKEN') or os.environ.get('GH_TOKEN') or os.environ.get('GITHUB_TOKEN')
+if not token:
+    result = subprocess.run(['git', 'credential', 'fill'], input='protocol=https\nhost=github.com\n\n', capture_output=True, text=True, env={**os.environ, 'GIT_TERMINAL_PROMPT':'0'})
+    credential = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
+    token = credential.get('password')
 if not token:
     raise SystemExit('No GitHub credential is available; no repository or release was changed')
+# CI uses its repository-scoped GITHUB_TOKEN to check the private source repo;
+# the publication PAT only needs Contents: write on the public update repo.
+source_token = os.environ.get('TABBIT_SOURCE_TOKEN') or token
 
 
 def api(method, path, payload=None, body=None):
     url = path if path.startswith('https://') else 'https://api.github.com' + path
     if urlparse(url).netloc not in {'api.github.com', 'uploads.github.com'}:
         raise RuntimeError('Refusing to send credentials outside GitHub API hosts')
-    headers = {'Authorization':'Bearer ' + token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2026-03-10', 'User-Agent':'Tabbit-demo-updater-release'}
+    credential = source_token if urlparse(url).path == '/repos/' + SOURCE_REPO else token
+    headers = {'Authorization':'Bearer ' + credential, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2026-03-10', 'User-Agent':'Tabbit-demo-updater-release'}
     if payload is not None:
         body = json.dumps(payload, ensure_ascii=False).encode()
         headers['Content-Type'] = 'application/json'

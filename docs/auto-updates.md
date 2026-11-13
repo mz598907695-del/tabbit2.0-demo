@@ -59,3 +59,26 @@ cargo check --locked --manifest-path src-tauri/Cargo.toml
 `src-tauri/examples/updater_smoke.rs` 是独立原生探针，只接受回环地址或配置中的正式 HTTPS 地址，以及临时目录里的
 `Tabbit Updater Smoke.app`。用真实的 Tauri 插件验证检查、下载、签名拒绝、版本绑定和安装。
 回环 HTTP 只在探针自己的配置中开启，正式客户端仍然要求 HTTPS 和有效签名。
+
+## 团队通过 GitHub Actions 发布
+
+源码仓库的 Actions → **Release macOS** → **Run workflow**，分支选择 `main`：
+
+1. 填写新的稳定版本号（例如 `0.1.10`，必须高于当前公开版本）和更新说明。
+2. 保持“验证通过后公开发布”勾选，运行后会检查源码、构建 Apple Silicon 安装包、用原私钥签名，并通过真实原生更新探针验证下载、安装、错误签名和版本绑定。
+3. 全部通过后才上传公开更新仓库。取消勾选则只构建验证，产物保留在本次运行的 Artifacts 中 14 天。
+
+此入口只支持手动触发，提交代码不会自动发版。同一时间只执行一个发布任务。
+版本号会同步到 CI 临时检出的前端、Tauri 和 Cargo 配置，不修改开发者工作区、不自动提交或打 Git 标签。
+构建使用仓库中已提交的 `src/demo-defaults.json`，不会抓取开发者电脑上的个人设置。
+
+在**源码仓库**的 Settings → Secrets and variables → Actions 配置：
+
+| Secret | 内容 |
+| --- | --- |
+| `TAURI_SIGNING_PRIVATE_KEY` | 原有 `signing.key` 文件的完整内容，必须匹配客户端内置公钥 |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 私钥密码；当前私钥无密码，可留空或不创建 |
+| `TABBIT_RELEASE_TOKEN` | 由 `mz598907695-del` 创建的 fine-grained PAT，仅选择 `tabbit-demo-updates`，授予 `Contents: Read and write` |
+
+`TABBIT_RELEASE_TOKEN` 不需要访问私有源码仓库。工作流通过临时的、只读的 `GITHUB_TOKEN` 检查源码仓库，发布脚本通过 `TABBIT_SOURCE_TOKEN` 接收它。
+PAT 到期前需替换对应 Secret。创建后直接存入仓库 Secret，不写进源码、更新包或日志。

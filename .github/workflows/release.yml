@@ -1,0 +1,121 @@
+name: Release macOS
+run-name: Release ${{ inputs.version }} · ${{ inputs.publish && 'publish' || 'verify only' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '新版本号，例如 0.1.10；必须高于已发布版本'
+        required: true
+        type: string
+      notes:
+        description: '更新说明'
+        required: false
+        default: '界面与体验优化。'
+        type: string
+      publish:
+        description: '验证通过后公开发布；取消勾选则只构建验证'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tabbit-team-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'mz598907695-del/tabbit2.0-demo' && github.ref == 'refs/heads/main'
+    runs-on: macos-15
+    timeout-minutes: 90
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_NOTES: ${{ inputs.notes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check runner and required secrets
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TABBIT_RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
+          SHOULD_PUBLISH: ${{ inputs.publish }}
+        run: |
+          python3 - <<'PY'
+          import os, platform
+          if platform.machine() != 'arm64':
+              raise SystemExit('Apple Silicon runner required')
+          required = ['TAURI_SIGNING_PRIVATE_KEY']
+          if os.environ['SHOULD_PUBLISH'] == 'true':
+              required.append('TABBIT_RELEASE_TOKEN')
+          for name in required:
+              if not os.environ.get(name):
+                  raise SystemExit('Missing repository secret: ' + name)
+          PY
+      - name: Install dependencies
+        run: |
+          npm ci
+          rustup default stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: macos-arm64-release-${{ hashFiles('src-tauri/Cargo.lock') }}
+      - name: Prepare release version
+        env:
+          TABBIT_RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
+        run: node scripts/prepare-ci-release.mjs "$RELEASE_VERSION"
+      - name: Check source, tests and frontend build
+        run: |
+          npm run check
+          python3 -m unittest discover -s scripts/tests -p 'test_release_*.py'
+      - name: Build and sign update artifacts
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run release:update -- --notes "$RELEASE_NOTES"
+      - name: Verify real native updater
+        run: python3 scripts/test-updater-native.py
+      - name: Save signed build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tabbit-${{ inputs.version }}-arm64
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            release/${{ inputs.version }}/*.dmg
+            release/${{ inputs.version }}/*.app.tar.gz
+            release/${{ inputs.version }}/*.app.tar.gz.sig
+            release/${{ inputs.version }}/latest.json
+      - name: Publish verified update
+        if: inputs.publish
+        env:
+          TABBIT_RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
+          TABBIT_SOURCE_TOKEN: ${{ github.token }}
+        run: python3 scripts/publish-update.py --publish
+      - name: Write release summary
+        env:
+          SHOULD_PUBLISH: ${{ inputs.publish }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          version = os.environ['RELEASE_VERSION']
+          published = os.environ['SHOULD_PUBLISH'] == 'true'
+          message = f'## Tabbit {version}\n\n构建、签名和原生更新验证通过。\n\n'
+          if published:
+              message += f'[公开发布页](https://github.com/mz598907695-del/tabbit-demo-updates/releases/tag/v{version})\n'
+          else:
+              message += '仅构建验证，未公开发布；安装包见本次运行的 Artifacts。\n'
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a') as output:
+              output.write(message)
+          PY
