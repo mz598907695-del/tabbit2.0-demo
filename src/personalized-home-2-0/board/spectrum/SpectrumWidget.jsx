@@ -12,14 +12,15 @@ const extraKinds = new Set(['world-clock', 'habits', 'hydration', 'reading', 'an
 const leisureKinds = new Set(['joke', 'image', 'workday-countdown']);
 
 /** A second visual family with the same persisted widget configuration contract. */
-export default function SpectrumWidget({ kind, config, size, onChange, preview = false, active = true, locale = 'zh-CN' }) {
+export default function SpectrumWidget({ kind, config, size, onChange, preview = false, active = true, locale = 'zh-CN', appearanceTheme = 'light' }) {
+  const theme = appearanceTheme === 'dark' ? 'dark' : 'light';
   const Content = infoKinds.has(kind) ? InfoWidgetContent
     : extraKinds.has(kind) ? ExtraWidgetContent
       : leisureKinds.has(kind) ? LeisureWidgetContent
         : kind === 'audio-visualizer' ? AudioVisualizerWidget : TaskWidgetContent;
-  return <div className="v3-scope personalized-home" data-kind={kind} data-theme="dark" data-widget-family="spectrum">
+  return <div className="v3-scope personalized-home" data-kind={kind} data-theme={theme} data-widget-family="spectrum">
     <div className="v3-card"><WidgetLocaleProvider locale={locale}>
-      <Content kind={kind} config={config} size={size} onChange={onChange} preview={preview} active={active} locale={locale} appearanceTheme="dark"/>
+      <Content kind={kind} config={config} size={size} onChange={onChange} preview={preview} active={active} locale={locale} appearanceTheme={theme}/>
     </WidgetLocaleProvider></div>
   </div>;
 }

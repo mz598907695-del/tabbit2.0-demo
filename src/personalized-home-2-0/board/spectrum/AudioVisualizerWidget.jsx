@@ -7,7 +7,7 @@ import '../audio-visualizer.css';
 function Spectrum({ bands = [], clipping, label }) {
   const values = Array.from({ length:32 }, (_,i)=>Math.max(0,Math.min(1,Number(bands[i])||0)));
   return <svg className="av-spectrum v3-audio-spectrum" viewBox="0 0 320 120" preserveAspectRatio="none" role="img" aria-label={label}>
-    {values.map((v,i)=>{const h=Math.max(3,v*100);return <rect key={i} x={i*10+2} y={60-h/2} width="5" height={h} rx="2.5" className={v>0.01?'v3-audio-lit':'v3-audio-quiet'} style={clipping?{fill:'#ff686c'}:undefined}/>;})}
+    {values.map((v,i)=>{const h=Math.max(3,v*100);return <rect key={i} x={i*10+2} y={60-h/2} width="5" height={h} rx="2.5" className={v>0.01?'v3-audio-lit':'v3-audio-quiet'} style={clipping?{fill:'var(--v3-danger)'}:undefined}/>;})}
   </svg>;
 }
 const ERRORS = {

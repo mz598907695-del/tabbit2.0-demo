@@ -18,13 +18,18 @@ export const widgetCatalog = [...coreWidgetCatalog, ...extraWidgetCatalog, ...le
 const coreKinds = new Set(coreWidgetCatalog.map(entry => entry.kind));
 const extraKinds = new Set(extraWidgetCatalog.map(entry => entry.kind));
 // The shared board frame remains the only owner of the card material and rim.
-const spectrumSurface = {
+const spectrumDarkSurface = {
   '--home-content-surface-fill': '#030405',
   '--board-card-noise': 'none',
   '--board-card-backdrop': 'none',
   '--board-card-brightness': 1,
   '--board-card-outline': '0',
   '--board-card-lighting': 'none',
+};
+const spectrumLightSurface = {
+  ...spectrumDarkSurface,
+  '--home-content-surface-fill': '#ffffff',
+  '--board-card-outline': '0.5px solid #dce2e8',
 };
 /** The board owns the frame and placement; each widget owns its actual task. */
 export const WidgetCard = memo(function WidgetCard({ kind, item = {}, size, onChange, inert = false, preview = false, active = true, appearanceTheme = 'light' }) {
@@ -46,7 +51,7 @@ export const WidgetCard = memo(function WidgetCard({ kind, item = {}, size, onCh
   const Content = spectrum ? SpectrumWidget : resolvedKind === 'ai-card' ? ImportedAICard : resolvedKind === 'audio-visualizer' ? AudioVisualizerWidget : coreKinds.has(resolvedKind) ? CoreWidgetContent : extraKinds.has(resolvedKind) ? ExtraWidgetContent : LeisureWidgetContent;
   const locale = config.locale === 'en-US' ? 'en-US' : 'zh-CN';
   const mounted = visible || near || retained || runningTask || resolvedKind === 'ai-card';
-  return <BoardCard ref={ref} className={`board-widget-card widget-unified${spectrum ? ' widget-spectrum' : ''}`} style={spectrum ? spectrumSurface : undefined} inert={inert} data-widget-kind={resolvedKind} data-widget-style={spectrum ? 'spectrum' : 'classic'}
+  return <BoardCard ref={ref} className={`board-widget-card widget-unified${spectrum ? ' widget-spectrum' : ''}`} style={spectrum ? (appearanceTheme === 'dark' ? spectrumDarkSurface : spectrumLightSurface) : undefined} inert={inert} data-widget-kind={resolvedKind} data-widget-style={spectrum ? 'spectrum' : 'classic'}
     data-widget-active={visible && active && !preview && !inert} data-widget-mounted={mounted} data-widget-near={near || visible}
     onPointerDownCapture={() => setRetained(true)} onFocusCapture={() => setRetained(true)}
     data-widget-width={size?.w} data-widget-height={size?.h} aria-label={item.title || definition?.title || 'AI 卡片'}>
