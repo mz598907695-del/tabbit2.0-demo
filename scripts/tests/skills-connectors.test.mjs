@@ -18,8 +18,8 @@ test('preinstalled skills appear only in mine, including when searching', () => 
 
 test('latest and hot order discovery and installed cards without mutating inputs', () => {
   const items = [
-    {id:'older',title:'Older',description:'',author:'A',category:'study',type:'community',skillType:'prompt',installed:true,createdAt:10,usageCount:100},
-    {id:'newer',title:'Newer',description:'',author:'A',category:'study',type:'community',skillType:'prompt',installed:true,createdAt:20,usageCount:1},
+    {id:'older',title:'Older',description:'',author:'A',category:'study',type:'community',skillType:'prompt',installed:true,createdAt:10,installCount:100},
+    {id:'newer',title:'Newer',description:'',author:'A',category:'study',type:'community',skillType:'prompt',installed:true,createdAt:20,installCount:1},
   ];
   for (const scope of ['discover','mine']) {
     const sectionId = scope === 'mine' ? 'installed' : 'all';

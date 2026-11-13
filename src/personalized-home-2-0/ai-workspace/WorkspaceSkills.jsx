@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Check, ChevronLeft, ChevronRight, Lightbulb, ListFilter, OutputSort, Plus, Search } from '../icons';
+import { ArrowRight, Check, ChevronLeft, ChevronRight, Lightbulb, ListFilter, OutputSort, OutputGridView, OutputListView, Plus, Search } from '../icons';
 import { UserRound } from 'lucide-react';
 import DropdownPanel from '../../DropdownPanel';
 import OfficialSkills from './OfficialSkills';
@@ -8,6 +8,7 @@ import { getSkillCardIllustration } from './workspace-skill-icons';
 import { getSkillScrollAnchor } from './workspace-skill-scroll';
 import './workspace-skills.css';
 import SegmentedControl from './SegmentedControl';
+import WorkspaceSecondaryPage from './WorkspaceSecondaryPage';
 import ConnectorCard from './ConnectorCard';
 import { CONNECTOR_CATEGORIES, CONNECTOR_STORAGE_KEY, connectorSections, readConnectorIds } from './workspace-connectors';
 
@@ -20,12 +21,15 @@ function authorAvatar(name) {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-export default function WorkspaceSkills({ active = true, items, ui, setUI, onCreate, onOpen, onUpdate }) {
-  const resource = ui.skillResource || 'skills';
+export default function WorkspaceSkills({ active = true, items, ui, setUI, onCreate, onOpen, onUpdate, authorFilter = null, onClearAuthor, onAuthor }) {
+  const resource = authorFilter ? 'skills' : ui.skillResource || 'skills';
   const isConnector = resource === 'connectors';
-  const scope = isConnector ? 'discover' : ui.skillScope || 'discover';
+  const scope = isConnector || authorFilter ? 'discover' : ui.skillScope || 'discover';
   const resourceLabel = isConnector ? '连接器' : '妙招';
   const sort = ui.skillSort || 'latest';
+  const [layout, setLayout] = useState(() => { try { return localStorage.getItem('tabbit.skills.layout.v1') === 'list' ? 'list' : 'grid'; } catch { return 'grid'; } });
+  function changeLayout(value) { setLayout(value); try { localStorage.setItem('tabbit.skills.layout.v1', value); } catch { /* keep the current view for this session */ } }
+  const listView = !isConnector && layout === 'list';
   const connectorCategory = ui.connectorCategory || 'all';
   const [addedConnectors, setAddedConnectors] = useState(readConnectorIds);
   const [sortOpen, setSortOpen] = useState(false);
@@ -50,8 +54,10 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
   const [scrolled,setScrolled] = useState(false);
   const [edges,setEdges] = useState({left:false,right:false});
   const headerRef=useRef(null), panelRef=useRef(null), tabsRef=useRef(null), searchWrapRef=useRef(null), searchRef=useRef(null), searchButton=useRef(null), filterRef=useRef(null), filterButton=useRef(null);
-  const sections=useMemo(() => isConnector ? connectorSections({scope,query:ui.query,sort,added:addedConnectors,category:connectorCategory}) : skillSections(items,{scope,kind:ui.kind,query:ui.query,sort}),[items,scope,ui.kind,ui.query,sort,isConnector,addedConnectors,connectorCategory]);
-  const categories=isConnector ? CONNECTOR_CATEGORIES : scope==='mine' ? [['official','官方预装'],['installed','已安装'],['custom','我创建的']] : [['all','全部'],...SKILL_CATEGORIES];
+  const sections=useMemo(() => isConnector ? connectorSections({scope,query:ui.query,sort,added:addedConnectors,category:connectorCategory}) : skillSections(items,{scope,kind:ui.kind,query:ui.query,sort,authorFilter}),[items,scope,ui.kind,ui.query,sort,isConnector,addedConnectors,connectorCategory,authorFilter]);
+  const authorName = authorFilter === 'Tabbit 官方' ? '官方' : authorFilter;
+  const authorCount = useMemo(() => authorFilter ? skillSections(items,{authorFilter})[0].items.length : 0, [items,authorFilter]);
+  const categories=authorFilter ? [['all','全部妙招']] : isConnector ? CONNECTOR_CATEGORIES : scope==='mine' ? [['official','官方预装'],['installed','已安装'],['custom','我创建的']] : [['all','全部'],...SKILL_CATEGORIES];
   const firstCategory = categories[0][0];
   useLayoutEffect(() => {
     if (!active) return;
@@ -66,7 +72,7 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
     window.addEventListener('resize', measure);
     measure();
     return () => { observer.disconnect(); window.removeEventListener('resize', measure); };
-  }, [active, sections]);
+  }, [active, sections, layout]);
   function measureEdges() { const node=tabsRef.current; if(node) setEdges({left:node.scrollLeft>1,right:node.scrollWidth-node.clientWidth-node.scrollLeft>1}); }
   useEffect(() => {
     if (!active) return;
@@ -115,7 +121,7 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
   useEffect(() => {
     setAnchor(firstCategory);
     panelRef.current?.scrollTo({top:0});
-  },[scope,resource,ui.kind,ui.query,sort,firstCategory,connectorCategory]);
+  },[scope,resource,ui.kind,ui.query,sort,firstCategory,connectorCategory,authorFilter]);
   useEffect(() => {
     if(!searchOpen) return;
     function outside(event) { if(!searchWrapRef.current?.contains(event.target)) setSearchOpen(false); }
@@ -152,8 +158,8 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
       behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',
     });
   }
-  function switchResource(value) { setUI({skillResource:value,kind:'all',query:''}); setExpanded({}); setFilterOpen(false); setSortOpen(false); setSearchOpen(false); panelRef.current?.scrollTo({top:0}); }
-  function switchScope(value) { setUI({skillScope:value}); setAnchor('all'); setExpanded({}); panelRef.current?.scrollTo({top:0}); }
+  function switchResource(value) { onClearAuthor?.(); setUI({skillResource:value,kind:'all',query:''}); setExpanded({}); setFilterOpen(false); setSortOpen(false); setSearchOpen(false); panelRef.current?.scrollTo({top:0}); }
+  function switchScope(value) { onClearAuthor?.(); setUI({skillScope:value}); setAnchor('all'); setExpanded({}); panelRef.current?.scrollTo({top:0}); }
   function arrowKeys(event) {
     const buttons=[...event.currentTarget.querySelectorAll('[role="tab"]')];
     const i=buttons.indexOf(document.activeElement); let next;
@@ -167,15 +173,19 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
     setSearchOpen(true);
     requestAnimationFrame(() => searchRef.current?.focus());
   }
-  return <>
-    <div className="aiwp-page-header aiws-header" data-scrolled={scrolled} ref={headerRef}>
-      <header className="aiwp-heading"><div className="aiwp-heading-copy"><h1>妙招·连接器</h1><p className="aiwp-heading-description">发现好用的妙招与连接器，管理常用的工具。</p></div><div className="aiwp-heading-actions">
+  const content = <>
+    <div className={`aiwp-page-header aiws-header${authorFilter ? ' aiws-author-header' : ''}`} data-scrolled={scrolled} ref={headerRef}>
+      {authorFilter ? <header className="aiws-author-profile">
+        <img className="aiws-profile-avatar" src={authorAvatar(authorName)} alt={`${authorName}的头像`}/>
+        <h1 tabIndex={-1}>{authorName}</h1>
+        <p><strong>{authorCount}</strong> 个妙招</p>
+      </header> : <header className="aiwp-heading"><div className="aiwp-heading-copy"><h1>妙招·连接器</h1><p className="aiwp-heading-description">发现好用的妙招与连接器，管理常用的工具。</p></div><div className="aiwp-heading-actions">
         {!isConnector && <button className="aiwp-primary" onClick={onCreate}>创建妙招</button>}
-      </div></header>
+      </div></header>}
       <div className="aiws-toolbar">
         <div className="aiws-toolbar-navigation">
-        <SegmentedControl className="aiws-resource-switch" label="内容类型" value={resource} controlsId="aiws-panel" onChange={switchResource} options={[{value:'skills',label:'妙招',Icon:Lightbulb},{value:'connectors',label:'连接器',iconClass:'icon-badiaodianyuanchatou'}]}/>
-        {!isConnector && <><span className="aiws-toolbar-divider" aria-hidden="true"/>
+        {authorFilter ? <h2 className="aiws-author-library-title">{ui.query || ui.kind !== 'all' ? `找到 ${sections[0].items.length} 个妙招` : '全部妙招'}</h2> : <SegmentedControl className="aiws-resource-switch" label="内容类型" value={resource} controlsId="aiws-panel" onChange={switchResource} options={[{value:'skills',label:'妙招',Icon:Lightbulb},{value:'connectors',label:'连接器',iconClass:'icon-badiaodianyuanchatou'}]}/>}
+        {!isConnector && !authorFilter && <><span className="aiws-toolbar-divider" aria-hidden="true"/>
         <div className="aiws-segments" role="tablist" aria-label={`${resourceLabel}范围`} onKeyDown={arrowKeys}>{[['discover','发现','zhinanzhen'],['mine','我的','ren']].map(([value,label,icon]) => <button key={value} role="tab" id={`aiws-scope-${value}`} aria-controls="aiws-panel" aria-selected={scope===value} tabIndex={scope===value?0:-1} onClick={() => switchScope(value)}><span className={`iconfont icon-${icon}`} aria-hidden="true"/><span className="aiws-tab-label">{label}</span></button>)}</div></>}
         </div>
         <div className="aiwp-toolbar-actions">
@@ -195,34 +205,47 @@ export default function WorkspaceSkills({ active = true, items, ui, setUI, onCre
               if (next !== undefined) { event.preventDefault(); buttons[next].focus(); }
             }}><h2 className="dropdown-heading">排序</h2>{[['latest','最新'],['hot','最热']].map(([value,label]) => <button type="button" key={value} role="menuitemradio" aria-checked={sort === value} onClick={() => { setUI({skillSort:value}); setSortOpen(false); sortButton.current?.focus(); }}><span>{label}</span><span className="dropdown-item-trailing">{sort === value && <Check size={16}/>}</span></button>)}</div>}
           </div>
+          {!isConnector && <><span className="aiws-toolbar-divider" aria-hidden="true"/>
+          <div className="aiws-layout-switch" role="group" aria-label="妙招布局">
+            <button className="aiwp-icon-button" aria-label="卡片视图" title="卡片视图" aria-pressed={!listView} onClick={() => changeLayout('grid')}><OutputGridView size={16}/></button>
+            <button className="aiwp-icon-button" aria-label="列表视图" title="列表视图" aria-pressed={listView} onClick={() => changeLayout('list')}><OutputListView size={16}/></button>
+          </div></>}
         </div>
       </div>
-      {<nav className="aiws-categories" data-left={edges.left} data-right={edges.right} aria-label={isConnector ? '连接器分类' : '妙招分类锚点'}>
+      {!authorFilter && <nav className="aiws-categories" data-left={edges.left} data-right={edges.right} aria-label={isConnector ? '连接器分类' : '妙招分类锚点'}>
         <div className="aiws-category-scroll" ref={tabsRef} onScroll={measureEdges}>{categories.map(([value,label]) => <button key={value} data-skill-category={value} aria-current={!isConnector && anchor===value?'location':undefined} aria-pressed={isConnector ? connectorCategory===value : undefined} disabled={!isConnector && value!=='all' && !sections.some(section=>section.id===value)} onClick={event => {if (isConnector) {setUI({connectorCategory:value});setExpanded({});} else jump(value);revealCategory(event.currentTarget);}}><span className="aiws-tab-label">{label}</span></button>)}</div>
         {edges.left && <button className="aiwp-tab-arrow aiws-scroll-arrow is-left" aria-label="向左查看更多分类" onClick={()=>tabsRef.current?.scrollBy({left:-320,behavior:'smooth'})}><ChevronLeft size={16}/></button>}
         {edges.right && <button className="aiwp-tab-arrow aiws-scroll-arrow is-right" aria-label="向右查看更多分类" onClick={()=>tabsRef.current?.scrollBy({left:320,behavior:'smooth'})}><ChevronRight size={16}/></button>}
       </nav>}
     </div>
-    <div id="aiws-panel" ref={panelRef} role="tabpanel" aria-label={isConnector ? '连接器' : undefined} aria-labelledby={isConnector ? undefined : `aiws-scope-${scope}`} className="aiws-sections">
-      {!isConnector && scope==='discover' && !ui.query && ui.kind==='all' && <div className="aiws-banner"><img src="/personalized-home-2-0/asset/skills-banner.webp" alt="开学没招，Tabbit 给你妙招，看看大学生都在用什么招" width="2400" height="400"/></div>}
-      {scope==='discover' && sections.every(section=>!section.items.length) ? <div className="aiws-empty"><Search size={24}/><h2>{`没有找到相关${resourceLabel}`}</h2><p>{'试试其他关键词或类型。'}</p><button className="aiw-button" onClick={()=>setUI({query:'',kind:'all',connectorCategory:'all'})}>{'清除筛选'}</button></div> : sections.map(section => section.id==='official' ? <OfficialSkills key={section.id} section={section} onOpen={onOpen}/> : <section key={section.id} id={`aiws-section-${section.id}`} data-skill-section={section.id} className="aiws-section" aria-label={section.label}>
-        {!isConnector && <div className="aiws-section-heading"><h2>{section.label}</h2>{section.items.length>2*(columns[section.id]||1) && <button aria-expanded={Boolean(expanded[section.id])} onClick={()=>setExpanded(previous=>({...previous,[section.id]:!previous[section.id]}))}>{expanded[section.id]?'收起':'展开'}<ArrowRight size={14}/></button>}</div>}
+    <div id="aiws-panel" ref={panelRef} role="tabpanel" aria-label={authorFilter ? `${authorFilter} 的妙招` : isConnector ? '连接器' : undefined} aria-labelledby={isConnector || authorFilter ? undefined : `aiws-scope-${scope}`} data-layout={layout} className="aiws-sections">
+      {!isConnector && !authorFilter && scope==='discover' && !ui.query && ui.kind==='all' && <div className="aiws-banner"><img src="/personalized-home-2-0/asset/skills-banner.webp" alt="开学没招，Tabbit 给你妙招，看看大学生都在用什么招" width="2400" height="400"/></div>}
+      {scope==='discover' && sections.every(section=>!section.items.length) ? <div className="aiws-empty"><Search size={24}/><h2>{`没有找到相关${resourceLabel}`}</h2><p>{'试试其他关键词或类型。'}</p><button className="aiw-button" onClick={()=>setUI({query:'',kind:'all',connectorCategory:'all'})}>{'清除筛选'}</button></div> : sections.map(section => section.id==='official' ? <OfficialSkills key={section.id} section={section} onOpen={onOpen} listView={listView}/> : <section key={section.id} id={`aiws-section-${section.id}`} data-skill-section={section.id} className="aiws-section" aria-label={section.label}>
+        {!isConnector && !authorFilter && <div className="aiws-section-heading"><h2>{section.label}</h2>{!listView && section.items.length>2*(columns[section.id]||1) && <button aria-expanded={Boolean(expanded[section.id])} onClick={()=>setExpanded(previous=>({...previous,[section.id]:!previous[section.id]}))}>{expanded[section.id]?'收起':'展开'}<ArrowRight size={14}/></button>}</div>}
         {!section.items.length && <div className="aiws-module-empty"><p>{ui.query || ui.kind!=='all' ? `没有符合筛选条件的${resourceLabel}` : isConnector ? '还没有添加连接器' : section.id==='custom' ? '还没有创建妙招' : '还没有安装妙招'}</p><button className="aiw-button" onClick={()=>{if(ui.query || ui.kind!=='all')setUI({query:'',kind:'all',connectorCategory:'all'});else if(section.id==='custom')onCreate();else switchScope('discover');}}>{ui.query || ui.kind!=='all'?'清除筛选':section.id==='custom'?'创建妙招':'去发现'}</button></div>}
-        <div className="aiws-cards">{(isConnector || expanded[section.id]?section.items:section.items.slice(0,2*(columns[section.id]||1))).map(item=>{
+        <div className={`aiws-cards${listView ? ' is-list' : ''}`}>{(isConnector || authorFilter || listView || expanded[section.id]?section.items:section.items.slice(0,2*(columns[section.id]||1))).map(item=>{
           if (isConnector) return <ConnectorCard key={item.id} item={item} added={addedConnectors.includes(item.id)} onToggle={() => toggleConnector(item.id)}/>;
           const { Icon, color, fill } = getSkillCardIllustration(item);
           const author = item.author === 'Tabbit 官方' ? '官方' : item.author;
           const typeLabel = SKILL_TYPES.find(([value])=>value===item.skillType)?.[1];
-          const usage = item.usageCount>0 && <span className="aiws-usage" aria-label={`${item.usageCount.toLocaleString('zh-CN')} 次使用`} title={`${item.usageCount.toLocaleString('zh-CN')} 次使用（示例数据）`}><UserRound size={14} aria-hidden="true"/>{Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(item.usageCount)}</span>;
-          return <article className="aiws-card" key={item.id} onClick={event => { if (!event.target.closest('button,a,input')) onOpen(item); }}>
+          const hasCount = Number.isFinite(item.installCount);
+          const usage = <span className="aiws-usage" aria-label={hasCount ? `${item.installCount.toLocaleString('zh-CN')} 人安装` : '安装人数未提供'} title={hasCount ? `${item.installCount.toLocaleString('zh-CN')} 人安装` : '安装人数未提供'}><UserRound size={14} aria-hidden="true"/>{hasCount ? Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(item.installCount) : '—'}{listView && <span>人安装</span>}</span>;
+          const canToggle = !item._publicView && item.type !== 'official' && (item.installed || item.type === 'custom');
+          const hasInstallAction = !['custom','official'].includes(item.type);
+          const installAction = hasInstallAction && <div className="aiws-card-actions"><button className="aiws-install" title={item.installed?'已安装，点击移除':'安装到我的妙招'} aria-label={`${item.installed?'移除已安装':'安装'} ${item.title}`} aria-pressed={item.installed} onClick={()=>onUpdate({...item,type:item.type==='installed'?'community':item.type,installed:!item.installed})}>{item.installed?<Check size={16}/>:<Plus size={16}/>}</button></div>;
+          return <article className={`aiws-card${hasInstallAction ? ' has-install-action' : ''}${canToggle && item.enabled === false ? ' is-disabled' : ''}`} key={item.id} onClick={event => { if (!event.target.closest('button,a,input')) onOpen(item); }}>
             <div className="aiws-card-main"><button className="aiws-skill-icon" style={{'--aiws-icon-color':color,'--aiws-icon-fill':fill}} aria-label={`查看 ${item.title}详情`} onClick={()=>onOpen(item)}><Icon size={20} strokeWidth={1.7}/></button>
             <div className="aiws-card-copy"><div className="aiws-card-name"><button className="aiws-card-title" onClick={()=>onOpen(item)} title={item.title}>{item.title}</button></div><p title={item.description}>{item.description}</p></div>
-            {item.type!=='custom' && <div className="aiws-card-actions"><button className="aiws-install" title={item.installed?'已安装，点击移除':'安装到我的妙招'} aria-label={`${item.installed?'移除已安装':'安装'} ${item.title}`} aria-pressed={item.installed} onClick={()=>onUpdate({...item,type:item.type==='installed'?'community':item.type,installed:!item.installed})}>{item.installed?<Check size={16}/>:<Plus size={16}/>}</button></div>}
+            {!listView && installAction}
             </div>
-            <div className="aiws-card-meta"><img className="aiws-author-avatar" src={authorAvatar(author)} alt=""/><span className="aiws-author" title={author}>{author}</span><span className="aiws-type">{typeLabel}</span>{usage}</div>
+            <div className="aiws-card-meta"><img className="aiws-author-avatar" src={authorAvatar(author)} alt=""/><button className="aiws-author" title={`查看 ${author} 的妙招`} onClick={() => onAuthor?.(item.author)}>{author}</button><span className="aiws-type">{typeLabel}</span>{usage}</div>
+            {listView && installAction}
+            {item.type === 'official' && <div className="aiws-card-management"><span>默认可用 · 自动更新</span></div>}
+            {canToggle && <div className="aiws-card-management"><span>{item.type === 'custom' ? item.publication?.status === 'published' ? '已发布' : '未发布' : '已安装'}</span><button role="switch" aria-checked={item.enabled !== false} aria-label={`${item.enabled === false ? '启用' : '停用'} ${item.title}`} className="aiws-enable-switch" onClick={() => onUpdate({...item,enabled:item.enabled === false})}><span aria-hidden="true"/><span>{item.enabled === false ? '已停用' : '已启用'}</span></button></div>}
           </article>;
         })}</div>
       </section>)}
     </div>
   </>;
+  return authorFilter ? <WorkspaceSecondaryPage key={authorFilter} title={`${authorName}的个人主页`} backLabel="返回妙招" onBack={onClearAuthor} active={active} className="aiws-author-page">{content}</WorkspaceSecondaryPage> : content;
 }

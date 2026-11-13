@@ -1,0 +1,35 @@
+@scope (.personalized-home) {
+.aiws-editor { max-height:calc(100dvh - 48px); width:min(720px,calc(100vw - 32px)); }
+.aiws-editor .aiws-editor-form { padding-top:20px; gap:18px; }
+.aiws-editor small { display:block; font-size:11px; line-height:1.7; color:var(--muted); font-weight:400; }
+.aiws-editor label { min-width:0; }
+.aiws-editor h3 { font-size:13px; font-weight:550; }
+.aiws-editor-section-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+.aiws-editor-section-heading>div { display:flex; gap:8px; flex-wrap:wrap; }
+.aiws-editor-content,.aiws-editor-variables { display:flex; flex-direction:column; gap:10px; }
+.aiws-editor .aiws-editor-code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; tab-size:2; line-height:1.6; }
+.aiws-import-button { position:relative; overflow:hidden; cursor:pointer; }
+.aiws-import-button input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.aiws-import-button:focus-within { outline:2px solid var(--text); outline-offset:3px; }
+.aiws-variable-row { display:grid; grid-template-columns:minmax(80px,1fr) minmax(80px,1.2fr) auto 28px; gap:8px; align-items:end; }
+.aiws-variable-row label,.aiws-assistant label { display:flex; flex-direction:column; gap:6px; font-size:12px; }
+.aiws-variable-row>.aiw-button,.aiws-variable-row>.aiw-content-icon-button { margin-bottom:3px; }
+.aiws-editor .aiws-editor-checkbox { display:flex; flex-direction:row; align-items:center; gap:8px; }
+.aiws-editor-checkbox input[type=checkbox] { width:16px; height:16px; margin:0; accent-color:var(--text); }
+.aiws-assistant,.aiws-import-preview { display:flex; flex-direction:column; gap:10px; border:1px solid var(--border); background:var(--bg); border-radius:10px; padding:14px; }
+.aiws-import-preview pre { white-space:pre-wrap; overflow-wrap:anywhere; max-height:180px; overflow:auto; font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace; margin:0; }
+.aiws-editor-notice { color:var(--muted); font-size:12px; }
+.aiws-editor .aiws-editor-footer { position:sticky; bottom:-24px; background:var(--surface); padding:16px 0 0; border-top:1px solid var(--border); z-index:1; }
+@media(max-width:620px) {
+ .aiws-editor .aiw-form-columns { grid-template-columns:1fr; }
+ .aiws-variable-row { grid-template-columns:minmax(70px,1fr) minmax(70px,1fr); }
+ .aiws-variable-row>.aiw-content-icon-button { justify-self:end; }
+ .aiws-editor .aiw-content-form { padding-left:16px; padding-right:16px; }
+}
+}
+@scope (.personalized-home) {
+/* Top-layer dialogs need an opaque surface even when the host uses glass fills. */
+.aiws-editor { --surface:#fff; --bg:#f4f4f4; --text:#191a1c; --muted:#777c84; --border:rgb(0 0 0 / 10%); background:#fff; color:var(--text); }
+:scope[data-theme="dark"] .aiws-editor { --surface:#242528; --bg:#191a1c; --text:#f2f2f3; --muted:#a0a1a8; --border:rgb(255 255 255 / 12%); background:#242528; }
+.aiws-editor .aiw-dialog-heading,.aiws-editor .aiws-editor-form,.aiws-editor .aiws-editor-footer { background:var(--surface); }
+}

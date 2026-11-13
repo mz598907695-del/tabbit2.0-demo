@@ -65,65 +65,66 @@ const samples = [
 const catalogue = samples.map(([category,title,description,skillType], index) => ({
   id:`skill-catalogue-${category}-${index}`, title, description, skillType, category,
   type:index % 3 === 0 ? 'official' : 'community', author:index % 3 === 0 ? 'Tabbit 官方' : ['灵感实验室','效率研究所','社区创作者'][index % 3],
-  usageCount:index < 27 ? 2400-index*67 : 1100-(index-27)*31, createdAt:1793318400000-index*86400000, prompt:description,
+  // Installation counts are independent sample data, never converted from usage totals.
+  installCount: [184, 126, 98, 215, 77, 143, 89, 62, 105][index % 9] + Math.floor(index / 9) * 7,
+  createdAt:1793318400000-index*86400000, prompt:description,
 }));
 const legacyCategories = { 'skill-1':'study', 'skill-2':'office', 'skill-3':'tools', 'skill-4':'business', 'skill-5':'design', 'skill-6':'office' };
+const officialIcons = new Map([
+  ['代码评审搭子','5'], ['界面灵感收集','3'], ['会议行动清单','4'], ['小红书选题搭子','6'],
+  ['论文阅读助手','1'], ['写作搭子','2'], ['行业研究框架','7'],
+  ['网页局部放大镜','8'], ['周末旅行灵感','9'], ['标题灵感','10'],
+  ['概念对照表','11'], ['竞品对照表','12'], ['交互文案检查','13'], ['邮件草稿助手','14'],
+]);
 export function getSkillCatalogue(saved = []) {
   const byId = new Map(catalogue.map(item => [item.id, item]));
   saved.forEach(item => byId.set(item.id, { ...byId.get(item.id), ...item }));
-  return [...byId.values()].map(item => ({ ...item,
+  return [...byId.values()].filter(item => !item.deleted).map(item => ({ ...item,
     category:item.category || legacyCategories[item.id] || 'tools',
     author:item.author || (item.type === 'official' ? 'Tabbit 官方' : item.type === 'custom' ? '我' : '社区创作者'),
-    usageCount:item.usageCount ?? (Number.parseFloat(item.used) * (/k/i.test(item.used || '') ? 1000 : 1) || 0),
-    installed:item.installed ?? item.type === 'installed',
+    installCount:Number.isFinite(item.installCount) && item.installCount >= 0 ? Math.floor(item.installCount) : item.type === 'custom' ? 0 : null,
+    installed:item.type === 'official' || (item.installed ?? item.type === 'installed'),
+    enabled:item.type === 'official' || item.enabled !== false,
+    ...(item.type === 'official' ? {officialIcon:officialIcons.get(item.title) || '1'} : {}),
   }));
 }
-export function skillSections(items, { scope='discover', kind='all', query='', sort='latest' } = {}) {
-  const officialOrder = [
-    ['代码评审搭子','5'], ['界面灵感收集','3'], ['会议行动清单','4'], ['小红书选题搭子','6'],
-    ['论文阅读助手','1'], ['写作搭子','2'], ['行业研究框架','7'],
-    ['网页局部放大镜','8'], ['周末旅行灵感','9'], ['标题灵感','10'],
-    ['概念对照表','11'], ['竞品对照表','12'], ['交互文案检查','13'], ['邮件草稿助手','14'],
-  ];
-  const officialIcons = new Map(officialOrder.map(([title,icon]) => [title,icon]));
-  const officialCopy = {
-    '2':['代码评审搭子','检查代码逻辑、边界条件与可读性，整理可落地的修改建议。'],
-    '3':['实验方案设计','围绕研究问题梳理假设、变量与实验步骤，列出验证要点。'],
-    '4':['附近探索指南','根据位置与兴趣整理周边去处，规划顺路的探索路线。'],
-    '5':['灵感捕手','从零散想法中提炼线索，延展出值得继续探索的新方向。'],
-    '6':['写作搭子','从提纲到初稿，帮你组织观点，保留自己的表达。'],
-    '7':['邮件草稿助手','将沟通要点整理成清楚、得体的邮件，补全主题与正文。'],
-    '8':['研究框架助手','拆解研究主题，整理资料方向、分析维度与待验证的问题。'],
-    '9':['网页局部放大镜','放大当前网页的细节，让阅读与查看更轻松。'],
-  };
+
+export function getPublishedSkill(item) {
+  const publication = item.publication;
+  if (item.deleted || publication?.status !== 'published' || !publication.snapshot) return null;
+  return { ...publication.snapshot, id:item.id, type:'custom', author:publication.snapshot.author || item.author || '我',
+    publication, installCount:item.installCount ?? 0, _publicView:true,
+    createdAt:Date.parse(publication.publishedAt) || item.createdAt || 0 };
+}
+
+export function skillSections(items, { scope='discover', kind='all', query='', sort='latest', authorFilter=null } = {}) {
   const term = query.trim().toLocaleLowerCase();
-  const officialItems = items.filter(item => item.type === 'official' && officialIcons.has(item.title))
-    .sort((a,b) => officialOrder.findIndex(([title]) => title===a.title)-officialOrder.findIndex(([title]) => title===b.title))
-    .map(item => {
-      const officialIcon = officialIcons.get(item.title);
-      const copy = officialCopy[officialIcon];
-      return { ...item, officialIcon, ...(copy ? { title:copy[0], description:copy[1], prompt:copy[1] } : {}) };
-    })
-    .filter(item => (kind === 'all' || item.skillType === kind) && `${item.title} ${item.description} ${item.author}`.toLocaleLowerCase().includes(term));
-  const filtered = items.filter(item => (kind === 'all' || item.skillType === kind) &&
-    `${item.title} ${item.description} ${item.author}`.toLocaleLowerCase().includes(term));
-  const preinstalledIds = new Set(items.filter(item => item.type === 'official' && officialIcons.has(item.title)).map(item => item.id));
-  const ordered = sortSkillItems(filtered, sort);
+  const matches = item => !item.deleted && (kind === 'all' || item.skillType === kind) &&
+    `${item.title} ${item.description} ${item.author}`.toLocaleLowerCase().includes(term);
+  if (authorFilter) {
+    const authored = items.flatMap(item => item.type === 'custom' ? (item.publication?.visibility === 'plaza' ? [getPublishedSkill(item)].filter(Boolean) : []) : [item])
+      .filter(item => item.author === authorFilter && matches(item));
+    return [{id:'all',label:'全部妙招',items:sortSkillItems(authored,sort)}];
+  }
+  const ordered = sortSkillItems(items.filter(matches), sort);
   if (scope === 'mine') return [
-    { id:'official', label:'官方预装', items:sortSkillItems(officialItems, sort) },
-    { id:'installed', label:'已安装', items:ordered.filter(item => item.installed && item.type !== 'custom' && !preinstalledIds.has(item.id)) },
+    { id:'official', label:'官方预装', items:ordered.filter(item => item.type === 'official') },
+    { id:'installed', label:'已安装', items:ordered.filter(item => item.installed && !['custom','official'].includes(item.type)) },
     { id:'custom', label:'我创建的', items:ordered.filter(item => item.type === 'custom') },
   ];
-  const available = ordered.filter(item => item.type !== 'custom' && !preinstalledIds.has(item.id));
+  const available = sortSkillItems(items.flatMap(item => item.type === 'official' ? [] : item.type === 'custom'
+    ? (item.publication?.visibility === 'plaza' ? [getPublishedSkill(item)].filter(Boolean) : []) : [item]).filter(matches), sort);
   return [
     { id:'all', label:sort === 'hot' ? '最热' : '最新', items:available.slice(0,8) },
     ...SKILL_CATEGORIES.map(([id,label]) => ({ id,label,items:available.filter(item => item.category === id) })),
   ].filter(section => section.items.length);
 }
 export function saveSkill(items, item) {
-  return items.some(existing => existing.id === item.id) ? items.map(existing => existing.id === item.id ? item : existing) : [...items,item];
+  const next = item.type === 'official' ? {...item, installed:true, enabled:true} : item;
+  return items.some(existing => existing.id === next.id) ? items.map(existing => existing.id === next.id ? next : existing) : [...items,next];
 }
 
 export function sortSkillItems(items, sort = 'latest') {
-  return [...items].sort((a,b) => sort === 'hot' ? (b.usageCount || 0) - (a.usageCount || 0) || (b.createdAt || 0) - (a.createdAt || 0) : (b.createdAt || 0) - (a.createdAt || 0));
+  const popularity = item => (item.connectionType ? item.usageCount : item.installCount) || 0;
+  return [...items].sort((a,b) => sort === 'hot' ? popularity(b) - popularity(a) || (b.createdAt || 0) - (a.createdAt || 0) : (b.createdAt || 0) - (a.createdAt || 0));
 }
