@@ -1,0 +1,156 @@
+name: Release desktop update
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'New version (X.Y.Z, greater than the latest published version)'
+        required: true
+        type: string
+      notes:
+        description: 'Release notes shown to clients'
+        required: true
+        type: string
+      publish:
+        description: 'Publish to clients after verification (otherwise build only)'
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tabbit-desktop-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'mz598907695-del/tabbit2.0-demo' && github.ref == 'refs/heads/main'
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      RELEASE_NOTES: ${{ inputs.notes }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Check runner and prepare version
+        run: |
+          node -e 'if (process.platform !== "darwin" || process.arch !== "arm64") throw new Error("Release requires an Apple Silicon macOS runner")'
+          node scripts/prepare-release-version.mjs --version "$RELEASE_VERSION"
+          node --input-type=module <<'NODE'
+          import { compareReleaseVersions } from './scripts/prepare-release-version.mjs';
+          const response = await fetch('https://api.github.com/repos/mz598907695-del/tabbit-demo-updates/releases/latest', { signal: AbortSignal.timeout(30000) });
+          if (!response.ok) throw new Error(`Cannot check latest release: HTTP ${response.status}`);
+          const latest = await response.json();
+          if (compareReleaseVersions(process.env.RELEASE_VERSION, latest.tag_name.replace(/^v/, '')) <= 0) {
+            throw new Error(`Version must be greater than ${latest.tag_name}`);
+          }
+          NODE
+      - name: Check release credentials
+        id: credentials
+        env:
+          SIGNING_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          PUBLISH: ${{ inputs.publish }}
+          APP_ID: ${{ vars.TABBIT_RELEASE_APP_ID }}
+          APP_KEY: ${{ secrets.TABBIT_RELEASE_APP_PRIVATE_KEY }}
+          RELEASE_TOKEN: ${{ secrets.TABBIT_RELEASE_TOKEN }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo 'Missing TAURI_SIGNING_PRIVATE_KEY; retain the original client signing key.' >&2
+            exit 1
+          fi
+          if [ "$PUBLISH" = true ] && [ -z "$RELEASE_TOKEN" ] && { [ -z "$APP_ID" ] || [ -z "$APP_KEY" ]; }; then
+            echo 'Publishing needs TABBIT_RELEASE_TOKEN or a configured release GitHub App. The source GITHUB_TOKEN cannot publish to another repository.' >&2
+            exit 1
+          fi
+          if [ -n "$APP_ID" ] && [ -n "$APP_KEY" ]; then
+            echo "use_app=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install and check source
+        run: |
+          npm ci
+          npm run check:source
+          npm test
+      - name: Build and sign update
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: npm run release:update -- --bundled-defaults --notes "$RELEASE_NOTES"
+      - name: Verify signed update and native updater
+        run: |
+          node scripts/verify-update-artifacts.mjs --version "$RELEASE_VERSION"
+          python3 scripts/test-updater-native.py
+      - name: Save verified build
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: tabbit-${{ inputs.version }}-arm64-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            release/${{ inputs.version }}/tabbit-2-demo_${{ inputs.version }}_aarch64.app.tar.gz
+            release/${{ inputs.version }}/tabbit-2-demo_${{ inputs.version }}_aarch64.app.tar.gz.sig
+            release/${{ inputs.version }}/Tabbit-2-Demo-${{ inputs.version }}-arm64.dmg
+            release/${{ inputs.version }}/latest.json
+      - name: Create scoped release token
+        if: inputs.publish && steps.credentials.outputs.use_app == 'true'
+        id: app-token
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        with:
+          app-id: ${{ vars.TABBIT_RELEASE_APP_ID }}
+          private-key: ${{ secrets.TABBIT_RELEASE_APP_PRIVATE_KEY }}
+          owner: mz598907695-del
+          repositories: tabbit-demo-updates
+          permission-contents: write
+      - name: Publish verified artifacts
+        if: inputs.publish
+        env:
+          TABBIT_RELEASE_TOKEN: ${{ steps.app-token.outputs.token || secrets.TABBIT_RELEASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 scripts/publish-update.py --version "$RELEASE_VERSION" --validate-only
+          python3 scripts/publish-update.py --version "$RELEASE_VERSION" --publish
+      - name: Verify public update endpoint
+        if: inputs.publish
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFile } from 'node:fs/promises';
+          const expected = JSON.parse(await readFile(`release/${process.env.RELEASE_VERSION}/latest.json`, 'utf8'));
+          const endpoint = 'https://github.com/mz598907695-del/tabbit-demo-updates/releases/latest/download/latest.json';
+          let verified = false;
+          for (let attempt = 0; attempt < 6; attempt++) {
+            try {
+              const response = await fetch(endpoint, { signal: AbortSignal.timeout(30000), cache: 'no-store' });
+              if (response.ok) {
+                const manifest = await response.json();
+                if (manifest.version === expected.version && JSON.stringify(manifest.platforms) === JSON.stringify(expected.platforms)) {
+                  verified = true;
+                  break;
+                }
+              }
+            } catch {
+              console.log(`Public endpoint check ${attempt + 1} did not complete; retrying.`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 10000));
+          }
+          if (!verified) throw new Error('Release was published, but its public update endpoint could not be verified; inspect the existing release before retrying');
+          NODE
+      - name: Record result
+        env:
+          PUBLISH: ${{ inputs.publish }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFile } from 'node:fs/promises';
+          const published = process.env.PUBLISH === 'true';
+          const version = process.env.RELEASE_VERSION;
+          await appendFile(process.env.GITHUB_STEP_SUMMARY,
+            `Version: ${version}\n\nSource: ${process.env.GITHUB_SHA}\n\n` +
+            (published ? `Published: https://github.com/mz598907695-del/tabbit-demo-updates/releases/tag/v${version}\n` :
+              'Build and verification passed. Download the private workflow artifact above; clients have not been updated.\n'));
+          NODE
