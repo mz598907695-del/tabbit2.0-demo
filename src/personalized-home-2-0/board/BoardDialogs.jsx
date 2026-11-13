@@ -17,6 +17,7 @@ import { shortcutIconFields } from './shortcut-icon';
 import { readShortcutIcon, SHORTCUT_ICON_ACCEPT } from './shortcut-icon-upload';
 import { MAX_BOARD_ITEMS } from './state';
 import { normalizeCodexUsageConfig, normalizeWorkdayConfig } from './utility-widget-data';
+import { normalizeDailyPictureConfig } from './daily-picture-data';
 
 const DEFAULT_SIZES = [
   { w: 2, h: 1, label: '横卡' },
@@ -204,7 +205,8 @@ export function BoardItemDialog({ item = null, onSave, onClose, embedded = false
   const widget = item?.type === 'widget';
   const shortcutEditor = !widget && !embedded;
   const kind = item?.kind;
-  const unifiedWidget = widget && !['reminder', 'joke', 'image', 'workday-countdown'].includes(kind);
+  const personalPhoto = kind === 'image' && normalizeDailyPictureConfig(item?.config).source === 'photo';
+  const unifiedWidget = widget && !personalPhoto && !['reminder', 'joke', 'workday-countdown'].includes(kind);
   const title = widget ? '编辑小组件' : item ? '编辑快捷方式' : '添加快捷方式';
 
   useEffect(() => {

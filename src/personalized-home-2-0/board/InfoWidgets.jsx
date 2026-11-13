@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, RefreshCw, Sun, Moon, Cloud, CloudRain, CloudSnow, CloudLightning, CloudFog, Snowflake, Wind, Droplets, ExternalLink } from 'lucide-react';
-import { WidgetShell, WidgetButton, Field, Metric, DotMatrixNumber, TickRing, DotGrid, Sparkline, useWidgetNow } from './UnifiedWidgetKit';
+import { WidgetShell, WidgetButton, Field, Metric, DotMatrixNumber, TickRing, DotGrid, DotProgress, Sparkline, useWidgetNow } from './UnifiedWidgetKit';
 import { INFO_CACHE_TTL, infoText, infoString, infoLocale, clampNumber, readInfoCache, fetchInfoResource, loadInfoNews, loadInfoWeather, searchInfoCities, weatherDescription, monthCells, clockParts, dailyInfoQuote, usageReading } from './info-widget-data';
 import './info-widgets.css';
 
@@ -51,7 +51,7 @@ function ClockWidget({ config, onChange, preview, active, locale }) {
   const display = config.seconds ? `${parts.time}:${parts.seconds}` : parts.time;
   const zoneLabel = new Intl.DateTimeFormat(locale, { ...(parts.timeZone ? { timeZone: parts.timeZone } : {}), timeZoneName: 'short' }).formatToParts(now).find(part => part.type === 'timeZoneName')?.value || '';
   return <WidgetShell title={title} preview={preview} className="iw-widget iw-clock" footer={<div className="iw-clock-footer"><span>{parts.date}</span><span className="iw-zone-pill">{zoneLabel}</span></div>} details={<div className="iw-detail uw-stack"><section className="uw-detail-summary iw-clock-summary"><div className="iw-detail-clock"><DotMatrixNumber value={display} label={display}/></div><p className="iw-muted">{parts.date} · {parts.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone}</p></section><section className="uw-detail-section"><h3>{t('显示设置', 'Display settings')}</h3><Field label={t('时区', 'Time zone')}><select value={parts.timeZone} onChange={e => onChange?.({ timeZone: e.target.value })}>{zones.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field><Field label={t('显示秒数', 'Show seconds')}><select value={config.seconds ? 'yes' : 'no'} onChange={e => onChange?.({ seconds: e.target.value === 'yes' })}><option value="no">{t('时与分', 'Hours and minutes')}</option><option value="yes">{t('时、分与秒', 'Hours, minutes and seconds')}</option></select></Field><Field label={t('卡片名称', 'Card title')}><Input maxLength={30} placeholder={t('时钟', 'Clock')} value={infoString(config.city)} onChange={e => onChange?.({ city: e.target.value })}/></Field></section></div>}>
-    <div className="iw-clock-face"><TickRing value={seconds} max={60} ticks={60} label={t(`当前 ${seconds} 秒`, `${seconds} seconds`)}><div className="iw-clock-center"><DotMatrixNumber value={parts.time} label={parts.time}/><span className="iw-clock-seconds"><DotMatrixNumber value={parts.seconds}/><small>{t('秒', 'sec')}</small></span><span>{config.seconds ? `${parts.seconds} ${t('秒', 'sec')}` : t('此时此刻', 'RIGHT NOW')}</span></div></TickRing></div>
+    <div className="iw-clock-face"><TickRing value={seconds} max={60} ticks={60} label={t(`当前 ${seconds} 秒`, `${seconds} seconds`)}><div className="iw-clock-center"><DotMatrixNumber value={parts.time} label={parts.time}/><span className="iw-clock-seconds"><DotMatrixNumber value={parts.seconds}/><small>{t('秒', 'sec')}</small></span><span className={`iw-clock-note${config.seconds ? '' : ' is-context'}`}>{config.seconds ? `${parts.seconds} ${t('秒', 'sec')}` : t('此时此刻', 'RIGHT NOW')}</span></div></TickRing></div>
     <div className="iw-clock-inline"><DotMatrixNumber value={display} label={display}/><span className="iw-muted">{parts.date}</span></div><time className="iw-clock-strip" aria-label={display}>{parts.time}</time><time className="iw-clock-narrow" aria-label={display} title={display}><span aria-hidden="true">{parts.time.split(':')[0]}</span><span aria-hidden="true">{parts.time.split(':')[1]}</span></time>
   </WidgetShell>;
 }
@@ -62,14 +62,15 @@ function CalendarWidget({ config, onChange, preview, active, locale }) {
   const heading = month.toLocaleDateString(locale, { year: 'numeric', month: 'long' }), monthName = month.toLocaleDateString(locale, { month: 'long' }), yearName = month.toLocaleDateString(locale, { year: 'numeric' }), weekdays = locale === 'en-US' ? ['M', 'T', 'W', 'T', 'F', 'S', 'S'] : [...'一二三四五六日'];
   const shift = delta => onChange?.({ monthOffset: Math.max(-1200, Math.min(1200, offset + delta)) });
   const grid = detail => <div className={`iw-calendar-grid${detail ? ' is-detail' : ''}`} aria-label={heading}>{weekdays.map((day, i) => <span key={`w${i}`} className={`iw-weekday${i > 4 ? ' is-weekend' : ''}`}>{day}</span>)}{cells.map((day, i) => <span key={i} className={`iw-day${i % 7 > 4 ? ' is-weekend' : ''}${offset === 0 && day === now.getDate() ? ' is-today' : ''}`} aria-current={offset === 0 && day === now.getDate() ? 'date' : undefined}>{day}</span>)}</div>;
-  const navigation = <div className="iw-calendar-nav"><MiniButton label={t('上个月', 'Previous month')} disabled={preview || offset <= -1200} onClick={() => shift(-1)}><ArrowLeft/></MiniButton><button type="button" data-board-interactive="true" className="iw-month-label" title={t('回到本月', 'Back to this month')} disabled={preview} onClick={() => onChange?.({ monthOffset: 0 })} aria-label={heading}><span className="iw-month-year">{yearName}</span><span className="iw-month-name">{monthName}</span></button><MiniButton label={t('下个月', 'Next month')} disabled={preview || offset >= 1200} onClick={() => shift(1)}><ArrowRight/></MiniButton></div>;
+  const navigation = <div className="iw-calendar-nav"><MiniButton label={t('上个月', 'Previous month')} disabled={preview || offset <= -1200} onClick={() => shift(-1)}><ArrowLeft/></MiniButton><button type="button" data-board-interactive="true" className="iw-month-label" title={t('回到本月', 'Back to this month')} disabled={preview} onClick={() => onChange?.({ monthOffset: 0 })} aria-label={heading}><span className="iw-month-year">{yearName}</span><span className="iw-month-name">{monthName}</span><span className="iw-month-short">{month.toLocaleDateString(locale, { year: 'numeric', month: 'short' })}</span></button><MiniButton label={t('下个月', 'Next month')} disabled={preview || offset >= 1200} onClick={() => shift(1)}><ArrowRight/></MiniButton></div>;
   return <WidgetShell title={t('日历', 'Calendar')} preview={preview} className="iw-widget iw-calendar" details={<div className="iw-detail uw-stack">{navigation}{grid(true)}<WidgetButton onClick={() => onChange?.({ monthOffset: 0 })}>{t('回到本月', 'Back to this month')}</WidgetButton><p className="iw-muted">{now.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}</p></div>}>
-    {navigation}{grid(false)}<div className="iw-calendar-tiny"><span className="iw-calendar-tiny-day"><DotMatrixNumber value={now.getDate()}/></span><span className="iw-calendar-tiny-meta">{now.toLocaleDateString(locale, { month: 'short', weekday: 'short' })}</span></div><div className="iw-calendar-strip"><span>{now.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}</span><span>{now.toLocaleDateString(locale, { weekday: 'short' })}</span></div>
+    {navigation}{grid(false)}<div className="iw-calendar-tiny"><span className="iw-calendar-tiny-month">{now.toLocaleDateString(locale, { month: 'short' })}</span><span className="iw-calendar-tiny-day"><DotMatrixNumber value={now.getDate()}/></span><span className="iw-calendar-tiny-meta">{now.toLocaleDateString(locale, { month: 'short', weekday: 'short' })}</span></div><div className="iw-calendar-strip"><span>{now.toLocaleDateString(locale, { month: 'short', day: 'numeric' })}</span><span>{now.toLocaleDateString(locale, { weekday: 'short' })}</span></div>
   </WidgetShell>;
 }
 
 function QuoteWidget({ config, onChange, preview, active, locale }) {
   const now = useWidgetNow(active && !preview, 60_000), quote = dailyInfoQuote(config, locale, now), t = (zh, en) => infoText(locale, zh, en);
+  const hasAttribution = !['', '今日寄语', 'A daily thought'].includes(infoString(config.author).trim());
   const next = () => onChange?.({ index: (Number(config.index) || 0) + 1, text: '', author: '' });
   const details = <div className="iw-detail uw-stack">
     <section className="uw-detail-summary iw-quote-summary">
@@ -83,7 +84,7 @@ function QuoteWidget({ config, onChange, preview, active, locale }) {
       <p className="uw-detail-caption">{t('默认寄语每天更换，也可手动切换。', 'A new thought each day. Or choose the next one yourself.')}</p>
     </section>
   </div>;
-  return <WidgetShell title={t('每日一句', 'Daily thought')} preview={preview} className="iw-widget iw-quote" details={details} footer={<div className="iw-footer-row"><span className="iw-quote-author">{quote.author}</span><MiniButton label={t('换一句', 'Next thought')} disabled={preview} onClick={next}><RefreshCw/></MiniButton></div>}>
+  return <WidgetShell title={t('每日一句', 'Daily thought')} preview={preview} className={`iw-widget iw-quote${hasAttribution ? '' : ' has-default-author'}`} details={details} actions={<MiniButton label={t('换一句', 'Next thought')} disabled={preview} onClick={next}><RefreshCw/></MiniButton>} footer={hasAttribution ? <span className="iw-quote-author">{quote.author}</span> : null}>
     <blockquote className="iw-quote-text">{quote.text}</blockquote>
   </WidgetShell>;
 }
@@ -92,7 +93,7 @@ function UsageWidget({ config, onChange, preview, locale }) {
   const t = (zh, en) => infoText(locale, zh, en), reading = usageReading(config), provider = infoString(config.provider).trim() || 'AI', [detailsOpen, setDetailsOpen] = useState(false);
   const save = value => onChange?.({ usedPercent: value, updatedAt: new Date().toISOString() });
   return <WidgetShell title={t('AI 余量', 'AI allowance')} preview={preview} className="iw-widget iw-usage" detailOpen={detailsOpen} onDetailOpenChange={setDetailsOpen} footer={<div className="iw-footer-row"><span>{t('手动记录', 'Manual record')}</span><button type="button" className="iw-text-button" data-board-interactive="true" disabled={preview} onClick={() => reading.hasValue ? save(Math.min(100, reading.used + 5)) : setDetailsOpen(true)}>{reading.hasValue ? t('+5% 已用', '+5% used') : t('开始记录', 'Start')}</button></div>} details={<div className="iw-detail uw-stack"><section className="uw-detail-summary iw-usage-detail-hero"><Metric value={reading.hasValue ? Number(reading.remaining.toFixed(1)) : '—'} unit={t('% 剩余', '% left')}/><DotGrid value={reading.hasValue ? reading.remaining : 0} max={100} columns={20} rows={5} label={t('剩余额度', 'Remaining allowance')}/></section><section className="uw-detail-section"><h3>{t('用量记录', 'Your allowance record')}</h3><Field label={t('AI 产品', 'AI product')}><Input maxLength={40} value={provider} onChange={e => onChange?.({ provider: e.target.value })}/></Field><Field label={t('已用比例（%）', 'Used allowance (%)')}><Input type="number" min="0" max="100" step="1" value={reading.hasValue ? reading.used : ''} onChange={e => save(e.target.value === '' ? null : clampNumber(e.target.value, 0, 100))}/></Field><Field label={t('重置日期', 'Reset date')}><Input type="date" value={infoString(config.resetDate)} onChange={e => onChange?.({ resetDate: e.target.value })}/></Field><div className="uw-row"><WidgetButton onClick={() => save(0)}>{t('记录为全部可用', 'Mark fully available')}</WidgetButton><WidgetButton onClick={() => save(null)}>{t('清除记录', 'Clear record')}</WidgetButton></div></section><p className="uw-detail-caption">{t('由你手动记录，不读取 AI 服务账号，也不会自动推测用量。', 'Manually recorded by you. This does not read an AI account or estimate its usage.')}{config.updatedAt && ` ${t('上次记录', 'Last recorded')}: ${dateLabel(config.updatedAt, locale)}`}</p></div>}>
-    <div className="iw-usage-heading"><span className="iw-muted">{provider}</span><span className="iw-usage-label">{t('剩余', 'REMAINING')}</span></div><div className="iw-usage-value" style={{ '--iw-number-ratio': infoNumberAspect(reading.hasValue ? Math.round(reading.remaining) : '—') }}><DotMatrixNumber value={reading.hasValue ? String(Math.round(reading.remaining)) : '—'} label={reading.hasValue ? `${reading.remaining}%` : t('尚未记录', 'Not recorded')}/><span>%</span></div><div className={`iw-usage-grid${reading.hasValue ? '' : ' is-empty'}`}><DotGrid value={reading.hasValue ? reading.remaining : 0} max={100} columns={20} rows={5} label={t('剩余额度', 'Remaining allowance')}/></div><span className="iw-usage-reset iw-muted">{config.resetDate ? `${t('重置', 'Resets')} · ${config.resetDate}` : reading.hasValue ? t('每个点代表 1%', 'Each dot represents 1%') : t('记录后显示剩余额度', 'Record your allowance to begin')}</span>
+    <div className="iw-usage-heading"><span className="iw-muted">{provider}</span><span className="iw-usage-label">{t('剩余', 'REMAINING')}</span></div><div className="iw-usage-value" style={{ '--iw-number-ratio': infoNumberAspect(reading.hasValue ? Math.round(reading.remaining) : '—') }}><DotMatrixNumber value={reading.hasValue ? String(Math.round(reading.remaining)) : '—'} label={reading.hasValue ? `${reading.remaining}%` : t('尚未记录', 'Not recorded')}/><span>%</span></div><div className={`iw-usage-grid${reading.hasValue ? '' : ' is-empty'}`}><DotGrid value={reading.hasValue ? reading.remaining : 0} max={100} columns={20} rows={5} label={t('剩余额度', 'Remaining allowance')}/></div><div className={`iw-usage-line${reading.hasValue ? '' : ' is-empty'}`}><DotProgress value={reading.hasValue ? reading.remaining : 0}/></div><span className="iw-usage-reset iw-muted">{config.resetDate ? `${t('重置', 'Resets')} · ${config.resetDate}` : reading.hasValue ? t('每个点代表 1%', 'Each dot represents 1%') : t('记录后显示剩余额度', 'Record your allowance to begin')}</span>
   </WidgetShell>;
 }
 
@@ -125,7 +126,7 @@ function WeatherWidget({ config, onChange, preview, active, locale }) {
     finally { if (searchController.current === controller) { setSearching(false); searchController.current = null; } }
   };
   const refresh = <MiniButton label={t('刷新天气', 'Refresh weather')} disabled={preview || state.loading} onClick={state.refresh}><RefreshCw className={state.loading ? 'iw-refreshing' : ''}/></MiniButton>;
-  const forecast = detail => hours.length > 1 && <div className={`iw-weather-forecast${detail ? ' is-detail' : ''}`}><div className="iw-footer-row"><span>{t('未来 12 小时', 'Next 12 hours')}</span><span>{Math.round(Math.min(...hours.map(h => h.value)))}° — {Math.round(Math.max(...hours.map(h => h.value)))}°</span></div><Sparkline values={hours.map(hour => hour.value)} label={t('未来 12 小时温度预报', 'Temperature forecast for the next 12 hours')}/><div className="iw-footer-row"><span>{hours[0].time.slice(11, 16)}</span><span>{hours.at(-1).time.slice(11, 16)}</span></div></div>;
+  const forecast = detail => hours.length > 1 && <div className={`iw-weather-forecast${detail ? ' is-detail' : ''}`}><div className="iw-footer-row"><span className="iw-forecast-period">{t('未来 12 小时', 'Next 12 hours')}</span><span className="iw-forecast-period-short">{t('12 小时', '12h')}</span><span>{Math.round(Math.min(...hours.map(h => h.value)))}° — {Math.round(Math.max(...hours.map(h => h.value)))}°</span></div><Sparkline values={hours.map(hour => hour.value)} label={t('未来 12 小时温度预报', 'Temperature forecast for the next 12 hours')}/><div className="iw-footer-row iw-forecast-times"><span>{hours[0].time.slice(11, 16)}</span><span>{hours.at(-1).time.slice(11, 16)}</span></div></div>;
   const details = <div className="iw-detail uw-stack">
     <section className="uw-detail-summary iw-weather-summary">
       <div className="iw-weather-detail-hero"><div><span className="iw-weather-detail-city">{city}</span><Metric value={current ? Math.round(current.temperature_2m) : '—'} unit="°C"/><span className="iw-muted">{current ? weatherDescription(current.weather_code, locale) : t('尚无天气数据', 'No weather data yet')}</span></div>{current && <WeatherSymbol code={current.weather_code} isDay={current.is_day !== 0}/>}</div>
@@ -142,24 +143,31 @@ function WeatherWidget({ config, onChange, preview, active, locale }) {
     <p className="uw-detail-caption">{t('天气与预报来自', 'Weather and forecasts by')} <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a> · {t('城市数据', 'City data')}: GeoNames{current?.time && <><br/>{t('天气时间', 'Weather time')}: {current.time.replace('T', ' ')} · {state.data.timezone}</>}</p>
   </div>;
   return <WidgetShell title={t('天气', 'Weather')} preview={preview} className="iw-widget iw-weather" detailOpen={detailsOpen} onDetailOpenChange={setDetailsOpen} actions={refresh} footer={<RemoteStatus state={state} locale={locale} preview={preview}/>} details={details}>
-    <button type="button" data-board-interactive="true" className="iw-weather-city" disabled={preview} title={t('更换城市', 'Change city')} onClick={() => setDetailsOpen(true)}>{city}</button><div className="iw-weather-current"><div className="iw-weather-value" style={{ '--iw-number-ratio': infoNumberAspect(current ? Math.round(current.temperature_2m) : '—') }}><DotMatrixNumber value={current ? String(Math.round(current.temperature_2m)) : '—'} label={current ? `${Math.round(current.temperature_2m)}°C` : t('暂无温度', 'No temperature')}/><span>°</span></div>{current ? <WeatherSymbol code={current.weather_code} isDay={current.is_day !== 0}/> : <Cloud className="iw-weather-symbol is-pending" strokeWidth={1.15} aria-hidden="true"/>}</div><span className="iw-weather-condition">{current ? weatherDescription(current.weather_code, locale) : preview ? t('添加后获取实时天气', 'Live weather after adding') : state.loading ? t('正在获取天气…', 'Fetching weather…') : t('等待天气数据', 'Waiting for weather')}</span>{forecast(false)}
+    <button type="button" data-board-interactive="true" className="iw-weather-city" disabled={preview} title={t('更换城市', 'Change city')} onClick={() => setDetailsOpen(true)}>{city}</button><div className="iw-weather-current"><div className="iw-weather-value" style={{ '--iw-number-ratio': infoNumberAspect(current ? Math.round(current.temperature_2m) : '—') }}><DotMatrixNumber value={current ? String(Math.round(current.temperature_2m)) : '—'} label={current ? `${Math.round(current.temperature_2m)}°C` : t('暂无温度', 'No temperature')}/><span>°</span></div>{current ? <WeatherSymbol code={current.weather_code} isDay={current.is_day !== 0}/> : <Cloud className="iw-weather-symbol is-pending" strokeWidth={1.15} aria-hidden="true"/>}</div><span className="iw-weather-condition">{current ? weatherDescription(current.weather_code, locale) : preview ? t('添加后获取实时天气', 'Live weather after adding') : state.loading ? t('正在获取天气…', 'Fetching weather…') : state.error ? t('连接失败', 'Unavailable') : t('等待天气数据', 'Waiting for weather')}</span>{forecast(false)}
   </WidgetShell>;
 }
 
 
 function NewsHeadlineList({ stories, preview, locale }) {
   const listRef = useRef(null);
-  const [layout, setLayout] = useState({ count: 1, rowHeight: 28 });
+  const [layout, setLayout] = useState({ count: 1, rowHeight: 28, lines: 1 });
   useEffect(() => {
     const list = listRef.current;
     if (!list) return;
     const measure = () => {
       // Use layout pixels so scaled catalogue previews keep the same row count.
       const height = list.clientHeight;
-      const preferred = Number.parseFloat(getComputedStyle(list).getPropertyValue('--iw-headline-row-height')) || 28;
-      const count = height >= 20 ? Math.min(20, Math.max(1, Math.floor((height + 0.25) / preferred))) : 0;
-      const rowHeight = Math.min(preferred, Math.max(0, height));
-      setLayout(previous => previous.count === count && Math.abs(previous.rowHeight - rowHeight) < 0.25 ? previous : { count, rowHeight });
+      const style = getComputedStyle(list);
+      const preferred = Number.parseFloat(style.getPropertyValue('--iw-headline-row-height')) || 28;
+      const limit = Math.max(1, Math.min(20, Number.parseInt(style.getPropertyValue('--iw-headline-max-count'), 10) || 20));
+      // These values also size the text and padding in CSS, including narrow cards.
+      const lineHeight = Number.parseFloat(style.getPropertyValue('--iw-headline-line-height')) || 20;
+      const rowPadding = Number.parseFloat(style.getPropertyValue('--iw-headline-row-padding')) || 0;
+      const lineLimit = Number.parseInt(style.getPropertyValue('--iw-headline-line-limit'), 10) || 1;
+      const count = height >= lineHeight + rowPadding ? Math.min(limit, Math.max(1, Math.floor((height + 0.25) / preferred))) : 0;
+      const rowHeight = limit === 1 ? height : Math.min(preferred, Math.max(0, height));
+      const lines = Math.max(1, Math.min(lineLimit, Math.floor((rowHeight - rowPadding) / lineHeight)));
+      setLayout(previous => previous.count === count && previous.lines === lines && Math.abs(previous.rowHeight - rowHeight) < 0.25 ? previous : { count, rowHeight, lines });
     };
     measure();
     if (typeof ResizeObserver === 'undefined') {
@@ -170,7 +178,7 @@ function NewsHeadlineList({ stories, preview, locale }) {
     observer.observe(list);
     return () => observer.disconnect();
   }, []);
-  return <ol ref={listRef} className="iw-news-headlines" aria-label={infoText(locale, '新闻标题', 'News headlines')} style={{ '--iw-headline-row-size': `${layout.rowHeight}px` }}>
+  return <ol ref={listRef} className="iw-news-headlines" aria-label={infoText(locale, '新闻标题', 'News headlines')} style={{ '--iw-headline-row-size': `${layout.rowHeight}px`, '--iw-headline-visible-lines': layout.lines }}>
     {stories.slice(0, layout.count).map((story, index) => <li key={story.url}>
       <span className="iw-headline-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
       <a href={story.url} target="_blank" rel="noopener noreferrer" data-board-interactive="true" title={[story.title, story.source].filter(Boolean).join(' · ')} tabIndex={preview ? -1 : undefined}>{story.title}</a>
@@ -194,7 +202,7 @@ function NewsWidget({ config, onChange, preview, active, locale }) {
     {sourceNotes}
   </div>;
   return <WidgetShell title={t('最新新闻', 'Latest news')} preview={preview} className="iw-widget iw-news" actions={refresh} footer={<RemoteStatus state={state} locale={locale} source={sourceName} preview={preview}/>} details={details}>
-    {stories.length ? <NewsHeadlineList stories={stories} preview={preview} locale={locale}/> : <div className="iw-news-empty"><div className="iw-news-masthead"><span>{language === 'zh' ? '中文资讯' : 'NEWSROOM'}</span><i/><i/><i/></div><p>{preview ? t('添加后，阅读最新报道。', 'Add to read the latest reports.') : state.loading ? t('正在获取最新报道…', 'Fetching the latest reports…') : state.error ? t('暂时无法连接新闻源', 'News source unavailable') : t('暂无匹配报道', 'No matching reports')}</p><span>{language === 'zh' ? t('中文原文 · 来源可追溯', 'Chinese · original sources') : 'English · original sources'}</span></div>}
+    {stories.length ? <NewsHeadlineList stories={stories} preview={preview} locale={locale}/> : <div className="iw-news-empty"><div className="iw-news-masthead"><span>{language === 'zh' ? '中文资讯' : 'NEWSROOM'}</span><i/><i/><i/></div><p>{preview ? t('添加后，阅读最新报道。', 'Add to read the latest reports.') : state.loading ? t('正在获取最新报道…', 'Fetching the latest reports…') : state.error ? t('暂时无法连接新闻源', 'News source unavailable') : t('暂无匹配报道', 'No matching reports')}</p><span className="iw-news-source-caption">{language === 'zh' ? t('中文原文 · 来源可追溯', 'Chinese · original sources') : 'English · original sources'}</span></div>}
   </WidgetShell>;
 }
 

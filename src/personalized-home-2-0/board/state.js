@@ -23,7 +23,7 @@ const MAX_BOARD_COLUMNS = MAX_WIDGET_WIDTH;
 const LAYOUT_VERSION = 3;
 const MAX_HISTORY = 30;
 const unifiedWidgetNames = Object.fromEntries([...coreWidgetCatalog, ...extraWidgetCatalog, ...leisureWidgetCatalog, ...audioWidgetCatalog].map(def => [def.kind, def.title]));
-const widgetNames = {...unifiedWidgetNames, 'ai-card':'AI 卡片',reminder:'提醒',joke:'笑话',image:'每日一图',weather:'天气',calendar:'日历',countdown:'倒计时',draw:'抽签',quote:'每日一句',news:'新闻','codex-usage':'Codex 用量监测','workday-countdown':'下班倒计时'};
+const widgetNames = {...unifiedWidgetNames, 'ai-card':'AI 卡片',reminder:'提醒'};
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const text = (value, fallback = '', max = 60) => typeof value === 'string' ? value.slice(0, max) : fallback;
 const validUrl = (value) => { try { const url=new URL(value);return typeof value==='string'&&['http:', 'https:'].includes(url.protocol)&&Boolean(url.hostname); } catch { return false; } };

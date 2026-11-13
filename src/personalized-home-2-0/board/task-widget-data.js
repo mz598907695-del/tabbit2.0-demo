@@ -13,11 +13,11 @@ const dayStamp = date => Date.UTC(date.getFullYear(), date.getMonth(), date.getD
 export function countdownState(config, now = new Date()) {
   const target = parseLocalDate(config.targetDate);
   const start = parseLocalDate(config.startDate);
-  if (!target) return { days: null, progress: null, total: null, target: null, start };
+  if (!target) return { days: null, progress: null, total: null, target: null, start, error: null };
   const days = Math.round((dayStamp(target) - dayStamp(now)) / 86400000);
   const total = start ? Math.round((dayStamp(target) - dayStamp(start)) / 86400000) : null;
   const progress = total > 0 ? bounded((total - days) / total, 0, 1) : null;
-  return { days, progress, total, target, start };
+  return { days, progress, total, target, start, error: total !== null && total < 0 ? 'order' : null };
 }
 export function timerState(config, now = Date.now()) {
   const phase = config.phase === 'break' || config.phase === 'rest' ? 'break' : 'focus';
@@ -113,12 +113,13 @@ export function convertTaskValue(value, category, from, to) {
   const a = group.units.find(item => item[0] === from), b = group.units.find(item => item[0] === to);
   if (!a || !b) return { result: null, error: 'unit' };
   if (category === 'temperature') {
-    const c = from === 'f' ? (n - 32) * 5 / 9 : from === 'k' ? n - 273.15 : n;
+    const c = from === 'f' ? (n - 32) * (5 / 9) : from === 'k' ? n - 273.15 : n;
     if (c < -273.1500001) return { result: null, error: 'absolute' };
-    return { result: to === 'f' ? c * 9 / 5 + 32 : to === 'k' ? c + 273.15 : c, error: null };
+    const result = to === 'f' ? c * (9 / 5) + 32 : to === 'k' ? c + 273.15 : c;
+    return Number.isFinite(result) ? { result, error: null } : { result: null, error: 'range' };
   }
-  const result = n * a[3] / b[3];
-  return Number.isFinite(result) ? { result, error: null } : { result: null, error: 'number' };
+  const result = n * (a[3] / b[3]);
+  return Number.isFinite(result) ? { result, error: null } : { result: null, error: 'range' };
 }
 export function formatTaskNumber(value, locale = 'zh-CN') {
   if (!Number.isFinite(value)) return '—';

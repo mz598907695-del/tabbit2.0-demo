@@ -39,7 +39,7 @@ export const WidgetCard = memo(function WidgetCard({ kind, item = {}, size, onCh
     data-widget-active={visible && active && !preview && !inert} data-widget-mounted={mounted} data-widget-near={near || visible}
     onPointerDownCapture={() => setRetained(true)} onFocusCapture={() => setRetained(true)}
     data-widget-width={size?.w} data-widget-height={size?.h} aria-label={item.title || definition?.title || 'AI 卡片'}>
-    {mounted && <WidgetLocaleProvider locale={locale} onChange={onChange ? value => onChange({ locale: value }) : undefined}>
+    {mounted && <WidgetLocaleProvider locale={locale}>
       <Content kind={resolvedKind} config={config} size={size} onChange={onChange} preview={preview || inert} active={visible || (active && !inert && !preview && runningTask)} locale={locale} appearanceTheme={appearanceTheme}/>
     </WidgetLocaleProvider>}
   </BoardCard>;

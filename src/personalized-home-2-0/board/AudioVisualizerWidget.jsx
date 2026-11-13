@@ -44,8 +44,8 @@ export function AudioVisualizerWidget({ config = {}, onChange, preview, active =
   const errorText = error ? (ERRORS[error] || ERRORS.failed)[english ? 1 : 0] : '';
   const statusPill = <span className={`av-live ${listening ? 'is-on' : ''}`}><i/>{sourceName}</span>;
   const graph = <Spectrum bands={frame.bands} clipping={frame.peak >= .98} label={listening ? t('真实音频频谱，声音强度 ', 'Live audio spectrum, intensity ') + intensity + '%' : t('频谱等待音源连接', 'Spectrum waiting for an audio source')}/>;
-  return <WidgetShell title={t('音频可视化', 'Audio spectrum')} preview={preview} className="av-widget"
-    footer={<div className="av-footer"><span>{sourceName}</span><span>{listening ? `${dbfs} dBFS` : t('实时频谱', 'Live spectrum')}</span></div>}
+  return <WidgetShell title={t('音频可视化', 'Audio spectrum')} preview={preview} className={`av-widget${listening ? ' is-listening' : ' is-waiting'}`}
+    footer={<div className="av-footer"><span>{sourceName}</span><span className={listening ? undefined : 'av-idle-caption'}>{listening ? `${dbfs} dBFS` : t('实时频谱', 'Live spectrum')}</span></div>}
     details={<div className="av-detail uw-stack">
       <div className="av-detail-status">{statusPill}<span role="status">{stateLabel}</span></div>
       <div className="av-detail-graph">{graph}</div>
@@ -58,7 +58,7 @@ export function AudioVisualizerWidget({ config = {}, onChange, preview, active =
       <p className="uw-muted">{source === 'microphone' ? t('允许麦克风访问后，小组件显示时会自动检测输入声音。', 'After microphone access is granted, detection resumes automatically while the widget is visible.') : native ? t('小组件显示时自动检测设备播放的声音。首次连接请允许系统音频访问；无声时会安静等待。', 'Device playback is detected automatically while this widget is visible. Allow system audio access on first connection; detection waits quietly during silence.') : t('浏览器需要你选择标签页、窗口或屏幕，并勾选共享音频，连接后会自动跟随声音。切换看板或离开标签页后再次使用，需重新选择音源；桌面应用支持自动连接。', 'Choose a tab, window or screen and share its audio; the spectrum then follows automatically. After switching boards or leaving the tab, choose the source again. The desktop app connects automatically.')}</p>
       <p className="uw-muted">{t('仅在本机实时分析，不录制、不上传。声音强度按数字音频电平换算，并非环境分贝；系统音量由设备支持情况决定。暂停检测、切换看板或离开标签页后释放音源。', 'Analyzed locally, without recording or uploading. Intensity is based on digital signal level, not environmental decibels; system volume is shown when supported. Pausing detection, switching boards or leaving the tab releases the source.')}</p>
     </div>}>
-    <div className="av-hero"><div className="av-value"><DotMatrixNumber value={primaryValue} label={primaryLabel + ' ' + (primaryValue === '—' ? stateLabel : primaryValue + '%')}/><span>%</span></div></div>
+    <div className="av-hero"><div className="av-value"><DotMatrixNumber value={primaryValue} label={primaryLabel + ' ' + (primaryValue === '—' ? stateLabel : primaryValue + '%')}/>{listening && <span>%</span>}</div></div>
     <div className="av-state" role="status" title={stateLabel}>{stateLabel}</div>
     <div className="av-graph">{graph}</div>
     {errorText && <span className="av-card-error" title={errorText}>{t('展开查看连接提示', 'Open for connection help')}</span>}
