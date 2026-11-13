@@ -1,0 +1,442 @@
+/* Isolated V3 content. Existing Demo and V2 styles are intentionally untouched. */
+.v3-scope .extra-focus .uw-main { display:block; }
+.v3-scope :is(.extra-world,.extra-breathing,.extra-links,.extra-expenses,.extra-time) .uw-main { gap:10px; }
+.v3-scope .extra-focus-face { min-width:0;min-height:0; }
+.v3-scope .extra-focus-name { color:var(--uw-fg);font-size:13px;line-height:1.45;font-weight:400; }
+.v3-scope .extra-focus-caption,.v3-scope .extra-eyebrow { color:var(--uw-muted);font-size:10px;line-height:1.4; }
+.v3-scope .extra-focus-number { flex-wrap:nowrap;align-items:baseline;gap:6px;color:var(--v3-accent); }
+.v3-scope .extra-focus-number > .v3-number { --v3-number-size:44px;flex:0 1 auto;max-width:100%;width:auto;min-width:0; }
+.v3-scope .extra-focus-number > small { color:var(--uw-muted);font-size:10px;line-height:1.4; }
+.v3-scope .extra-focus-number > .extra-focus-micro-value { display:none; }
+.v3-scope .extra-mini-button.uw-button { min-height:28px;border:0;background:var(--v3-soft);color:var(--v3-accent);padding:5px 11px;border-radius:99px;gap:5px;font-size:11px; }
+.v3-scope .extra-mini-button.uw-button[aria-pressed=true] { border:0;background:var(--v3-accent);color:#090d0d; }
+.v3-scope .extra-icon-button.uw-button { border:0;background:#1c1c20;color:var(--v3-accent); }
+.v3-scope .nv-capsule-track { display:flex;align-items:stretch;gap:4px;min-width:0;width:100%;height:14px;flex:none;color:var(--v3-accent); }
+.v3-scope .nv-capsule-track > i { flex:1;min-width:0;border-radius:99px;background:color-mix(in srgb,var(--v3-accent) 12%,#121216); }
+.v3-scope .nv-capsule-track > i.is-filled { background:var(--v3-accent); }
+.v3-scope .nv-scale-labels { display:flex;justify-content:space-between;align-items:center;margin-top:5px;font-size:9px;line-height:12px;color:var(--uw-muted);font-variant-numeric:tabular-nums; }
+.v3-scope .extra-editorial-art { object-fit:contain;filter:drop-shadow(0 3px 8px #0005); }
+
+/* World clock: a local 24-hour rail links a primary time with distant cities. */
+.v3-scope .extra-world .uw-main { justify-content:center;gap:12px; }
+.v3-scope .extra-world-primary { flex:none; }
+.v3-scope .extra-world-primary > div { width:100%; }
+.v3-scope .extra-world-value { display:flex;margin-top:6px;color:var(--v3-accent); }
+.v3-scope .extra-world-value > .v3-number { --v3-number-size:42px;display:block;max-width:100%;color:var(--v3-accent); }
+.v3-scope .extra-world-tiny-time { display:none; }
+.v3-scope .extra-world .extra-eyebrow { display:flex;align-items:center;justify-content:space-between; }
+.v3-scope .extra-world .extra-eyebrow > svg { color:var(--v3-accent); }
+.v3-scope .nv-world-track { flex:none; }
+.v3-scope .nv-world-track .nv-capsule-track { height:6px;gap:2px; }
+.v3-scope .extra-world-cities { display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap; }
+.v3-scope .extra-world-cities > div { display:flex;flex:1;min-width:48px;flex-direction:column;align-items:flex-start;gap:5px; }
+.v3-scope .extra-world-cities b { color:var(--uw-fg);font-size:20px;font-weight:400;letter-spacing:-.035em;line-height:1.1; }
+.v3-scope .extra-world-cities > div:nth-child(n+3) { display:none; }
+.v3-scope .extra-world-cities .extra-city-phase { display:none; }
+.v3-scope .extra-world .uw-footer { color:var(--uw-muted);font-size:10px; }
+.v3-scope .extra-clock-face { color:var(--v3-accent); }
+
+/* Habit: the seven real check-ins become a row of luminous capsules. */
+.v3-scope .extra-habit-face { display:flex;flex-direction:column;justify-content:space-between;gap:10px; }
+.v3-scope .extra-habit-current { display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px; }
+.v3-scope .extra-habit-current .extra-focus-number { flex:1;flex-wrap:wrap;gap:2px 6px; }
+.v3-scope .extra-habit-current .extra-focus-number > small { flex-basis:100%; }
+.v3-scope .extra-habit-current .extra-mini-button { width:auto; }
+.v3-scope .extra-habit-current .extra-mini-button > span { display:inline; }
+.v3-scope .extra-habit-week { display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;max-width:none; }
+.v3-scope .extra-habit-week > span { gap:6px; }
+.v3-scope .extra-habit-week i { display:block;width:100%;height:11px;border-radius:99px;background:var(--v3-soft); }
+.v3-scope .extra-habit-week .is-done i { background:var(--v3-accent); }
+.v3-scope .extra-habit-week small { color:var(--uw-muted);font-size:9px; }
+.v3-scope .extra-habit-history span { background:#1a1b1d;border-radius:99px;color:#909296; }
+.v3-scope .extra-habit-history span.is-done { color:#060a08;background:var(--v3-accent); }
+
+/* Hydration: a glass, the live count, and one clear action. */
+.v3-scope .extra-hydration-face { display:flex;flex-direction:column;justify-content:space-between;gap:9px; }
+.v3-scope .extra-hydration-current { display:flex;flex-direction:row;align-items:center;flex:1;gap:12px; }
+.v3-scope .extra-hydration-current .extra-focus-number { display:flex;flex:1;flex-wrap:wrap; }
+.v3-scope .extra-hydration-current > .extra-editorial-art { display:block;width:60px;height:76px;max-width:36%;max-height:100%; }
+.v3-scope .extra-hydration-action { display:flex;flex-direction:row;align-items:center;gap:9px;max-width:none; }
+.v3-scope .extra-hydration-action > .extra-focus-caption { display:block;font-size:9px; }
+.v3-scope .extra-water-progress { background:var(--v3-soft);height:8px;border-radius:99px; }
+.v3-scope .extra-water-progress > i { background:var(--v3-accent);border-radius:99px; }
+
+/* Reading: cover and title above a continuous reading rail. */
+.v3-scope .extra-reading-face { display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-rows:minmax(42px,1fr) auto auto;align-items:center;gap:9px 12px; }
+.v3-scope .extra-reading-face > .extra-editorial-art { display:block;grid-column:1;grid-row:1;width:42px;height:58px; }
+.v3-scope .extra-reading-face > .extra-focus-name { grid-column:2;grid-row:1;-webkit-line-clamp:2; }
+.v3-scope .extra-reading-current { display:flex;grid-column:1/-1;grid-row:2;align-items:center;justify-content:space-between;gap:8px; }
+.v3-scope .extra-reading-current .extra-focus-number { flex:1;flex-wrap:nowrap; }
+.v3-scope .extra-reading-current .v3-number { --v3-number-size:35px; }
+.v3-scope .extra-reading-current .extra-mini-button { display:flex;width:28px;height:28px;min-width:28px;padding:4px; }
+.v3-scope .nv-reading-track { display:flex;grid-column:1/-1;grid-row:3;align-items:center;gap:8px;min-width:0; }
+.v3-scope .nv-reading-track .nv-capsule-track { flex:1;height:8px;gap:3px; }
+.v3-scope .nv-reading-track > span { flex:none;color:var(--v3-accent);font-size:10px; }
+
+/* Anniversary: identity, a warm count, and the actual date. */
+.v3-scope .extra-anniversary-face { display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:8px; }
+.v3-scope .nv-anniversary-mark { display:flex;align-items:center;gap:7px;color:var(--v3-accent); }
+.v3-scope .nv-anniversary-mark svg { fill:var(--v3-soft);flex:none; }
+.v3-scope .nv-anniversary-mark span { font-size:10px; }
+.v3-scope .extra-anniversary-face > .extra-focus-number { width:auto;max-width:100%;gap:7px; }
+.v3-scope .extra-anniversary-face .extra-focus-number .v3-number { --v3-number-size:48px;max-width:100%; }
+.v3-scope .extra-anniversary-face > .extra-focus-number > small { flex-basis:auto; }
+.v3-scope .extra-anniversary-face > .extra-focus-caption { display:none; }
+
+/* Breathing: the phase drives the waveform; no decorative concentric ring. */
+.v3-scope .extra-breathing .uw-main { flex-direction:column;align-items:stretch;justify-content:center;gap:10px; }
+.v3-scope .nv-breath-dial { display:flex;flex:1;flex-direction:column;align-items:stretch;justify-content:center;width:100%;max-width:none;height:auto;min-height:0;gap:4px; }
+.v3-scope .nv-breath-value { display:flex;align-items:baseline;justify-content:space-between;gap:8px; }
+.v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:42px;color:var(--v3-accent);max-width:100%; }
+.v3-scope .nv-breath-value > .extra-breath-phase { display:block;font-size:11px;color:var(--uw-muted);white-space:nowrap; }
+.v3-scope .nv-breath-wave { display:block;flex:1;width:100%;min-height:20px;max-height:62px;overflow:visible; }
+.v3-scope .nv-breath-wave path { fill:none;stroke:var(--v3-accent);stroke-width:4;stroke-linecap:round; }
+.v3-scope .nv-session-progress { height:4px;gap:5px; }
+.v3-scope .extra-breathing .uw-main > .extra-mini-button { width:auto;align-self:center;min-height:28px;padding:4px 13px; }
+.v3-scope .extra-breathing .uw-main > .extra-mini-button > span { display:inline; }
+.v3-scope .extra-breathing .uw-footer { font-size:9px;line-height:13px; }
+.v3-scope .extra-breath-detail { height:220px; }
+.v3-scope .extra-breath-detail .nv-breath-dial { height:100%;max-width:320px;gap:16px; }
+.v3-scope .extra-breath-detail .nv-breath-wave { max-height:120px; }
+
+/* Launch links: tinted monograms and aligned rows instead of plain text. */
+.v3-scope .extra-links-list { display:flex;flex-direction:column;gap:6px;flex:1;min-height:0; }
+.v3-scope .extra-links-list > a { display:flex;min-height:38px;padding:7px 0;gap:10px;border:0;border-radius:0; }
+.v3-scope .extra-links-list .extra-site-letter { display:grid;flex:none;width:29px;height:29px;min-height:29px;padding:0;border:0;border-radius:9px;background:var(--v3-soft);color:var(--v3-accent); }
+.v3-scope .extra-site-monogram { display:block;font-size:12px;font-weight:400; }
+.v3-scope .extra-site-rank { display:none; }
+.v3-scope .extra-links-list b { font-size:12px;font-weight:400;color:var(--uw-fg); }
+.v3-scope .extra-links-list small { display:block;font-size:9px;color:var(--uw-muted); }
+.v3-scope .extra-links-list a > svg { color:var(--v3-accent); }
+.v3-scope .extra-links .uw-footer { font-size:9px;color:var(--uw-muted); }
+
+/* Goals: completion capsules stay above the editable checklist. */
+.v3-scope .extra-goals-face { display:flex;flex-direction:column;gap:8px; }
+.v3-scope .extra-goal-summary { display:grid;grid-template-columns:auto 1fr;align-items:baseline;gap:4px 8px;height:auto; }
+.v3-scope .extra-goal-summary .extra-focus-number { flex-wrap:nowrap; }
+.v3-scope .extra-goal-summary .v3-number { --v3-number-size:27px; }
+.v3-scope .extra-goal-summary > .extra-focus-caption { font-size:10px; }
+.v3-scope .extra-goal-summary .nv-capsule-track { grid-column:1/-1;height:5px;gap:4px; }
+.v3-scope .extra-goal-card-list { flex:1;gap:0;min-height:0; }
+.v3-scope .extra-goal-card-row label { min-height:26px;padding:4px 0;font-size:11px;gap:7px; }
+.v3-scope .extra-goal-card-row input { width:13px;height:13px;accent-color:var(--v3-accent); }
+.v3-scope .extra-goal-card-row .is-done { color:var(--uw-muted); }
+.v3-scope .extra-goal-entry { display:flex;min-height:24px; }
+.v3-scope .extra-goal-create { min-height:24px;padding:2px 0;color:var(--v3-accent);font-size:10px; }
+.v3-scope .extra-goal-entry > .extra-focus-caption { display:none; }
+
+/* Expenses: real daily spending renders as rounded bars, never random data. */
+.v3-scope .extra-expenses .uw-main { justify-content:space-between;gap:9px; }
+.v3-scope .extra-expense-total .extra-numeric { margin-top:5px;gap:5px;color:var(--v3-accent); }
+.v3-scope .extra-expense-total .v3-number { --v3-number-size:35px;max-width:100%; }
+.v3-scope .extra-expense-chart { display:flex;flex:1;min-height:16px;max-height:65px; }
+.v3-scope .nv-expense-bars { display:block;width:100%;height:100%;min-height:16px; }
+.v3-scope .nv-expense-bars rect { fill:var(--v3-soft); }
+.v3-scope .nv-expense-bars rect.is-filled { fill:var(--v3-accent); }
+.v3-scope .nv-expense-bars .is-today rect.is-filled { fill:#f0e2ff; }
+.v3-scope .extra-expense-quick { display:flex;min-height:28px;padding:0 0 0 9px;background:#1a1a1e;border-radius:99px;gap:4px; }
+.v3-scope .extra-expense-quick .uw-input { border:0;background:transparent;font-size:12px;padding:4px;height:28px; }
+.v3-scope .extra-expense-quick .extra-icon-button { border:0;background:var(--v3-soft);color:var(--v3-accent); }
+.v3-scope .extra-expenses .uw-footer { display:none; }
+
+/* Time progress: bright pill ticks, a light number, and a simple time range. */
+.v3-scope .extra-time .uw-main { display:flex;flex-direction:column;justify-content:space-between;gap:10px; }
+.v3-scope .extra-period-tabs { display:flex;align-self:flex-start;gap:3px;padding:2px;background:#1a1a1d; }
+.v3-scope .extra-period-tabs button { padding:4px 10px;font-size:10px;line-height:15px; }
+.v3-scope .extra-period-tabs button[aria-pressed=true] { color:var(--v3-accent);background:var(--v3-soft);box-shadow:none; }
+.v3-scope .nv-time-instrument { display:flex;flex:1;flex-direction:column;justify-content:center;gap:12px;min-height:0;min-width:0; }
+.v3-scope .nv-time-value { display:flex;align-items:baseline;gap:4px;color:var(--v3-accent);min-width:0; }
+.v3-scope .nv-time-value .v3-number { --v3-number-size:43px; }
+.v3-scope .nv-time-value small { font-size:13px; }
+.v3-scope .nv-time-scale .nv-capsule-track { height:26px;gap:4px; }
+.v3-scope .nv-time-caption { color:var(--uw-muted);font-size:10px; }
+.v3-scope .extra-time-compact-summary { display:none; }
+.v3-scope .extra-time .uw-footer { font-size:10px; }
+
+/* Wide cards use readable horizontal groupings, not oversized type. */
+@container uw (min-width:300px) and (min-height:136px) {
+ .v3-scope .extra-world .uw-main { display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;align-items:center;gap:12px 24px; }
+ .v3-scope .nv-world-track { grid-column:1/-1;grid-row:2; }
+ .v3-scope .extra-world-cities { grid-column:2;grid-row:1; }
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:42px; }
+ .v3-scope .extra-habit-face { display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;gap:12px 20px;align-items:center; }
+ .v3-scope .extra-habit-face > .extra-focus-name { grid-column:1;grid-row:1; }
+ .v3-scope .extra-habit-current { grid-column:1;grid-row:2; }
+ .v3-scope .extra-habit-week { grid-column:2;grid-row:1/-1;width:100%; }
+ .v3-scope .extra-habit-week i { height:38px;max-width:12px; }
+ .v3-scope .extra-habit-current .extra-mini-button > span { display:none; }
+ .v3-scope .extra-hydration-face { display:grid;grid-template-columns:minmax(0,1fr) 98px;grid-template-rows:1fr auto;gap:10px 16px;align-items:center; }
+ .v3-scope .extra-hydration-action { grid-column:2;grid-row:1;flex-direction:column;align-items:flex-start; }
+ .v3-scope .extra-hydration-face > .nv-capsule-track { grid-column:1/-1;grid-row:2; }
+ .v3-scope .extra-reading-face { grid-template-columns:58px 1fr;grid-template-rows:auto auto auto;gap:6px 16px; }
+ .v3-scope .extra-reading-face > .extra-editorial-art { grid-column:1;grid-row:1/3;width:58px;height:78px; }
+ .v3-scope .extra-reading-face > .extra-focus-name { grid-column:2;grid-row:1; }
+ .v3-scope .extra-reading-current { grid-column:2;grid-row:2; }
+ .v3-scope .extra-anniversary-face { display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;align-items:center;gap:12px 18px; }
+ .v3-scope .nv-anniversary-mark { grid-column:1;grid-row:1; }
+ .v3-scope .extra-anniversary-face > .extra-focus-name { grid-column:1;grid-row:2; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number { grid-column:2;grid-row:1/-1;flex-wrap:wrap; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number small { flex-basis:100%; }
+ .v3-scope .extra-breathing .uw-main { flex-direction:row;align-items:center;gap:20px; }
+ .v3-scope .nv-breath-dial { flex:1; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button { flex:none;padding:8px 10px;width:35px;height:35px;min-height:35px; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button > span { display:none; }
+ .v3-scope .extra-links-list { display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:5px 16px; }
+ .v3-scope .extra-goals-face { display:grid;grid-template-columns:70px minmax(0,1fr);grid-template-rows:1fr auto;gap:8px 16px; }
+ .v3-scope .extra-goal-summary { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px; }
+ .v3-scope .extra-goal-summary .v3-number { --v3-number-size:38px; }
+ .v3-scope .extra-goal-summary .nv-capsule-track { height:6px; }
+ .v3-scope .extra-goal-card-list { grid-column:2;grid-row:1; }
+ .v3-scope .extra-goal-entry { grid-column:2;grid-row:2; }
+ .v3-scope .extra-expenses .uw-main { display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;align-items:center;gap:12px 20px; }
+ .v3-scope .extra-expense-chart { width:100%;height:60px;max-height:none; }
+ .v3-scope .extra-expense-quick { grid-column:1/-1; }
+ .v3-scope .nv-time-instrument { display:grid;grid-template-columns:auto 1fr;gap:8px 18px;align-items:center; }
+ .v3-scope .nv-time-value { grid-column:1;grid-row:1/3; }
+ .v3-scope .nv-time-scale { grid-column:2;grid-row:1; }
+ .v3-scope .nv-time-caption { grid-column:2;grid-row:2; }
+ .v3-scope .nv-time-scale .nv-capsule-track { height:34px; }
+}
+
+/* Compact squares and tall narrow cards shed secondary context first. */
+@container uw (max-width:190px) {
+ .v3-scope .extra-focus-number > .v3-number { --v3-number-size:32px; }
+ .v3-scope .extra-focus-name { font-size:12px; }
+ .v3-scope .extra-habit-face,.v3-scope .extra-hydration-face,.v3-scope .extra-anniversary-face { gap:7px; }
+ .v3-scope .extra-habit-current .extra-mini-button { width:25px;min-height:25px;padding:4px; }
+ .v3-scope .extra-habit-current .extra-mini-button > span { display:none; }
+ .v3-scope .extra-habit-week { gap:4px; }
+ .v3-scope .extra-habit-week i { height:7px; }
+ .v3-scope .extra-hydration-current > .extra-editorial-art { width:42px;height:56px; }
+ .v3-scope .extra-hydration-action > .extra-focus-caption { display:none; }
+ .v3-scope .extra-reading-face { grid-template-columns:30px 1fr;grid-template-rows:1fr auto;gap:7px; }
+ .v3-scope .extra-reading-face > .extra-editorial-art { width:30px;height:43px; }
+ .v3-scope .extra-reading-current .v3-number { --v3-number-size:28px; }
+ .v3-scope .nv-reading-track { display:none; }
+ .v3-scope .nv-anniversary-mark { display:none; }
+ .v3-scope .extra-anniversary-face .extra-focus-number .v3-number { --v3-number-size:36px; }
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:33px; }
+ .v3-scope .extra-world-cities b { font-size:16px; }
+ .v3-scope .nv-world-track { display:none; }
+ .v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:31px; }
+ .v3-scope .nv-breath-wave { max-height:42px; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button { font-size:10px;min-height:25px;padding:3px 8px; }
+ .v3-scope .extra-links-list > a { min-height:30px;gap:7px;padding:4px 0; }
+ .v3-scope .extra-links-list .extra-site-letter { width:23px;height:23px;min-height:23px;border-radius:7px; }
+ .v3-scope .extra-links-list small { display:none; }
+ .v3-scope .extra-goal-summary .v3-number { --v3-number-size:22px; }
+ .v3-scope .extra-goal-card-row label { font-size:10px;min-height:22px; }
+ .v3-scope .extra-goals-face { gap:5px; }
+ .v3-scope .extra-expense-total .v3-number { --v3-number-size:28px; }
+ .v3-scope .extra-expense-chart { max-height:28px; }
+ .v3-scope .extra-period-tabs button { padding:3px 7px;font-size:9px; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:34px; }
+ .v3-scope .nv-time-scale .nv-capsule-track { height:18px;gap:3px; }
+ .v3-scope .nv-time-caption { display:none; }
+}
+@container uw (max-width:135px) and (min-height:136px) {
+ .v3-scope .extra-habit-current { flex-direction:column;align-items:flex-start;gap:9px; }
+ .v3-scope .extra-habit-current .extra-mini-button { width:auto; }
+ .v3-scope .extra-habit-current .extra-mini-button > span { display:inline; }
+ .v3-scope .extra-habit-week { gap:3px; }
+ .v3-scope .extra-habit-week small { display:none; }
+ .v3-scope .extra-hydration-current { flex-direction:column-reverse;align-items:flex-start;gap:10px; }
+ .v3-scope .extra-hydration-current > .extra-editorial-art { width:45px;height:64px;max-width:100%; }
+ .v3-scope .extra-hydration-current .extra-focus-number { flex:none;flex-wrap:wrap; }
+ .v3-scope .extra-hydration-face > .nv-capsule-track { height:6px;gap:2px; }
+ .v3-scope .extra-hydration-action .extra-mini-button { padding:4px 8px; }
+ .v3-scope .extra-reading-face { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:13px; }
+ .v3-scope .extra-reading-face > .extra-editorial-art { width:42px;height:56px; }
+ .v3-scope .extra-reading-current { flex-wrap:wrap; }
+ .v3-scope .extra-reading-current .extra-focus-number { flex-basis:100%;flex-wrap:wrap; }
+ .v3-scope .extra-anniversary-face { justify-content:center;gap:14px; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number { flex-wrap:wrap; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number > small { flex-basis:100%; }
+ .v3-scope .extra-world .uw-main { gap:15px; }
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:26px; }
+ .v3-scope .extra-world-cities { flex-direction:column;gap:14px; }
+ .v3-scope .extra-world-cities > div { flex:none;gap:3px; }
+ .v3-scope .nv-breath-value { flex-direction:column;align-items:flex-start;gap:5px; }
+ .v3-scope .nv-breath-wave { max-height:50px; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button { align-self:flex-start; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button > span { display:none; }
+ .v3-scope .extra-links-list .extra-site-letter { display:none; }
+ .v3-scope .extra-goal-card-row label { align-items:flex-start; }
+ .v3-scope .extra-goal-card-row label > span { white-space:normal;-webkit-line-clamp:2; }
+ .v3-scope .extra-expense-total .v3-number { --v3-number-size:24px; }
+ .v3-scope .extra-expense-quick { display:none; }
+ .v3-scope .extra-period-tabs { flex-direction:column;border-radius:14px; }
+ .v3-scope .nv-time-value { flex-wrap:wrap; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:30px; }
+ .v3-scope .nv-time-scale { display:none; }
+}
+
+/* Shallow cards are one horizontal sentence with one operation. */
+@container uw (min-width:136px) and (max-height:135px) {
+ .v3-scope .extra-world .uw-main,.v3-scope .extra-breathing .uw-main,.v3-scope .extra-time .uw-main,.v3-scope .extra-expenses .uw-main { display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:9px; }
+ .v3-scope .extra-world-value { margin:0; }
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:30px; }
+ .v3-scope .nv-world-track,.v3-scope .extra-world-cities,.v3-scope .extra-world .extra-eyebrow { display:none; }
+ .v3-scope .extra-habit-face,.v3-scope .extra-hydration-face,.v3-scope .extra-reading-face,.v3-scope .extra-anniversary-face { display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px; }
+ .v3-scope .extra-focus-name { flex:1;min-width:0;font-size:11px;-webkit-line-clamp:1; }
+ .v3-scope .extra-focus-number > .v3-number { --v3-number-size:28px; }
+ .v3-scope .extra-habit-week,.v3-scope .extra-hydration-face > .nv-capsule-track,.v3-scope .extra-hydration-current > .extra-editorial-art,.v3-scope .extra-reading-face > .extra-editorial-art,.v3-scope .nv-reading-track,.v3-scope .nv-anniversary-mark { display:none; }
+ .v3-scope .extra-habit-current .extra-mini-button > span,.v3-scope .extra-hydration-action .extra-mini-button > span { display:none; }
+ .v3-scope .extra-habit-current .extra-mini-button,.v3-scope .extra-hydration-action .extra-mini-button { width:27px;height:27px;min-height:27px;padding:4px; }
+ .v3-scope .extra-habit-current .extra-focus-number { flex-wrap:nowrap; }
+ .v3-scope .extra-habit-current .extra-focus-number > small { flex-basis:auto; }
+ .v3-scope .extra-hydration-current { flex:1; }
+ .v3-scope .extra-hydration-action > .extra-focus-caption { display:none; }
+ .v3-scope .extra-reading-current { flex:0 1 auto; }
+ .v3-scope .extra-reading-current .extra-mini-button { display:none; }
+ .v3-scope .extra-anniversary-face .extra-focus-number .v3-number { --v3-number-size:29px; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number { flex:none;max-width:none;flex-wrap:nowrap; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button { width:27px;height:27px;min-height:27px;padding:4px; }
+ .v3-scope .extra-breathing .uw-main > .extra-mini-button > span { display:none; }
+ .v3-scope .nv-breath-dial { flex:none;width:auto; }
+ .v3-scope .nv-breath-value { justify-content:flex-start; }
+ .v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:29px; }
+ .v3-scope .nv-breath-wave,.v3-scope .nv-session-progress { display:none; }
+ .v3-scope .extra-links-list { display:flex;flex-direction:row;gap:12px;overflow:auto; }
+ .v3-scope .extra-links-list > a { flex:none;min-height:25px;max-width:100%;padding:0; }
+ .v3-scope .extra-links-list > a:nth-child(n+3) { display:none; }
+ .v3-scope .extra-links-list small { display:none; }
+ .v3-scope .extra-goal-card-list,.v3-scope .extra-goal-entry { display:none; }
+ .v3-scope .extra-goal-summary { display:flex;align-items:center;gap:8px;height:100%; }
+ .v3-scope .extra-goal-summary .nv-capsule-track { display:none; }
+ .v3-scope .extra-goal-summary .v3-number { --v3-number-size:28px; }
+ .v3-scope .extra-expense-total .extra-eyebrow,.v3-scope .extra-expense-chart,.v3-scope .extra-expense-quick { display:none; }
+ .v3-scope .extra-expense-total .extra-numeric { margin:0; }
+ .v3-scope .extra-expense-total .v3-number { --v3-number-size:27px; }
+ .v3-scope .extra-time .extra-period-tabs,.v3-scope .nv-time-scale,.v3-scope .nv-time-caption { display:none; }
+ .v3-scope .nv-time-instrument { display:flex;justify-content:center;flex:none; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:29px; }
+ .v3-scope .extra-time-compact-summary { display:none; }
+}
+@container uw (min-width:136px) and (max-height:70px) {
+ .v3-scope .extra-focus-number > .v3-number,.v3-scope .extra-anniversary-face .extra-focus-number .v3-number,.v3-scope .nv-time-value .v3-number,.v3-scope .extra-world-value > .v3-number,.v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:24px; }
+ .v3-scope .extra-focus-number > small { font-size:9px;white-space:nowrap; }
+ .v3-scope .extra-habit-current .extra-mini-button { display:none; }
+ .v3-scope .extra-links-list > a:nth-child(n+2) { display:none; }
+}
+
+/* Tiny square and 50px rails remain honest summaries; full controls live in details. */
+@container uw (max-width:135px) and (max-height:135px) {
+ .v3-scope .extra-focus-face { display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px; }
+ .v3-scope .extra-focus-name { font-size:10px;line-height:14px;-webkit-line-clamp:1; }
+ .v3-scope .extra-focus-number > .v3-number { --v3-number-size:27px; }
+ .v3-scope .extra-habit-current,.v3-scope .extra-hydration-current,.v3-scope .extra-reading-current { display:flex;flex:none;align-items:baseline;flex-direction:row;width:100%; }
+ .v3-scope .extra-habit-current .extra-focus-number { flex-wrap:nowrap; }
+ .v3-scope .extra-habit-current .extra-focus-number > small { flex-basis:auto; }
+ .v3-scope .extra-habit-current .extra-mini-button,.v3-scope .extra-habit-week,.v3-scope .extra-hydration-current > .extra-editorial-art,.v3-scope .extra-hydration-face > .nv-capsule-track,.v3-scope .extra-hydration-action,.v3-scope .extra-reading-face > .extra-editorial-art,.v3-scope .extra-reading-current .extra-mini-button,.v3-scope .nv-reading-track,.v3-scope .nv-anniversary-mark { display:none; }
+ .v3-scope .extra-anniversary-face .extra-focus-number .v3-number { --v3-number-size:28px; }
+ .v3-scope .extra-world .uw-main { justify-content:center; }
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:24px; }
+ .v3-scope .extra-world-cities,.v3-scope .nv-world-track,.v3-scope .extra-world .uw-footer { display:none; }
+ .v3-scope .extra-world .extra-eyebrow { font-size:9px; }
+ .v3-scope .extra-breathing .uw-main { justify-content:center; }
+ .v3-scope .nv-breath-dial { flex:none;gap:0; }
+ .v3-scope .nv-breath-value { flex-direction:column;align-items:flex-start;gap:4px; }
+ .v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:28px; }
+ .v3-scope .nv-breath-wave,.v3-scope .nv-session-progress,.v3-scope .extra-breathing .uw-main > .extra-mini-button,.v3-scope .extra-breathing .uw-footer { display:none; }
+ .v3-scope .extra-links-list > a { min-height:24px; }
+ .v3-scope .extra-links-list .extra-site-letter,.v3-scope .extra-links-list small { display:none; }
+ .v3-scope .extra-links-list b { font-size:10px; }
+ .v3-scope .extra-goal-card-list,.v3-scope .extra-goal-entry,.v3-scope .extra-goal-summary .nv-capsule-track { display:none; }
+ .v3-scope .extra-goal-summary { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;height:100%; }
+ .v3-scope .extra-expense-chart,.v3-scope .extra-expense-quick { display:none; }
+ .v3-scope .extra-expense-total .extra-numeric > .v3-number { display:block;--v3-number-size:21px; }
+ .v3-scope .extra-expense-compact-value { display:none !important; }
+ .v3-scope .extra-time .extra-period-tabs,.v3-scope .nv-time-scale,.v3-scope .nv-time-caption { display:none; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:27px; }
+}
+@container uw (max-width:80px) {
+ .v3-scope .extra-focus-number { flex-direction:column;align-items:flex-start;gap:3px; }
+ .v3-scope .extra-focus-number > .v3-number.uw-dot-number { display:none; }
+ .v3-scope .extra-focus-number > .extra-focus-micro-value { display:block;font-size:19px;line-height:22px;color:var(--v3-accent); }
+ .v3-scope .extra-focus-name { font-size:10px;line-height:14px;-webkit-line-clamp:2; }
+ .v3-scope .extra-focus-number > small { font-size:9px;line-height:12px; }
+ .v3-scope .extra-focus-face { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:9px; }
+ .v3-scope .extra-habit-current,.v3-scope .extra-hydration-current,.v3-scope .extra-reading-current { display:block;flex:none;width:100%; }
+ .v3-scope .extra-habit-current .extra-mini-button,.v3-scope .extra-habit-week,.v3-scope .extra-hydration-current > .extra-editorial-art,.v3-scope .extra-hydration-face > .nv-capsule-track,.v3-scope .extra-hydration-action,.v3-scope .extra-reading-face > .extra-editorial-art,.v3-scope .extra-reading-current .extra-mini-button,.v3-scope .nv-reading-track,.v3-scope .nv-anniversary-mark,.v3-scope .extra-anniversary-face > .extra-focus-caption { display:none; }
+ .v3-scope .extra-world-value > .v3-number.uw-dot-number { display:none; }
+ .v3-scope .extra-world-tiny-time { display:block;color:var(--v3-accent);font-size:18px;line-height:1.15; }
+ .v3-scope .extra-world-cities,.v3-scope .nv-world-track,.v3-scope .extra-world .uw-footer,.v3-scope .extra-world .extra-eyebrow > svg { display:none; }
+ .v3-scope .extra-world .extra-eyebrow { font-size:9px; }
+ .v3-scope .extra-breathing .uw-main { align-items:flex-start; }
+ .v3-scope .nv-breath-value { flex-direction:column;align-items:flex-start;gap:7px; }
+ .v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:22px; }
+ .v3-scope .nv-breath-value > .extra-breath-phase { font-size:9px;white-space:normal; }
+ .v3-scope .nv-breath-wave,.v3-scope .nv-session-progress,.v3-scope .extra-breathing .uw-main > .extra-mini-button,.v3-scope .extra-breathing .uw-footer { display:none; }
+ .v3-scope .extra-links-list > a { display:block; }
+ .v3-scope .extra-links-list .extra-site-letter,.v3-scope .extra-links-list small,.v3-scope .extra-links-list a > svg { display:none; }
+ .v3-scope .extra-links-list b { font-size:9px;white-space:normal;overflow-wrap:anywhere; }
+ .v3-scope .extra-goal-card-list,.v3-scope .extra-goal-entry,.v3-scope .extra-goal-summary .nv-capsule-track { display:none; }
+ .v3-scope .extra-goal-summary { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:7px;height:100%; }
+ .v3-scope .extra-expense-total .extra-numeric { display:block; }
+ .v3-scope .extra-expense-total .v3-number.uw-dot-number { display:none; }
+ .v3-scope .extra-expense-total .extra-numeric > .extra-expense-compact-value { display:block !important;font-size:16px;overflow-wrap:anywhere;white-space:normal;color:var(--v3-accent); }
+ .v3-scope .extra-expense-chart,.v3-scope .extra-expense-quick { display:none; }
+ .v3-scope .extra-time .extra-period-tabs,.v3-scope .nv-time-scale,.v3-scope .nv-time-caption { display:none; }
+ .v3-scope .nv-time-value { flex-direction:column;gap:4px;align-items:flex-start; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:18px; }
+ .v3-scope .nv-time-value small { font-size:10px; }
+}
+
+/* Keep square-card content within the same compact rhythm as its shell. */
+@container uw (min-width:136px) and (max-width:299px) and (min-height:136px) and (max-height:260px) {
+ .v3-scope .extra-world .uw-main { gap:7px; }
+ .v3-scope .extra-world-value { margin-top:4px; }
+ .v3-scope .extra-world-cities > div { gap:3px; }
+ .v3-scope .extra-anniversary-face { justify-content:center;gap:9px; }
+ .v3-scope .extra-anniversary-face .extra-focus-number .v3-number { --v3-number-size:42px; }
+ .v3-scope .extra-time .uw-main { gap:6px; }
+ .v3-scope .nv-time-instrument { gap:7px; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:38px; }
+ .v3-scope .nv-time-scale .nv-capsule-track { height:21px; }
+ .v3-scope .nv-time-caption { display:none; }
+}
+@container uw (min-width:136px) and (max-width:190px) and (min-height:136px) and (max-height:200px) {
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:30px; }
+ .v3-scope .extra-world-cities > div { gap:2px; }
+ .v3-scope .extra-reading-face { grid-template-rows:minmax(0,1fr) auto;gap:5px; }
+ .v3-scope .extra-reading-face > .extra-editorial-art { height:37px; }
+ .v3-scope .extra-anniversary-face { gap:7px; }
+ .v3-scope .extra-anniversary-face .extra-focus-number .v3-number { --v3-number-size:32px; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:30px; }
+ .v3-scope .nv-time-scale .nv-capsule-track { height:14px; }
+ .v3-scope .extra-time .uw-main { gap:4px; }
+ .v3-scope .nv-time-instrument { gap:5px; }
+ .v3-scope .extra-time .nv-scale-labels { display:none; }
+}
+@container uw (max-width:80px) {
+ .v3-scope .extra-anniversary-face { width:100%;max-width:100%;gap:7px; }
+ .v3-scope .extra-anniversary-face > .extra-focus-name { width:100%;max-width:100%;overflow-wrap:anywhere; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number { width:100%;max-width:100%;flex-wrap:nowrap; }
+ .v3-scope .extra-anniversary-face .extra-focus-number > .v3-number.uw-dot-number { display:none; }
+ .v3-scope .extra-anniversary-face .extra-focus-number > .extra-focus-micro-value { max-width:100%;font-size:17px;white-space:normal;overflow-wrap:anywhere; }
+ .v3-scope .extra-anniversary-face > .extra-focus-number > small { flex-basis:auto;max-width:100%;white-space:normal;overflow-wrap:anywhere; }
+}
+
+/* Landscape cards keep the signal beside the number instead of stacking it. */
+@container uw (min-width:300px) and (min-height:136px) and (max-height:200px) {
+ .v3-scope .extra-world .uw-main { grid-template-rows:1fr;gap:8px 16px; }
+ .v3-scope .extra-world .nv-world-track { display:none; }
+ .v3-scope .extra-world-value > .v3-number { --v3-number-size:34px; }
+ .v3-scope .extra-world-cities { gap:8px; }
+ .v3-scope .extra-world-cities b { font-size:18px; }
+ .v3-scope .extra-breathing .uw-main { gap:14px; }
+ .v3-scope .nv-breath-value > .extra-breath-number.v3-number { --v3-number-size:32px; }
+ .v3-scope .nv-breath-dial { gap:3px; }
+ .v3-scope .nv-breath-wave { max-height:32px;min-height:18px; }
+ .v3-scope .nv-session-progress { display:none; }
+ .v3-scope .extra-time .uw-main { gap:5px; }
+ .v3-scope .extra-time .extra-period-tabs { padding:2px; }
+ .v3-scope .extra-time .extra-period-tabs button { padding:2px 9px;line-height:14px; }
+ .v3-scope .nv-time-instrument { grid-template-rows:auto;gap:8px 14px; }
+ .v3-scope .nv-time-value { grid-row:1; }
+ .v3-scope .nv-time-value .v3-number { --v3-number-size:34px; }
+ .v3-scope .nv-time-scale { grid-row:1; }
+ .v3-scope .nv-time-scale .nv-capsule-track { height:19px;gap:1px; }
+ .v3-scope .nv-time-caption { display:none; }
+}

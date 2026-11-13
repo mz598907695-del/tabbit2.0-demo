@@ -1,5 +1,5 @@
 import { createCuratedSecondDesktop, CURATED_SECOND_DESKTOP_VERSION } from './curated-desktop.js';
-import { createDefaultWidgetBoard, DEFAULT_WIDGET_BOARD_VERSION, DEFAULT_WIDGET_BOARD_COLUMNS } from './default-widget-board.js';
+import { createDefaultWidgetBoard, DEFAULT_WIDGET_BOARD_VERSION, DEFAULT_WIDGET_BOARD_COLUMNS, ensureSpectrumWidgetBoard, SPECTRUM_WIDGET_BOARD_VERSION } from './default-widget-board.js';
 import { useCallback, useEffect, useState } from 'react';
 import { compactBoardItems, firstVacancy, layoutItems, reflowBoardItems } from './layout.js';
 import { isWidgetSize, MAX_WIDGET_WIDTH } from './widget-size.js';
@@ -213,6 +213,7 @@ export function sanitizePages(saved, fallback, legacyOptions = {}) {
     const layoutOrder=cleanLayoutOrder(page.layoutOrder,items);
     return {...(page.curatedLayoutVersion===CURATED_SECOND_DESKTOP_VERSION?{curatedLayoutVersion:page.curatedLayoutVersion}:{}),
       ...(page.defaultWidgetBoardVersion===DEFAULT_WIDGET_BOARD_VERSION?{defaultWidgetBoardVersion:DEFAULT_WIDGET_BOARD_VERSION}:{}),
+      ...(page.spectrumWidgetBoardVersion===SPECTRUM_WIDGET_BOARD_VERSION?{spectrumWidgetBoardVersion:SPECTRUM_WIDGET_BOARD_VERSION}:{}),
       ...(page.preferredColumns===DEFAULT_WIDGET_BOARD_COLUMNS?{preferredColumns:DEFAULT_WIDGET_BOARD_COLUMNS}:{}),
       id,name:page.name==='混排体验'?'我的空间':text(page.name,'未命名',24)||'未命名',layoutVersion:LAYOUT_VERSION,items,layouts:cleanLayouts(page.layouts,items,legacyOptions),...(layoutOrder?{layoutOrder}:{})};
   });
@@ -356,11 +357,13 @@ export function useBoardState(seeds, brands) {
     }
     // Do not recreate a deliberately deleted default board on every launch.
     if(defaultIndex<0)defaultWidgetBoardVersion=DEFAULT_WIDGET_BOARD_VERSION;
-    return {pages,defaultWidgetBoardVersion,migrated,defaultPageId:pages[defaultIndex]?.id};
+    const starterLinks=createCuratedSecondDesktop({items:[]},brands).items.filter(item=>item.type==='shortcut');
+    const spectrum=ensureSpectrumWidgetBoard(pages,starterLinks,saved?.spectrumWidgetBoardVersion || 0);
+    return {pages:spectrum.pages,defaultWidgetBoardVersion,spectrumWidgetBoardVersion:spectrum.spectrumWidgetBoardVersion,migrated,defaultPageId:pages[defaultIndex]?.id};
   };
   const [history,setHistory] = useState(()=>{
-    const {pages,defaultWidgetBoardVersion,migrated,defaultPageId}=initial();
-    const versions={defaultWidgetBoardVersion,commonScrollDemoVersion:COMMON_SCROLL_DEMO_VERSION,desktopOrderVersion:2,firstDesktopShortcutsVersion:1,thirdDesktopEmptyVersion:1,curatedSecondDesktopVersion:CURATED_SECOND_DESKTOP_VERSION};
+    const {pages,defaultWidgetBoardVersion,spectrumWidgetBoardVersion,migrated,defaultPageId}=initial();
+    const versions={defaultWidgetBoardVersion,spectrumWidgetBoardVersion,commonScrollDemoVersion:COMMON_SCROLL_DEMO_VERSION,desktopOrderVersion:2,firstDesktopShortcutsVersion:1,thirdDesktopEmptyVersion:1,curatedSecondDesktopVersion:CURATED_SECOND_DESKTOP_VERSION};
     try{return {...createBoardHistory(pages,migrated?defaultPageId:localStorage.getItem('personalized-home-2-0-board-active-id')||defaultPageId,localStorage.getItem('personalized-home-2-0-board-index')??0),...versions};}
     catch{return {...createBoardHistory(pages,defaultPageId),...versions};}
   });
@@ -372,7 +375,7 @@ export function useBoardState(seeds, brands) {
   }catch{}},[selectedIndex,history.activeId]);
   // The marker belongs to the initialized history, not the module version:
   // Fast Refresh can retain a history that has not received the sample set yet.
-  useEffect(()=>{try{localStorage.setItem(BOARD_STORAGE,JSON.stringify({version:LAYOUT_VERSION,defaultWidgetBoardVersion:history.defaultWidgetBoardVersion,desktopOrderVersion:history.desktopOrderVersion,firstDesktopShortcutsVersion:history.firstDesktopShortcutsVersion,thirdDesktopEmptyVersion:history.thirdDesktopEmptyVersion,curatedSecondDesktopVersion:history.curatedSecondDesktopVersion,commonScrollDemoVersion:history.commonScrollDemoVersion,pages:history.present.map(page=>({...page,layoutVersion:LAYOUT_VERSION}))}));}catch{}},[history.present,history.defaultWidgetBoardVersion,history.commonScrollDemoVersion,history.desktopOrderVersion,history.firstDesktopShortcutsVersion,history.thirdDesktopEmptyVersion,history.curatedSecondDesktopVersion]);
+  useEffect(()=>{try{localStorage.setItem(BOARD_STORAGE,JSON.stringify({version:LAYOUT_VERSION,defaultWidgetBoardVersion:history.defaultWidgetBoardVersion,spectrumWidgetBoardVersion:history.spectrumWidgetBoardVersion,desktopOrderVersion:history.desktopOrderVersion,firstDesktopShortcutsVersion:history.firstDesktopShortcutsVersion,thirdDesktopEmptyVersion:history.thirdDesktopEmptyVersion,curatedSecondDesktopVersion:history.curatedSecondDesktopVersion,commonScrollDemoVersion:history.commonScrollDemoVersion,pages:history.present.map(page=>({...page,layoutVersion:LAYOUT_VERSION}))}));}catch{}},[history.present,history.defaultWidgetBoardVersion,history.spectrumWidgetBoardVersion,history.commonScrollDemoVersion,history.desktopOrderVersion,history.firstDesktopShortcutsVersion,history.thirdDesktopEmptyVersion,history.curatedSecondDesktopVersion]);
   const setPages=useCallback(update=>setHistory(current=>boardHistoryReducer(current,{type:'pages',update})),[]);
   const setIndex=useCallback(update=>setHistory(current=>boardHistoryReducer(current,{type:'index',update})),[]);
   const reorderPage=useCallback((id,index)=>setPages(pages=>reorderPages(pages,id,index)),[setPages]);

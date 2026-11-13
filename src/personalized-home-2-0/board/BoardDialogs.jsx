@@ -517,7 +517,7 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
     setSizeKeys(previous => ({ ...previous, [kind]: `${size.w}-${size.h}` }));
   }
 
-  function navigateSize(event, kind, choices, index) {
+  function navigateSize(event, kind, choices, index, itemKey = kind) {
     let next;
     if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = choices.length - 1;
@@ -527,23 +527,24 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
     event.preventDefault();
     const size = choices[next];
     selectSize(kind, size);
-    sizeRefs.current[`${kind}-${size.w}-${size.h}`]?.focus();
+    sizeRefs.current[`${itemKey}-${size.w}-${size.h}`]?.focus();
   }
 
   function addWidget(item, size) {
     if (unavailable) return;
-    const result = onAdd?.(item.kind, { ...size, label: size.label || `${size.w} × ${size.h}` }, targetPageId);
-    clearTimeout(successTimers.current[item.kind]);
+    const itemKey = item.libraryKey || item.kind;
+    const result = onAdd?.(item.kind, { ...size, label: size.label || `${size.w} × ${size.h}` }, targetPageId, item.visualStyle);
+    clearTimeout(successTimers.current[itemKey]);
     const ok = result?.ok === true;
-    if (ok) showAddedToast(item.title);
+    if (ok) showAddedToast(`${item.title}${item.variantLabel ? ` · ${item.variantLabel}` : ''}`);
     else dismissToast();
-    setFeedback(previous => ({ ...previous, [item.kind]: {
+    setFeedback(previous => ({ ...previous, [itemKey]: {
       ok, checked: ok, targetPageId,
       message: ok ? `已添加到「${targetPage.name}」` : result?.message || '添加失败，请重试。',
     } }));
-    if (ok) successTimers.current[item.kind] = window.setTimeout(() => {
-      setFeedback(previous => ({ ...previous, [item.kind]: { ...previous[item.kind], checked: false } }));
-      delete successTimers.current[item.kind];
+    if (ok) successTimers.current[itemKey] = window.setTimeout(() => {
+      setFeedback(previous => ({ ...previous, [itemKey]: { ...previous[itemKey], checked: false } }));
+      delete successTimers.current[itemKey];
     }, 1600);
   }
 
@@ -609,48 +610,50 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
           return result;
         }} />}
         {visibleCatalog.map(item => {
+          const itemKey = item.libraryKey || item.kind;
+          const accessibleTitle = `${item.title}${item.variantLabel ? ` · ${item.variantLabel}` : ''}`;
           const choices = DEFAULT_SIZES;
           const selectedSize = choices.find(size => `${size.w}-${size.h}` === sizeKeys[item.kind])
             || choices.find(size => size.w === item.defaultSize?.w && size.h === item.defaultSize?.h)
             || choices[1];
           const selectedIndex = choices.indexOf(selectedSize);
           const stepSize = direction => selectSize(item.kind, choices[(selectedIndex + direction + choices.length) % choices.length]);
-          const previewId = `${id}-${item.kind}-preview`;
-          const itemFeedback = feedback[item.kind]?.targetPageId === targetPageId ? feedback[item.kind] : null;
+          const previewId = `${id}-${itemKey}-preview`;
+          const itemFeedback = feedback[itemKey]?.targetPageId === targetPageId ? feedback[itemKey] : null;
           // Keep all presets inside one steady preview stage; only the card's proportion changes.
           const cardWidth = 50 + (selectedSize.w - 1) * 81.25;
           const cardHeight = 50 + (selectedSize.h - 1) * 81.25;
           const previewWidth = cardWidth * Math.min(1.3, 214 / cardHeight);
-          return <article key={item.kind} className="board-library-card" data-library-kind={item.kind} aria-labelledby={`${id}-${item.kind}-title`}>
+          return <article key={itemKey} className="board-library-card" data-library-kind={item.kind} data-library-style={item.visualStyle || 'classic'} aria-labelledby={`${id}-${itemKey}-title`}>
             <div className="board-library-preview-stage">
-              <button type="button" className="board-library-step" aria-label={`${item.title}：上一种尺寸`} aria-controls={previewId} onClick={() => stepSize(-1)}><ChevronLeft size={18} aria-hidden="true" /></button>
+              <button type="button" className="board-library-step" aria-label={`${accessibleTitle}：上一种尺寸`} aria-controls={previewId} onClick={() => stepSize(-1)}><ChevronLeft size={18} aria-hidden="true" /></button>
               <div id={previewId} className="board-library-preview-frame" style={{ '--library-preview-width': `${previewWidth}px`, aspectRatio: `${cardWidth} / ${cardHeight}` }} data-size={`${selectedSize.w}x${selectedSize.h}`}>
                 <div className="board-library-preview" inert aria-hidden="true"><LibraryPreview preview={item.preview} /></div>
                 <button
                   type="button"
                   className={`board-library-add${itemFeedback?.checked ? ' is-added' : ''}`}
-                  aria-label={`添加${item.title}`}
-                  aria-describedby={unavailable ? `${id}-capacity` : itemFeedback && !itemFeedback.ok ? `${id}-${item.kind}-feedback` : undefined}
+                  aria-label={`添加${accessibleTitle}`}
+                  aria-describedby={unavailable ? `${id}-capacity` : itemFeedback && !itemFeedback.ok ? `${id}-${itemKey}-feedback` : undefined}
                   disabled={unavailable || !onAdd}
-                  data-tooltip={itemFeedback?.checked ? '继续添加' : `添加${item.title}`}
+                  data-tooltip={itemFeedback?.checked ? '继续添加' : `添加${accessibleTitle}`}
                   onClick={() => addWidget(item, selectedSize)}
                 >{itemFeedback?.checked ? <Check size={17} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.2} />}</button>
               </div>
-              <button type="button" className="board-library-step" aria-label={`${item.title}：下一种尺寸`} aria-controls={previewId} onClick={() => stepSize(1)}><ChevronRight size={18} aria-hidden="true" /></button>
+              <button type="button" className="board-library-step" aria-label={`${accessibleTitle}：下一种尺寸`} aria-controls={previewId} onClick={() => stepSize(1)}><ChevronRight size={18} aria-hidden="true" /></button>
             </div>
-            <span className="board-dialog-sr-only" role="status" aria-live="polite" aria-atomic="true">{item.title}：{selectedSize.label}，{selectedSize.w} × {selectedSize.h}</span>
-            <div className="board-library-sizes" role="radiogroup" aria-label={`${item.title}尺寸`}>
+            <span className="board-dialog-sr-only" role="status" aria-live="polite" aria-atomic="true">{accessibleTitle}：{selectedSize.label}，{selectedSize.w} × {selectedSize.h}</span>
+            <div className="board-library-sizes" role="radiogroup" aria-label={`${accessibleTitle}尺寸`}>
               {choices.map((size, index) => {
                 const key = `${size.w}-${size.h}`;
                 const selected = size === selectedSize;
                 const label = `${size.w} × ${size.h}`;
-                return <button type="button" key={key} className="board-library-size" role="radio" aria-checked={selected} aria-label={label} tabIndex={selected ? 0 : -1} ref={node => { sizeRefs.current[`${item.kind}-${key}`] = node; }} onClick={() => selectSize(item.kind, size)} onKeyDown={event => navigateSize(event, item.kind, choices, index)}><span aria-hidden="true" /></button>;
+                return <button type="button" key={key} className="board-library-size" role="radio" aria-checked={selected} aria-label={label} tabIndex={selected ? 0 : -1} ref={node => { sizeRefs.current[`${itemKey}-${key}`] = node; }} onClick={() => selectSize(item.kind, size)} onKeyDown={event => navigateSize(event, item.kind, choices, index, itemKey)}><span aria-hidden="true" /></button>;
               })}
             </div>
             <div className="board-library-copy">
-              <h3 className="board-library-title" id={`${id}-${item.kind}-title`}>{item.title}</h3>
+              <h3 className="board-library-title" id={`${id}-${itemKey}-title`}>{item.title}{item.variantLabel && <span className="board-library-variant">{item.variantLabel}</span>}</h3>
               <FadeText>{item.description}</FadeText>
-              <div className={itemFeedback && !itemFeedback.ok ? 'board-library-feedback is-error' : 'board-dialog-sr-only'} id={`${id}-${item.kind}-feedback`} role="status" aria-live="polite" aria-atomic="true">{itemFeedback && !itemFeedback.ok ? itemFeedback.message : ''}</div>
+              <div className={itemFeedback && !itemFeedback.ok ? 'board-library-feedback is-error' : 'board-dialog-sr-only'} id={`${id}-${itemKey}-feedback`} role="status" aria-live="polite" aria-atomic="true">{itemFeedback && !itemFeedback.ok ? itemFeedback.message : ''}</div>
             </div>
           </article>;
         })}

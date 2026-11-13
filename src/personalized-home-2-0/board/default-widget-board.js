@@ -5,8 +5,11 @@ import { audioWidgetCatalog } from './audio-widget-catalog.js';
 
 export const DEFAULT_WIDGET_BOARD_VERSION = 1;
 export const DEFAULT_WIDGET_BOARD_COLUMNS = 12;
+export const SPECTRUM_WIDGET_BOARD_VERSION = 1;
+export const SPECTRUM_WIDGET_BOARD_ID = 'spectrum-widget-board-v1';
 
-const catalog = [...coreWidgetCatalog, ...extraWidgetCatalog, ...leisureWidgetCatalog, ...audioWidgetCatalog];
+// The visualizer is the first widget after the two rows of shortcut entries.
+const catalog = [...audioWidgetCatalog, ...coreWidgetCatalog, ...extraWidgetCatalog, ...leisureWidgetCatalog];
 
 /** Two rows of links, followed by the complete built-in widget collection. */
 export function createDefaultWidgetBoard(page, starterLinks = [], reservedIds = []) {
@@ -52,4 +55,47 @@ export function createDefaultWidgetBoard(page, starterLinks = [], reservedIds = 
   };
   delete board.curatedLayoutVersion;
   return board;
+}
+
+/** Create the new visual collection without borrowing personal widget records. */
+export function createSpectrumWidgetBoard(starterLinks = [], reservedIds = [], pageId = SPECTRUM_WIDGET_BOARD_ID) {
+  const board = createDefaultWidgetBoard({ id: pageId, name: '光谱', items: [] }, starterLinks.map((item, index) => ({
+    ...item, id: `spectrum-link-${item.key || index}`,
+  })), reservedIds);
+  const idMap = new Map();
+  const usedIds = new Set(reservedIds.map(String));
+  board.items = board.items.map(item => {
+    const base = item.type === 'widget' ? `spectrum-widget-${item.kind}` : item.id;
+    let id = base, suffix = 2;
+    while (usedIds.has(id)) id = `${base}-${suffix++}`;
+    usedIds.add(id);
+    idMap.set(item.id, id);
+    return item.type === 'widget'
+      ? { ...item, id, config: { ...item.config, visualStyle: 'spectrum' } }
+      : { ...item, id };
+  });
+  board.layoutOrder = board.layoutOrder.map(id => idMap.get(id));
+  board.layouts = Object.fromEntries(Object.entries(board.layouts).map(([key, positions]) => [key,
+    Object.fromEntries(Object.entries(positions).map(([id, point]) => [idMap.get(id), point])),
+  ]));
+  delete board.defaultWidgetBoardVersion;
+  return { ...board, spectrumWidgetBoardVersion: SPECTRUM_WIDGET_BOARD_VERSION };
+}
+
+/** Add the new board once at position two; never reshape an existing board. */
+export function ensureSpectrumWidgetBoard(pages, starterLinks = [], appliedVersion = 0) {
+  if (appliedVersion >= SPECTRUM_WIDGET_BOARD_VERSION || pages.some(page => page.spectrumWidgetBoardVersion >= SPECTRUM_WIDGET_BOARD_VERSION)) {
+    return { pages, spectrumWidgetBoardVersion: Math.max(appliedVersion, SPECTRUM_WIDGET_BOARD_VERSION), added: false };
+  }
+  // The storage contract supports at most 20 boards. Leave every saved board in
+  // place and defer adding the collection until a slot becomes available.
+  if (pages.length >= 20) return { pages, spectrumWidgetBoardVersion: appliedVersion, added: false };
+  const pageIds = new Set(pages.map(page => String(page.id)));
+  let pageId = SPECTRUM_WIDGET_BOARD_ID, suffix = 2;
+  while (pageIds.has(pageId)) pageId = `${SPECTRUM_WIDGET_BOARD_ID}-${suffix++}`;
+  const reservedIds = pages.flatMap(page => page.items.map(item => item.id));
+  const board = createSpectrumWidgetBoard(starterLinks, reservedIds, pageId);
+  const next = [...pages];
+  next.splice(Math.min(1, next.length), 0, board);
+  return { pages: next, spectrumWidgetBoardVersion: SPECTRUM_WIDGET_BOARD_VERSION, added: true };
 }

@@ -1,0 +1,271 @@
+/* V3 task faces: colored live rails, light readouts, and compact controls.
+   All selectors are local to the comparison; production widgets stay intact. */
+.v3-scope .tw-widget { --uw-accent:var(--v3-accent);--uw-track:#171719;--uw-line:#29292c; }
+.v3-scope .tw-widget .uw-main { gap:10px; }
+.v3-scope .tw-widget :is(.tw-meta,.tw-subline,.tw-ring-caption) { color:var(--uw-muted);font-size:10px; }
+.v3-scope .tw-widget .tw-action { border:0;border-radius:999px;background:var(--v3-soft);color:var(--v3-accent);min-height:30px;padding:5px 11px;font-size:11px; }
+.v3-scope .tw-widget .tw-icon-action { width:30px;min-width:30px;padding:5px; }
+.v3-scope .tw-widget :is(.tw-input,.tw-select,.tw-textarea) { border-color:#29292c;background:#171719;color:var(--uw-fg); }
+.v3-scope .tw-widget :is(.tw-input,.tw-select,.tw-textarea):focus-visible { outline:2px solid var(--v3-accent);outline-offset:2px; }
+.v3-scope .tw-widget .tw-empty { color:var(--uw-muted); }
+.v3-scope .tw-widget .tw-error { color:#ff9d90; }
+.v3-scope .tw-widget .tw-select-wrap>svg { color:var(--v3-accent); }
+.v3-scope .nv-track-labels { display:flex;justify-content:space-between;gap:8px;color:var(--uw-muted);font-size:9px;line-height:15px;min-width:0; }
+.v3-scope .nv-track-labels span { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+
+/* A date marker travels on a real elapsed-time rail. */
+.v3-scope .tw-countdown .uw-main { display:flex;flex-direction:column;justify-content:center;align-items:stretch;gap:7px; }
+.v3-scope .tw-countdown-identity { color:var(--uw-fg);font-size:13px;font-weight:400;line-height:20px; }
+.v3-scope .tw-countdown-number { display:flex;align-items:baseline;gap:7px;max-width:100%; }
+.v3-scope .tw-countdown-number .v3-number { --v3-number-size:56px;color:var(--v3-accent);font-weight:300;letter-spacing:-.055em;width:auto;max-width:100%; }
+.v3-scope .tw-countdown-number[data-long-number=true] .v3-number { --v3-number-size:38px; }
+.v3-scope .tw-countdown-number>.tw-countdown-unit { font-size:12px;padding:0;color:var(--v3-accent); }
+.v3-scope .tw-countdown .tw-subline { display:none; }
+.v3-scope .tw-countdown .tw-subline.is-essential { display:block; }
+.v3-scope .nv-countdown-route.tw-countdown-progress { display:flex;flex-direction:column;align-items:stretch;gap:7px;max-width:none;height:auto;min-height:0;margin:10px 0 0; }
+.v3-scope .nv-countdown-route .uw-dots { flex:none;min-height:8px; }
+.v3-scope .tw-countdown .tw-meta { font-size:10px; }
+
+/* Focus becomes a timing instrument: readout, ruler, controls. */
+.v3-scope .tw-pomodoro .uw-main { display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:10px; }
+.v3-scope .tw-pomodoro .tw-card-phase { display:none; }
+.v3-scope .tw-pomodoro .tw-segments { margin:0;border:0;background:#171719;padding:3px; }
+.v3-scope .tw-pomodoro .tw-segments button { min-height:24px;padding:3px 12px;color:var(--uw-muted); }
+.v3-scope .tw-pomodoro .tw-segments button[aria-pressed=true] { color:var(--v3-accent);background:var(--v3-soft); }
+.v3-scope .nv-focus-readout { display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0; }
+.v3-scope .nv-focus-readout .tw-time-number { justify-content:flex-start;width:auto;min-width:0; }
+.v3-scope .nv-focus-readout .v3-number { --v3-number-size:44px;font-weight:300;letter-spacing:-.045em;color:var(--v3-accent); }
+.v3-scope .nv-phase-badge { flex:none;white-space:nowrap;color:var(--uw-muted);font-size:10px; }
+.v3-scope .nv-focus-meter { display:flex;align-items:stretch;gap:4px;min-height:23px;height:28px;flex:none; }
+.v3-scope .nv-focus-meter i { display:block;flex:1;min-width:1px;border-radius:5px;background:var(--v3-soft); }
+.v3-scope .nv-focus-meter i:nth-child(5n) { background:color-mix(in srgb,var(--v3-accent) 25%,#171719); }
+.v3-scope .nv-focus-meter i.is-filled { background:var(--v3-accent); }
+.v3-scope .tw-pomodoro .tw-timer-controls { flex-direction:row;justify-content:space-between;gap:8px; }
+.v3-scope .tw-pomodoro .tw-timer-controls>.tw-action:first-child { flex:1; }
+.v3-scope .tw-pomodoro .tw-timer-compact { display:none; }
+.v3-scope .tw-pomodoro .tw-timer-notice { display:none; }
+.v3-scope .tw-pomodoro .tw-detail-ring .uw-tick-ring { width:210px;max-width:100%; }
+.v3-scope .tw-pomodoro .tw-detail-ring .v3-number { --v3-number-size:42px; }
+
+/* Every chip is an actual choice; only the selected one lights up. */
+.v3-scope .tw-draw .uw-main { align-items:stretch;justify-content:center;gap:13px; }
+.v3-scope .nv-choice-strip { display:flex;gap:5px;flex:none;min-width:0; }
+.v3-scope .nv-choice-strip span { flex:1;display:grid;place-items:center;min-width:0;height:24px;border-radius:10px;background:var(--v3-soft);color:var(--v3-accent);font-size:10px;font-variant-numeric:tabular-nums;opacity:.65; }
+.v3-scope .nv-choice-strip span.is-selected { opacity:1;background:var(--v3-accent);color:#08070b; }
+.v3-scope .tw-draw .uw-main>.tw-draw-result { display:flex;align-items:center;justify-content:flex-start;text-align:left;line-height:1.45;font-size:24px;font-weight:400;color:var(--uw-fg); }
+.v3-scope .tw-draw-action-row { justify-content:space-between; }
+.v3-scope .tw-draw-action-row .tw-meta { display:block;font-size:10px; }
+
+/* A quiet writing surface with one colored edge. */
+.v3-scope .tw-note .uw-main { gap:10px; }
+.v3-scope .tw-note-editor { padding-left:12px;border-left:2px solid var(--v3-accent);color:var(--uw-fg);font-size:13px;line-height:1.85; }
+.v3-scope .tw-note .tw-meta { display:flex;align-items:center;gap:5px;font-size:9px; }
+.v3-scope .tw-note .tw-meta:before { content:'';display:block;width:4px;height:4px;background:var(--v3-accent);border-radius:50%; }
+.v3-scope .tw-note .tw-note-count { display:none; }
+.v3-scope .tw-note .tw-note-editor.is-detail { border:0;border-radius:14px;padding:16px;background:#151517; }
+
+/* Keypad keeps mathematical operators distinct from numeric input. */
+.v3-scope .tw-calculator .uw-main { justify-content:center;gap:8px; }
+.v3-scope .tw-calculator-entry { padding:0; }
+.v3-scope .tw-calculator-entry .tw-input { color:var(--uw-muted);background:transparent;border:0;text-align:left; }
+.v3-scope .tw-calculator-entry output .v3-number { --v3-number-size:36px;color:var(--v3-accent);font-weight:300;width:auto; }
+.v3-scope .tw-calculator-keys { gap:5px; }
+.v3-scope .tw-calculator-keys button { background:#1c1c1e;color:#eeeef0;border-radius:999px;font-size:12px;min-height:20px; }
+.v3-scope .tw-calculator-keys button:nth-child(-n+4) { background:#303032;color:#c6c6ca; }
+.v3-scope .tw-calculator-keys button:nth-child(4n),.v3-scope .tw-calculator-keys button:nth-child(19) { background:var(--v3-soft);color:var(--v3-accent); }
+.v3-scope .tw-calculator-keys button.is-equals { background:var(--v3-accent);color:#050607;font-weight:500; }
+.v3-scope .tw-calculator-keys button:hover { filter:brightness(1.3); }
+.v3-scope .tw-calculator .tw-detail .tw-calculator-entry .v3-number { --v3-number-size:48px; }
+
+/* Two quantity pods are linked by the real swap action. */
+.v3-scope .tw-converter .uw-main { gap:9px;justify-content:center; }
+.v3-scope .tw-converter-category { display:block; }
+.v3-scope .tw-converter-category .tw-select { color:var(--v3-accent);background:transparent;border:0; }
+.v3-scope .tw-converter-card .tw-converter-row { padding:8px 10px;border-radius:15px;background:#161719;gap:6px;grid-template-columns:minmax(0,1fr) 58px; }
+.v3-scope .tw-converter-card .tw-converter-row:last-child { background:var(--v3-soft); }
+.v3-scope .tw-converter-row .tw-input { background:transparent;border:0;color:var(--uw-fg);font-size:25px;font-weight:300; }
+.v3-scope .tw-converter-row .v3-number { --v3-number-size:29px;color:var(--v3-accent);font-weight:300; }
+.v3-scope .tw-converter-row .tw-select { background:transparent;border:0;padding-left:5px;padding-right:23px; }
+.v3-scope .tw-converter-row .tw-select-wrap>svg { right:4px; }
+.v3-scope .tw-converter-direction { height:21px; }
+.v3-scope .tw-converter-direction .tw-action { min-width:24px;width:24px;min-height:24px;background:transparent;color:var(--v3-accent); }
+.v3-scope .tw-converter .tw-detail .tw-converter-row { border-radius:16px;padding:10px;background:#171719; }
+.v3-scope .tw-converter .tw-detail .tw-converter-row:last-child { background:var(--v3-soft); }
+
+/* Tasks: restrained counters and a live completion rail above the checklist. */
+.v3-scope .nv-task-summary { display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;font-size:10px;color:var(--uw-muted); }
+.v3-scope .nv-task-summary b { font-weight:400;font-size:18px;color:var(--v3-accent);margin-right:3px; }
+.v3-scope .nv-task-track { width:60px;height:5px;flex:none;border-radius:99px;background:var(--v3-soft);overflow:hidden; }
+.v3-scope .nv-task-track i { display:block;height:100%;border-radius:99px;background:var(--v3-accent);transition:width .18s ease-out; }
+.v3-scope .tw-todo-card-list { --tw-row-height:31px; }
+.v3-scope .tw-todo-list li { gap:9px; }
+.v3-scope .tw-todo-list input[type=checkbox] { accent-color:var(--v3-accent);width:15px;height:15px; }
+.v3-scope .tw-todo-list li>span { font-size:12px; }
+.v3-scope .tw-todo-list .is-done>span { opacity:.65; }
+.v3-scope .tw-widget .tw-add-trigger { padding:3px 9px;background:var(--v3-soft);color:var(--v3-accent);border-radius:99px;font-size:10px; }
+.v3-scope .tw-widget .tw-more { color:var(--uw-muted);font-size:10px; }
+.v3-scope .tw-card-add .tw-input { border:0;background:#1b1b1d;border-radius:99px;padding-inline:10px;color:var(--uw-fg); }
+
+/* Class times form a compact, colored itinerary. */
+.v3-scope .tw-card-weekdays .tw-weekdays { padding:2px;border-radius:99px;background:#151719; }
+.v3-scope .tw-weekdays button { font-size:10px;min-height:23px; }
+.v3-scope .tw-weekdays button[aria-pressed=true] { color:#090a0c;background:var(--v3-accent); }
+.v3-scope .tw-lesson-card-list { --tw-row-height:47px; }
+.v3-scope .tw-lesson-card-list li { padding:5px 0;gap:10px; }
+.v3-scope .tw-lesson-copy { position:relative;padding-left:10px;border-left:2px solid var(--v3-accent); }
+.v3-scope .tw-lesson-copy strong { font-size:12px;font-weight:400; }
+.v3-scope .tw-lesson-time>span { color:var(--v3-accent);font-size:11px; }
+.v3-scope .tw-lesson-time small { color:var(--uw-muted); }
+.v3-scope .tw-day-label { color:var(--v3-accent); }
+
+/* Readable regular cards retain editable inputs and all main controls. */
+@container uw (min-width:151px) and (min-height:210px) {
+ .v3-scope .tw-calculator .uw-main { justify-content:flex-start; }
+ .v3-scope .tw-calculator .uw-main>.tw-calculator-entry { display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);align-items:center;gap:6px; }
+ .v3-scope .tw-calculator-card-keys { display:block;flex:1;min-height:0; }
+ .v3-scope .tw-calculator-inline { display:none; }
+ .v3-scope .tw-converter-card { display:block; }
+ .v3-scope .tw-converter-compact { display:none; }
+}
+
+@container uw (min-width:151px) and (min-height:300px) {
+ .v3-scope .tw-pomodoro .tw-card-phase { display:block; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:54px; }
+ .v3-scope .nv-focus-meter { height:42px; }
+}
+
+/* Width buys a parallel composition, not bigger labels. */
+@container uw (min-width:300px) and (min-height:161px) {
+ .v3-scope .tw-countdown .uw-main { display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;align-content:center;gap:6px 16px; }
+ .v3-scope .tw-countdown-identity { grid-area:1/1/2/2;align-self:end; }
+ .v3-scope .tw-countdown-number { grid-area:1/2/3/3;align-self:center; }
+ .v3-scope .tw-countdown .tw-subline { display:block;grid-area:2/1/3/2; }
+ .v3-scope .tw-countdown .tw-subline.is-essential { display:block; }
+ .v3-scope .tw-countdown .tw-meta { display:block;grid-area:3/1/4/3; }
+ .v3-scope .nv-countdown-route { grid-area:3/1/4/3; }
+ .v3-scope .tw-pomodoro .uw-main { display:grid;grid-template-columns:minmax(0,1fr) 90px;grid-template-rows:auto auto auto;align-content:center;gap:10px 16px; }
+ .v3-scope .tw-pomodoro .tw-card-phase { display:none; }
+ .v3-scope .nv-focus-readout { grid-area:1/1/2/2; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:40px; }
+ .v3-scope .nv-phase-badge { display:none; }
+ .v3-scope .nv-focus-meter { grid-area:2/1/3/2;height:30px; }
+ .v3-scope .nv-focus-labels { grid-area:3/1/4/2; }
+ .v3-scope .tw-pomodoro .tw-timer-controls { grid-area:1/2/4/3;flex-direction:column;justify-content:center; }
+ .v3-scope .tw-pomodoro .tw-timer-controls>.tw-action:first-child { flex:none;width:100%; }
+ .v3-scope .tw-converter-category { display:none; }
+ .v3-scope .tw-converter-card { display:block; }
+ .v3-scope .tw-converter-compact { display:none; }
+ .v3-scope .tw-converter-card .tw-converter-form { display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:9px;align-items:center; }
+ .v3-scope .tw-converter-card .tw-converter-row { display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:12px; }
+ .v3-scope .tw-converter-card .tw-select-wrap { max-width:100%;width:100%; }
+ .v3-scope .tw-converter-card .tw-converter-row .tw-input { padding:0;height:32px; }
+ .v3-scope .tw-converter-card .tw-converter-row output { height:32px; }
+ .v3-scope .tw-converter-card .tw-converter-row .tw-select { padding:0 24px 0 0; }
+}
+
+/* Compact squares and short rectangles present a single useful action. */
+@container uw (max-height:209px) {
+ .v3-scope .tw-widget .uw-main { gap:7px; }
+ .v3-scope .tw-countdown-number .v3-number { --v3-number-size:40px; }
+ .v3-scope .nv-countdown-route { display:none!important; }
+ .v3-scope .tw-pomodoro .tw-card-phase,.v3-scope .nv-focus-labels { display:none; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:35px; }
+ .v3-scope .nv-focus-meter { height:20px;min-height:20px;gap:3px; }
+ .v3-scope .nv-choice-strip { gap:4px; }
+ .v3-scope .nv-choice-strip span { height:18px;font-size:9px;border-radius:6px; }
+ .v3-scope .tw-draw .uw-main>.tw-draw-result { font-size:18px; }
+ .v3-scope .tw-draw-action-row .tw-meta { display:none; }
+ .v3-scope .tw-note .tw-meta { display:none; }
+ .v3-scope .nv-task-summary { display:none; }
+ .v3-scope .tw-lesson-card-list { --tw-row-height:31px; }
+ .v3-scope .tw-lesson-card-list .tw-lesson-time small { display:none; }
+}
+@container uw (max-height:160px) {
+ .v3-scope .tw-countdown .uw-main { display:flex;flex-direction:row;align-items:center;gap:12px; }
+ .v3-scope .tw-countdown-number .v3-number { --v3-number-size:34px; }
+ .v3-scope .tw-countdown .tw-subline,.v3-scope .tw-countdown .tw-meta { display:none; }
+ .v3-scope .tw-pomodoro .uw-main { display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px; }
+ .v3-scope .nv-focus-readout { flex:1;min-width:0; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:30px; }
+ .v3-scope .nv-phase-badge,.v3-scope .nv-focus-meter { display:none; }
+ .v3-scope .tw-pomodoro .tw-timer-controls { flex-direction:row; }
+ .v3-scope .tw-pomodoro .tw-timer-controls>.tw-action:first-child { flex:none;min-width:30px;padding:4px 8px; }
+ .v3-scope .tw-pomodoro .tw-timer-controls .tw-icon-action { display:none; }
+ .v3-scope .nv-choice-strip { display:none; }
+ .v3-scope .tw-draw .uw-main { flex-direction:row; }
+ .v3-scope .tw-draw .uw-main>.tw-draw-result { flex:1;font-size:15px; }
+ .v3-scope .tw-draw-action-row .tw-action { min-height:26px;padding:4px 8px;font-size:10px; }
+ .v3-scope .tw-converter-category { display:none; }
+ .v3-scope .tw-converter-card { display:none; }
+ .v3-scope .tw-converter-compact { display:flex;flex-direction:row;align-items:baseline; }
+ .v3-scope .tw-converter-compact .v3-number { --v3-number-size:27px; }
+}
+
+/* Narrow cards stack the same data; micro cards leave full actions in details. */
+@container uw (max-width:150px) {
+ .v3-scope .tw-countdown .uw-main { display:flex;flex-direction:column;align-items:flex-start;gap:7px; }
+ .v3-scope .tw-countdown-number .v3-number { --v3-number-size:36px; }
+ .v3-scope .tw-countdown-identity { white-space:normal;font-size:11px;line-height:16px; }
+ .v3-scope .tw-countdown .tw-meta,.v3-scope .nv-countdown-route { display:none!important; }
+ .v3-scope .tw-pomodoro .uw-main { display:flex;flex-direction:column;align-items:stretch;gap:13px; }
+ .v3-scope .tw-pomodoro .tw-card-phase,.v3-scope .nv-phase-badge,.v3-scope .nv-focus-labels { display:none; }
+ .v3-scope .nv-focus-readout { flex:none; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:29px; }
+ .v3-scope .nv-focus-meter { display:flex;height:32px;min-height:32px;gap:3px; }
+ .v3-scope .nv-focus-meter i:nth-child(even) { display:none; }
+ .v3-scope .tw-pomodoro .tw-timer-controls { flex-direction:column;align-items:stretch; }
+ .v3-scope .tw-pomodoro .tw-timer-controls>.tw-action:first-child { width:100%;min-width:0;flex:none; }
+ .v3-scope .tw-pomodoro .tw-timer-controls .tw-icon-action { display:none; }
+ .v3-scope .tw-draw .uw-main { flex-direction:column; }
+ .v3-scope .nv-choice-strip { flex-wrap:wrap;gap:4px; }
+ .v3-scope .nv-choice-strip span { min-width:20px;flex:1; }
+ .v3-scope .tw-draw .uw-main>.tw-draw-result { font-size:16px; }
+ .v3-scope .tw-draw-action-row .tw-meta { display:none; }
+ .v3-scope .tw-note-editor { padding-left:8px;font-size:12px; }
+ .v3-scope .tw-calculator-entry output .v3-number { --v3-number-size:28px; }
+ .v3-scope .tw-converter-category,.v3-scope .tw-converter-card { display:none; }
+ .v3-scope .tw-converter-compact { display:flex;flex-direction:column;align-items:flex-start;gap:8px; }
+ .v3-scope .tw-converter-compact .v3-number { --v3-number-size:30px; }
+ .v3-scope .nv-task-summary { display:none; }
+ .v3-scope .tw-todo-compact .v3-number { --v3-number-size:34px; }
+ .v3-scope .tw-lesson-compact .tw-lesson-start { color:var(--v3-accent); }
+}
+@container uw (max-width:150px) and (max-height:160px) {
+ .v3-scope .nv-focus-meter,.v3-scope .nv-choice-strip,.v3-scope .tw-pomodoro .tw-timer-controls { display:none; }
+ .v3-scope .tw-pomodoro .uw-main { gap:4px; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:25px; }
+ .v3-scope .tw-note .tw-meta { display:none; }
+}
+@container uw (max-height:90px) {
+ .v3-scope .tw-countdown .uw-main { flex-direction:row;align-items:center;gap:8px; }
+ .v3-scope .tw-countdown-identity { order:1;flex:1;white-space:nowrap;font-size:11px; }
+ .v3-scope .tw-countdown-number { flex:none; }
+ .v3-scope .tw-countdown-number .v3-number { --v3-number-size:24px; }
+ .v3-scope .tw-countdown-number>.tw-countdown-unit { font-size:10px; }
+ .v3-scope .tw-pomodoro .uw-main { flex-direction:row;align-items:center;justify-content:flex-start; }
+ .v3-scope .nv-focus-readout .v3-number { --v3-number-size:24px; }
+ .v3-scope .nv-focus-readout { flex:none; }
+ .v3-scope .nv-phase-badge { display:block;font-size:10px; }
+ .v3-scope .tw-pomodoro .tw-timer-controls,.v3-scope .nv-focus-meter,.v3-scope .nv-focus-labels,.v3-scope .tw-pomodoro .tw-card-phase { display:none; }
+ .v3-scope .tw-draw .uw-main>.tw-draw-result { display:block;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px; }
+ .v3-scope .nv-choice-strip,.v3-scope .tw-draw-action-row,.v3-scope .tw-note .tw-meta { display:none; }
+ .v3-scope .tw-calculator-entry output .v3-number { --v3-number-size:24px; }
+ .v3-scope .tw-converter-compact { flex-direction:row;align-items:baseline;gap:5px; }
+ .v3-scope .tw-converter-compact .v3-number { --v3-number-size:23px; }
+ .v3-scope .tw-todo-compact .v3-number { --v3-number-size:23px; }
+ .v3-scope .tw-note-compact { color:var(--v3-accent); }
+}
+@container uw (max-width:70px) {
+ .v3-scope .tw-countdown-identity,.v3-scope .tw-countdown .tw-subline,.v3-scope .nv-focus-meter,.v3-scope .nv-phase-badge,.v3-scope .tw-pomodoro .tw-timer-controls,.v3-scope .nv-choice-strip,.v3-scope .tw-draw-action-row,.v3-scope .nv-task-summary { display:none; }
+ .v3-scope .tw-countdown-number { flex-direction:column;align-items:flex-start;gap:2px; }
+ .v3-scope .tw-countdown-number .v3-number { --v3-number-size:23px; }
+ .v3-scope .tw-countdown-number[data-long-number=true] .v3-number { --v3-number-size:14px; }
+ .v3-scope .nv-focus-readout { display:none; }
+ .v3-scope .tw-pomodoro .tw-timer-compact { display:flex; }
+ .v3-scope .tw-pomodoro .tw-timer-split { color:var(--v3-accent);font-weight:300; }
+ .v3-scope .tw-note .tw-meta { display:none; }
+ .v3-scope .tw-calculator-entry output .v3-number,.v3-scope .tw-converter-compact .v3-number,.v3-scope .tw-todo-compact .v3-number { --v3-number-size:20px; }
+ .v3-scope .tw-converter-compact { flex-direction:column;align-items:flex-start; }
+ .v3-scope .tw-converter-source,.v3-scope .tw-converter-equals { display:none; }
+}
+@media (prefers-reduced-motion:reduce) { .v3-scope .nv-task-track i { transition:none; } }

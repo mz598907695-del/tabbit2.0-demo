@@ -6,7 +6,7 @@ import { extraWidgetCatalog } from '../../src/personalized-home-2-0/board/extra-
 import { leisureWidgetCatalog } from '../../src/personalized-home-2-0/board/leisure-widget-data.js';
 import { audioWidgetCatalog } from '../../src/personalized-home-2-0/board/audio-widget-catalog.js';
 
-const catalog = [...coreWidgetCatalog, ...extraWidgetCatalog, ...leisureWidgetCatalog, ...audioWidgetCatalog];
+const catalog = [...audioWidgetCatalog, ...coreWidgetCatalog, ...extraWidgetCatalog, ...leisureWidgetCatalog];
 const starterLinks = Array.from({ length: 29 }, (_, index) => ({ id: `starter-${index}`, type: 'shortcut', key: `link-${index}`, label: `链接 ${index + 1}`, url: `https://example.com/${index}`, image: `icon-${index}.png`, size: { w: 1, h: 1 } }));
 const emptyBoard = () => ({ id: 'group-1', name: '常用', items: [], layouts: {}, layoutVersion: 3 });
 
@@ -125,6 +125,6 @@ test('IDs reserved by other boards are never reused and all geometry references 
   assert.deepEqual(board.layoutOrder, ids);
   assert.deepEqual(Object.keys(board.layouts['gap:free:12']), ids);
   assert.deepEqual(board.layouts['gap:free:12']['starter-0-3'], { x: 0, y: 0 });
-  assert.deepEqual(board.layouts['gap:free:12']['default-widget-clock-2'], { x: 0, y: 2 });
+  assert.deepEqual(board.layouts['gap:free:12']['default-widget-clock-2'], { x: 6, y: 2 });
   assert.deepEqual(reserved, ['starter-0', 'starter-0-2', 'default-widget-clock', 'saved-note']);
 });

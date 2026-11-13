@@ -11,6 +11,7 @@ import { createPortal } from 'react-dom';
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Plus, SquarePen, Scaling, ChevronRight, ListChecks, Trash2, CopyPlus, FileInput, PanelTop, Check, Undo2, Redo2 } from "../icons";
 import WidgetCard, { widgetCatalog } from './WidgetCards';
+import { widgetLibraryVariants, createLibraryWidgetItem } from './widget-library-variants';
 import BoardItem from './BoardItem';
 import { boardItemName as itemName } from './BoardItemContent';
 import ContextSubmenu from '../ContextSubmenu';
@@ -28,6 +29,7 @@ const normalizeItemSize=(item,size,options)=>item.type==='shortcut'
   ? normalizeShortcutSize(size) : normalizeWidgetSize(size,options);
 
 const widgetDefaults = new Map(widgetCatalog.map(item => [item.kind, item.defaultSize || { w:2, h:2 }]));
+const libraryVariants = widgetLibraryVariants(widgetCatalog);
 
 function organizeBoardItems(items, columns) {
   const ordered=[...items].sort((a,b)=>a.y-b.y||a.x-b.x);
@@ -246,10 +248,10 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
     if(targetId===page.id)setSelected(item.id);
     return {ok:true};
   };
-  const addWidget=(kind,size,targetId=page.id)=>{
+  const addWidget=(kind,size,targetId=page.id,visualStyle='classic')=>{
     const def=widgetCatalog.find(i=>i.kind===kind);
     if(!def)return {ok:false,message:'该小组件暂不可用'};
-    return addItem({id:crypto.randomUUID(),type:'widget',kind,title:def.title,config:{...(def.createDefaultConfig?.()||def.defaultConfig)},size:size||def.defaultSize||{w:2,h:2}},targetId);
+    return addItem(createLibraryWidgetItem(def,{id:crypto.randomUUID(),size,visualStyle}),targetId);
   };
   const importAICard=(pkg,targetId=page.id)=>{
     try {
@@ -506,7 +508,7 @@ export default function WorkspaceBoard({ref,page,pages,onPageChange,onInitialize
         {menu.view==='itemSize'?SHORTCUT_SIZE_PRESETS.map(size=><button key={size.id} type="button" role="menuitemradio" aria-checked={normalizeShortcutSize(menuItem.size).w===size.w} onClick={()=>{resize(menuItem,size);setMenu(null);restoreMenuFocus();}}><span className="home-menu-check-slot" aria-hidden="true">{normalizeShortcutSize(menuItem.size).w===size.w&&<Check size={16}/>}</span>{size.label}（1×{size.w}）</button>):pages.filter(entry=>entry.id!==page.id).map(entry=><button type="button" role="menuitem" key={entry.id} onClick={()=>transfer(menuItem,entry.id)}><PanelTop size={16} aria-hidden="true"/>移动到{entry.name}</button>)}
       </ContextSubmenu>}
     </div>,getHomeRoot())}
-    {library&&<BoardLibrary homeAnchorRef={rootRef} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} catalog={widgetCatalog.map(def=>({...def,preview:<WidgetCard kind={def.kind} item={{config:def.defaultConfig}} appearanceTheme={appearanceTheme} preview/>}))} pages={pages} currentPageId={page.id} onAdd={addWidget} onShortcut={(value,targetId)=>addItem({...value,id:crypto.randomUUID(),type:'shortcut',key:'custom',service:value.label},targetId)} onGenerateWidget={onGenerateWidget} onImport={importAICard} onClose={()=>setLibrary(false)}/>}
+    {library&&<BoardLibrary homeAnchorRef={rootRef} shortcutShape={shortcutShape} shortcutSize={shortcutSize} appearanceTheme={appearanceTheme} catalog={libraryVariants.map(def=>({...def,preview:<WidgetCard kind={def.kind} item={{config:{...def.defaultConfig,...(def.visualStyle==='spectrum'?{visualStyle:'spectrum'}:{})}}} appearanceTheme={appearanceTheme} preview/>}))} pages={pages} currentPageId={page.id} onAdd={addWidget} onShortcut={(value,targetId)=>addItem({...value,id:crypto.randomUUID(),type:'shortcut',key:'custom',service:value.label},targetId)} onGenerateWidget={onGenerateWidget} onImport={importAICard} onClose={()=>setLibrary(false)}/>}
     {editor&&editor.type!=='group'&&<BoardItemDialog item={editor==='new'?null:editor} appearanceTheme={appearanceTheme} onSave={saveItem} onClose={()=>{setEditor(null);setEditorTargetId(null);restoreMenuFocus();}}/>}
     {editor?.type==='group'&&<GroupNameDialog name={page.name} onClose={()=>setEditor(null)} onSave={name=>{onRenameGroup(name);setEditor(null);}}/>}
     {confirm&&<BoardConfirm title={`删除看板“${page.name}”？`} description={`将移除此看板中的 ${page.items.length} 个项目，之后可撤销。`} onConfirm={()=>{onDeleteGroup();setConfirm(null);}} onClose={()=>setConfirm(null)}/>}
