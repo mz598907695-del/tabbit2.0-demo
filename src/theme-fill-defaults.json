@@ -1,0 +1,82 @@
+{
+  "默认": {
+    "light": {
+      "color": "#f2f7ff",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#404040",
+      "opacity": 40
+    }
+  },
+  "橙色": {
+    "light": {
+      "color": "#ffaa00",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#b37700",
+      "opacity": 40
+    }
+  },
+  "黄色": {
+    "light": {
+      "color": "#ffe007",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#c6ae07",
+      "opacity": 40
+    }
+  },
+  "绿色": {
+    "light": {
+      "color": "#6deb36",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#4ba525",
+      "opacity": 40
+    }
+  },
+  "青色": {
+    "light": {
+      "color": "#00c7fc",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#008db3",
+      "opacity": 40
+    }
+  },
+  "蓝色": {
+    "light": {
+      "color": "#3a88fe",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#245cb0",
+      "opacity": 40
+    }
+  },
+  "紫色": {
+    "light": {
+      "color": "#b188ff",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#7e61bc",
+      "opacity": 40
+    }
+  },
+  "粉色": {
+    "light": {
+      "color": "#f6a8ff",
+      "opacity": 60
+    },
+    "dark": {
+      "color": "#b079b9",
+      "opacity": 40
+    }
+  }
+}

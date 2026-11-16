@@ -35,8 +35,9 @@ test('solid and gradient surface fills share two continuous color stops', () => 
   assert.equal(appearanceColorMix('#fff', '#fff'), '#fff');
 });
 
-test('the window veil retains its authored transparent stop while moving to the dark gradient', () => {
-  const mixed = appearanceFillMix('linear-gradient(180deg, rgba(245, 245, 245, .85), #f5f5f500 99%)', 'linear-gradient(rgba(34, 34, 34, .6), rgba(25, 25, 25, .2))');
-  assert.ok(mixed.includes('calc(99% + (1% * var(--space-appearance-progress, 0)))'));
-  assert.ok(mixed.includes('#f5f5f500, rgba(25, 25, 25, .2)'));
+test('the window veil blends the light ten-percent endpoint into the dark gradient', () => {
+  const mixed = appearanceFillMix('linear-gradient(180deg, rgba(245, 245, 245, .85) 0%, rgba(245, 245, 245, .1) 100%)', 'linear-gradient(rgba(26, 26, 26, .7), rgba(26, 26, 26, .2))');
+  assert.ok(mixed.endsWith('100%)'));
+  assert.ok(!mixed.includes('calc(99%'));
+  assert.ok(mixed.includes('rgba(245, 245, 245, .1), rgba(26, 26, 26, .2)'));
 });

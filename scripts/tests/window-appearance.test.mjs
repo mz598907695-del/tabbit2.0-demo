@@ -23,6 +23,40 @@ function storage(initial={}) {
   return {getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value))};
 }
 
+test('theme fill slider maps display endpoints and exact authored defaults',()=>{
+  const api=modules()(resolve('src/themeFillPalette.ts'));
+  assert.equal(api.sliderToFillOpacity(0),20);
+  assert.equal(api.sliderToFillOpacity(100),80);
+  assert.equal(api.fillOpacityToSlider(20),0);
+  assert.equal(api.fillOpacityToSlider(80),100);
+  for(const actual of [20,40,60,80]) {
+    assert.ok(Math.abs(api.sliderToFillOpacity(api.fillOpacityToSlider(actual))-actual)<1e-10);
+  }
+});
+
+test('fresh theme fill defaults reproduce the approved eight light and dark palettes',()=>{
+  const api=modules()(resolve('src/themeFillPalette.ts'));
+  const palette=api.readFillPalette(storage());
+  assert.equal(Object.keys(palette).length,8);
+  for(const modes of Object.values(palette)) {
+    assert.equal(modes.light.opacity,60);
+    assert.equal(modes.dark.opacity,40);
+  }
+  assert.equal(api.resolveFillColor('#47b2ff','light',palette),'#3a88fe');
+  assert.equal(api.resolveFillColor('#47b2ff','dark',palette),'#245cb0');
+  assert.equal(api.resolveFillColor('#f2f7ff','dark',palette),'#404040');
+});
+
+test('a saved fill override preserves its opposite mode and all other theme defaults',()=>{
+  const api=modules()(resolve('src/themeFillPalette.ts'));
+  const palette=api.readFillPalette(storage({[api.THEME_FILL_PALETTE_KEY]:JSON.stringify({'蓝色':{light:{color:'#123456',opacity:55}}})}));
+  assert.equal(palette['蓝色'].light.color,'#123456');
+  assert.equal(palette['蓝色'].light.opacity,55);
+  assert.equal(palette['蓝色'].dark.color,'#245cb0');
+  assert.equal(palette['粉色'].light.color,'#f6a8ff');
+  assert.equal(api.resolveFillOpacity('#47b2ff','dark',palette,0),40);
+});
+
 test('fresh packaged defaults retain the captured color theme and system color preference',()=>{
   const load=modules(),store=storage();
   load(resolve('src/demoDefaults.ts')).initializeDemoDefaults(store,true);

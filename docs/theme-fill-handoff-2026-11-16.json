@@ -1,0 +1,181 @@
+{
+  "version": "2026-11-16",
+  "opacityMeaning": "不透明度；实际 60% 表示 alpha=0.6，0% 完全透明，100% 完全不透明",
+  "layerOrderBackToFront": [
+    "固定原生标准玻璃底层",
+    "主题染色填充层（壁纸主题时壁纸覆盖在该层上方）",
+    "全局渐变叠层",
+    "浏览器界面与页面内容"
+  ],
+  "nativeGlass": "固定系统标准玻璃；主题色及浓度不再修改原生材质，染色由独立全局填充层承担",
+  "sliderMapping": {
+    "userRangePercent": [
+      0,
+      100
+    ],
+    "actualRangePercent": [
+      20,
+      80
+    ],
+    "actualFromUser": "actualPercent = 20 + userPercent * 0.6",
+    "userFromActual": "userPercent = (actualPercent - 20) / 0.6",
+    "alphaFromUser": "alpha = 0.2 + userPercent * 0.006",
+    "defaultLight": {
+      "actualPercent": 60,
+      "userPercent": 66.66666666666667
+    },
+    "defaultDark": {
+      "actualPercent": 40,
+      "userPercent": 33.333333333333336
+    },
+    "rounding": "显示可保留两位小数；内部保留精度，避免默认60%/40%被取整滑杆改变"
+  },
+  "themes": {
+    "默认": {
+      "light": {
+        "color": "#F2F7FF",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#404040",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "橙色": {
+      "light": {
+        "color": "#FFAA00",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#B37700",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "黄色": {
+      "light": {
+        "color": "#FFE007",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#C6AE07",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "绿色": {
+      "light": {
+        "color": "#6DEB36",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#4BA525",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "青色": {
+      "light": {
+        "color": "#00C7FC",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#008DB3",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "蓝色": {
+      "light": {
+        "color": "#3A88FE",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#245CB0",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "紫色": {
+      "light": {
+        "color": "#B188FF",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#7E61BC",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    },
+    "粉色": {
+      "light": {
+        "color": "#F6A8FF",
+        "actualOpacityPercent": 60,
+        "alpha": 0.6,
+        "userSliderPercent": 66.666667
+      },
+      "dark": {
+        "color": "#B079B9",
+        "actualOpacityPercent": 40,
+        "alpha": 0.4,
+        "userSliderPercent": 33.333333
+      }
+    }
+  },
+  "globalGradientOverlay": {
+    "direction": "从上到下",
+    "light": {
+      "css": "linear-gradient(180deg, rgba(245, 245, 245, 0.85) 0%, rgba(245, 245, 245, 0.1) 100%)",
+      "stops": [
+        {
+          "positionPercent": 0,
+          "color": "#F5F5F5",
+          "alpha": 0.85
+        },
+        {
+          "positionPercent": 100,
+          "color": "#F5F5F5",
+          "alpha": 0.1
+        }
+      ]
+    },
+    "dark": {
+      "css": "linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.2))",
+      "stops": [
+        {
+          "positionPercent": 0,
+          "color": "#1A1A1A",
+          "alpha": 0.7
+        },
+        {
+          "positionPercent": 100,
+          "color": "#1A1A1A",
+          "alpha": 0.2
+        }
+      ]
+    },
+    "behavior": "覆盖在染色层上方，颜色与透明度独立；不随染色浓度滑杆变化；normal/source-over合成"
+  }
+}

@@ -37,6 +37,7 @@ svg { width: 17px; height: 17px; stroke-width: 1.9; }
 }
 .glass-surface.mode-horizontal { background: rgba(255,255,255,var(--glass-veil, 0)); }
 .container-fill { position: absolute; inset: 0; overflow:hidden; pointer-events: none; }
+.window-theme-fill { position:absolute; inset:0; background:var(--window-theme-fill,rgba(242,247,255,.1)); }
 .container-fill::after { content:""; position:absolute; inset:0; background:var(--nine-color-bg-global-mask); }
 .container-wallpaper-background { position:absolute; inset:0; }
 .window-wallpaper-canvas { position:absolute; left:var(--wallpaper-canvas-left,0px); top:var(--wallpaper-canvas-top,0px); width:var(--wallpaper-canvas-width,100%); height:var(--wallpaper-canvas-height,100%); }

@@ -7,6 +7,7 @@ import WallpaperMedia from './themes/WallpaperMedia';
 import { BoardConfirm } from './board/BoardDialogs';
 import SettingSegments from './SettingSegments';
 import { spaceColors } from '../spaceColors';
+import { fillOpacityToSlider, sliderToFillOpacity } from '../themeFillPalette';
 import { APP_ICON_OPTIONS } from './appIcons';
 import './overlays.css';
 
@@ -34,7 +35,6 @@ export function ThemePanel({
   onSpaceColor,
   frameTint = 50,
   onFrameTint,
-  frameClear = false,
   onFrameClear,
   wallpaperLibrary,
   onUploadWallpaper,
@@ -64,6 +64,7 @@ export function ThemePanel({
   const gallerySelected = themeSource === 'gallery';
   const selectedSwatchIndex = gallerySelected ? -1 : palette.findIndex(item => item.value.toLowerCase() === spaceColor.toLowerCase());
   const selectedSwatchColor = palette[selectedSwatchIndex]?.color || spaceColor;
+  const frameSlider = fillOpacityToSlider(frameTint);
   const selectedAppIconPosition = Math.max(0, APP_ICON_OPTIONS.indexOf(selectedAppIcon));
   const [category, setCategory] = useState(getThemeCategory(theme));
   const { wallpapers = [], loading = false, uploading = false, deletingId = null, error = "" } = wallpaperLibrary || {};
@@ -284,7 +285,7 @@ export function ThemePanel({
                 aria-label="重置主框架效果"
                 title="重置主框架效果"
                 onClick={() => {
-                  const defaultTint = selectedSwatchIndex === 0 ? 10 : resolvedAppearance === 'dark' ? 20 : 70;
+                  const defaultTint = resolvedAppearance === 'dark' ? 40 : 60;
                   onFrameTint?.(defaultTint, { clear:false, preset:true, reset:true });
                 }}
               >
@@ -293,9 +294,9 @@ export function ThemePanel({
             </div>
             <div className="overlay-settings-card overlay-frame-card" style={{ '--overlay-space-color':selectedSwatchColor }}>
               <SettingSegments
-                label="玻璃材质"
-                value={frameClear ? 'clear' : 'regular'}
-                disabled={gallerySelected}
+                label="玻璃底层（固定）"
+                value='regular'
+                disabled
                 options={[{ value:'regular', label:'标准' }, { value:'clear', label:'通透' }]}
                 onChange={value => onFrameClear?.(value === 'clear')}
               />
@@ -303,20 +304,20 @@ export function ThemePanel({
               <div className="overlay-opacity-setting">
                 <label className="overlay-setting-label" htmlFor={`${panelId}-opacity`}>浓度</label>
                 <div className="overlay-range-control" style={{
-                  "--overlay-range-value": `${frameTint}%`,
-                  "--overlay-range-negative-value": `${-frameTint}%`,
-                  "--overlay-range-edge-correction": `${frameTint * 0.04}px`,
+                  "--overlay-range-value": `${frameSlider}%`,
+                  "--overlay-range-negative-value": `${-frameSlider}%`,
+                  "--overlay-range-edge-correction": `${frameSlider * 0.04}px`,
                 }}>
                   <input
                     id={`${panelId}-opacity`}
                     type="range"
                     min="0"
                     max="100"
-                    step="1"
-                    value={frameTint}
-                    onChange={event => onFrameTint?.(Number(event.target.value))}
+                    step="any"
+                    value={frameSlider}
+                    onChange={event => onFrameTint?.(sliderToFillOpacity(Number(event.target.value)))}
                     aria-label="主框架染色浓度"
-                    aria-valuetext={`${frameTint}%`}
+                    aria-valuetext={`${Number(frameSlider.toFixed(2))}%`}
                   />
                   <span className="overlay-range-thumb" aria-hidden="true" />
                 </div>

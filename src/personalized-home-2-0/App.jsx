@@ -16,6 +16,7 @@ import PageManagerDialog from "./board/PageManagerDialog";
 import ThemeSidebarResizeHandle from './ThemeSidebarResizeHandle';
 import { resolvePreferences } from "./preferences";
 import { spaceColors } from "../spaceColors";
+import { readFillPalette, resolveFillOpacity, THEME_FILL_PREVIEW_EVENT } from "../themeFillPalette";
 import { normalizeAppIcon } from "./appIcons";
 import { useBoardState, transferBoardItem, applyBoardPageChange } from "./board/state";
 import { getThemeBackground, getThemeSelectionAppearance } from "./themes/appearance";
@@ -129,6 +130,25 @@ export function App({ hostActive = true } = {}) {
     window.addEventListener(GLASS_SPACE_THEME_EVENT,syncSpaceTheme);
     return () => window.removeEventListener(GLASS_SPACE_THEME_EVENT,syncSpaceTheme);
   }, []);
+  useEffect(() => {
+    if (!import.meta.env.DEV || !hostActive) return;
+    const previewFill = event => {
+      const { color, mode } = event.detail || {};
+      const preset = spaceColors.find(item => item.tintColor === color);
+      if (!preset || !['light', 'dark'].includes(mode)) return;
+      themeSelectionEpoch.current += 1;
+      localStorage.setItem(COLOR_WINDOW_APPEARANCE_KEY, mode);
+      setAppearanceTheme(mode);
+      setWindowAppearance(mode);
+      setPreferences(current => ({ ...current, theme:mode, themeSource:'color', appearance:mode }));
+      setSpaceColor(color);
+      const tint = resolveFillOpacity(color, mode, readFillPalette(), mode === 'dark' ? preset.darkTint : preset.tint);
+      setFrameTint(tint);
+      window.dispatchEvent(new CustomEvent(GLASS_THEME_EVENT, { detail:{ theme:mode, themeSource:'color', appearance:mode, color, tint, preset:true } }));
+    };
+    window.addEventListener(THEME_FILL_PREVIEW_EVENT, previewFill);
+    return () => window.removeEventListener(THEME_FILL_PREVIEW_EVENT, previewFill);
+  }, [hostActive]);
   useLiquidGlassLens(preferences.liquidGlass && preferences.shortcuts && !widgetAI);
   const wallpaperLibrary = useWallpapers();
   const selectedWallpaper = getBundledWallpaper(preferences.theme)

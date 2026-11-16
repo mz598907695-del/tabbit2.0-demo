@@ -167,6 +167,7 @@ function App() {
     <SpaceContext.Provider value={spaceContext}>
       <main className={`glass-surface mode-${mode} ${isNewTab ? 'has-new-tab' : ''} ${verticalCollapsed ? 'vertical-collapsed' : ''}`} onClick={() => setMenuOpen(false)}>
         <div className="container-fill" aria-hidden="true">
+          <div className="window-theme-fill"/>
           {getWallpaperLayers(windowWallpaper.wallpaper, windowWallpaper.transition).filter(layer => layer.scene.url).map(({ scene, incoming, outgoing }) => (
             <div key={scene.id} className={`container-wallpaper-background${incoming ? ' is-incoming' : ''}${outgoing ? ' is-outgoing' : ''}`}>
               <div className="window-wallpaper-canvas">

@@ -1,50 +1,34 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import "./GlassControls.css";
 import { baseGlassSettings, defaultSpaceGlass, themedGlassSettings, GLASS_THEME_EVENT, GLASS_SPACE_THEME_EVENT } from "./demoDefaults";
 import { SPACE_GESTURE_EVENT, type SpaceGestureProgress } from "./spaceTransition";
 import { presetTintForMode } from "./spaceColors";
+import ThemeFillControls from "./ThemeFillControls";
+import { readFillPalette, resolveFillColor, resolveFillOpacity, updateFillOpacity, THEME_FILL_PALETTE_EVENT } from "./themeFillPalette";
 import { resolveThemeSource } from './themeSelection';
 
 const defaults = baseGlassSettings;
 type Settings = typeof defaults;
-const actualTint = (value:number) => 5 + Math.max(0,Math.min(100,value)) * .5;
-const visualSettings = (settings: Settings) => ({
-  tint: [...[1, 3, 5].map((offset) => parseInt(settings.color.slice(offset, offset + 2), 16)), 255 * actualTint(settings.tint) / 100],
-  opacity:100,
-  clear: settings.clear, veil: settings.veil, highlight: settings.highlight, edge: settings.edge,
-});
+const actualTint = (value:number) => Math.max(0,Math.min(100,value));
+const visualSettings = (settings: Settings) => {
+  const mode = document.documentElement.dataset.mode === 'dark' ? 'dark' : 'light';
+  const palette = readFillPalette();
+  const color = resolveFillColor(settings.color, mode, palette);
+  const opacity = resolveFillOpacity(settings.color, mode, palette, settings.tint);
+  return {
+    tint: [...[1, 3, 5].map((offset) => parseInt(color.slice(offset, offset + 2), 16)), 255 * actualTint(opacity) / 100],
+    opacity:100,
+    clear: settings.clear, veil: settings.veil, highlight: settings.highlight, edge: settings.edge,
+  };
+};
 
 let renderedGlass = visualSettings(defaults);
 let renderedSpace: string | undefined;
-type GlassUpdate = { tint: number[]; opacity:number; clear: boolean; onComplete: (error?: unknown) => void };
-let pendingGlassUpdate: GlassUpdate | undefined;
-let updatingGlass = false;
-
-async function updateNativeGlass(update: GlassUpdate) {
-  pendingGlassUpdate = update;
-  if (updatingGlass) return;
-  updatingGlass = true;
-  try {
-    while (pendingGlassUpdate) {
-      const next = pendingGlassUpdate;
-      pendingGlassUpdate = undefined;
-      try {
-        await invoke("update_glass", { tint: next.tint, clear: next.clear, opacity:next.opacity / 100 });
-        next.onComplete();
-      } catch (error) {
-        next.onComplete(error);
-      }
-    }
-  } finally {
-    updatingGlass = false;
-  }
-}
-
 export default function GlassControls({ spaceId, spaceName }: { spaceId: string; spaceName: string }) {
   const storageKey = `tabbit-glass-space:${spaceId}`;
   const spaceDefaults = defaultSpaceGlass(spaceId);
   const [open, setOpen] = useState(true);
+  const [fillRevision, setFillRevision] = useState(0);
   const [settings, setSettings] = useState<Settings>(() => {
     try {
       const theme = localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light';
@@ -79,22 +63,28 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
     clear:localStorage.getItem(`tabbit-glass-user-clear:${spaceId}`) === 'true'
       || (localStorage.getItem(`tabbit-glass-user-clear:${spaceId}`) === null && settings.clear),
   });
-  const [error, setError] = useState("");
   const native = "__TAURI_INTERNALS__" in window;
   useEffect(() => {
     const root = document.documentElement;
     const syncPresetTint = () => {
-      if (userAdjusted.current.tint) return;
+      setFillRevision(value => value + 1);
       setSettings(current => {
-        const tint = presetTintForMode(current.color, root.dataset.mode === "dark");
+        const tint = resolveFillOpacity(current.color, root.dataset.mode === "dark" ? "dark" : "light", readFillPalette(), current.tint);
         return tint === undefined || tint === current.tint ? current : { ...current, tint };
       });
     };
     const observer = new MutationObserver(syncPresetTint);
     observer.observe(root, { attributes:true, attributeFilter:["data-mode"] });
     syncPresetTint();
-    return () => observer.disconnect();
-  }, [spaceId]);
+    const updatePalette = syncPresetTint;
+    window.addEventListener(THEME_FILL_PALETTE_EVENT, updatePalette);
+    window.addEventListener('storage', updatePalette);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener(THEME_FILL_PALETTE_EVENT, updatePalette);
+      window.removeEventListener('storage', updatePalette);
+    };
+  }, [spaceId, settings.color]);
   useEffect(() => {
     const select = (event:Event) => {
       const detail = (event as CustomEvent<{ color?:string; theme?:string; themeSource?:string; appearance?:string; tint?:number; clear?:boolean; preset?:boolean; reset?:boolean }>).detail;
@@ -102,6 +92,9 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
       const currentTheme = localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light';
       const gallery = resolveThemeSource(currentTheme, localStorage.getItem(`tabbit-glass-theme-source:${spaceId}`)) === 'gallery';
       if (gallery && !detail.themeSource && (detail.tint !== undefined || detail.clear !== undefined || detail.color !== undefined)) return;
+      if ((!detail.preset || detail.reset) && typeof detail.tint === 'number') {
+        updateFillOpacity(settings.color, document.documentElement.dataset.mode === 'dark' ? 'dark' : 'light', detail.tint);
+      }
       if (detail.preset && typeof detail.tint === "number") {
         userAdjusted.current.tint = false;
         localStorage.setItem(`tabbit-glass-user-tint:${spaceId}`, "false");
@@ -115,7 +108,7 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
         localStorage.setItem(`tabbit-glass-user-${key}:${spaceId}`, String(userAdjusted.current[key]));
       }
       if (typeof detail.color === 'string' || typeof detail.tint === 'number' || typeof detail.clear === 'boolean') setSettings(current => ({
-        ...themedGlassSettings(detail.color ?? current.color, detail.tint ?? current.tint),
+        ...themedGlassSettings(detail.color ?? current.color, resolveFillOpacity(detail.color ?? current.color, document.documentElement.dataset.mode === 'dark' ? 'dark' : 'light', readFillPalette(), detail.tint ?? current.tint)),
         clear:detail.preset && !detail.reset && userAdjusted.current.clear ? current.clear : detail.clear ?? current.clear,
       }));
       if (typeof detail.theme === 'string') localStorage.setItem(`tabbit-glass-theme:${spaceId}`, detail.theme);
@@ -124,7 +117,7 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
     };
     window.addEventListener(GLASS_THEME_EVENT, select);
     return () => window.removeEventListener(GLASS_THEME_EVENT, select);
-  }, [spaceId]);
+  }, [spaceId, settings.color]);
   useEffect(() => {
     const theme = localStorage.getItem(`tabbit-glass-theme:${spaceId}`) || 'light';
     window.dispatchEvent(new CustomEvent(GLASS_SPACE_THEME_EVENT, { detail:{ spaceId, theme,
@@ -160,15 +153,8 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
       root.style.setProperty("--glass-highlight", String(renderedGlass.highlight / 100));
       root.style.setProperty("--glass-edge", String(renderedGlass.edge / 100));
       root.style.setProperty("--glass-opacity", String(renderedGlass.opacity / 100));
-      if (native) {
-        void updateNativeGlass({
-          tint: renderedGlass.tint.map(Math.round), clear: renderedGlass.clear, opacity:renderedGlass.opacity,
-          onComplete: (cause) => {
-            if (cancelled) return;
-            setError(cause ? String(cause) : "");
-          },
-        });
-      }
+      const [red, green, blue, alpha] = renderedGlass.tint;
+      root.style.setProperty("--window-theme-fill", `rgba(${red}, ${green}, ${blue}, ${alpha / 255})`);
     };
     const apply = (progress:number) => applyBetween(from, target, progress);
     const syncGesture = (event:Event) => {
@@ -200,7 +186,7 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
       rollbackFrame = requestAnimationFrame(tick);
     };
     window.addEventListener(SPACE_GESTURE_EVENT, syncGesture);
-    // Material motion is independent of the content, which switches immediately.
+    // Animate only the theme fill; the native glass backplate stays fixed.
     if (switching && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const began = performance.now();
       const tick = (now:number) => {
@@ -217,10 +203,10 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
       cancelAnimationFrame(colorFrame);
       window.removeEventListener(SPACE_GESTURE_EVENT, syncGesture);
     };
-  }, [settings, native, spaceId]);
+  }, [settings, spaceId, fillRevision]);
 
   const change = <K extends keyof Settings>(key: K, value: Settings[K]) => {
-    if (key === "tint") { userAdjusted.current.tint = true; localStorage.setItem(`tabbit-glass-user-tint:${spaceId}`, "true"); }
+    if (key === "tint") { updateFillOpacity(settings.color, document.documentElement.dataset.mode === "dark" ? "dark" : "light", Number(value)); userAdjusted.current.tint = true; localStorage.setItem(`tabbit-glass-user-tint:${spaceId}`, "true"); }
     if (key === "clear") { userAdjusted.current.clear = true; localStorage.setItem(`tabbit-glass-user-clear:${spaceId}`, "true"); }
     setSettings(current => ({ ...current, [key]:value }));
   };
@@ -240,14 +226,14 @@ export default function GlassControls({ spaceId, spaceName }: { spaceId: string;
     <button className="glass-debug-toggle" type="button" onClick={() => setOpen(value => !value)}>玻璃调试 <span>{open ? "收起" : "展开"}</span></button>
     {open && <div className="glass-debug-body">
       <div className="glass-debug-space">当前空间：{spaceName}<span>自动保存</span></div>
-      <div className="glass-debug-status">{native ? "原生玻璃 · 实时预览" : "网页预览 · 原生材质请在桌面窗口查看"}</div>
-      <label className="glass-control-row"><span>玻璃材质</span><select aria-label="玻璃材质" value={settings.clear ? "clear" : "regular"} onChange={event => change("clear", event.target.value === "clear")}><option value="regular">Regular · 标准</option><option value="clear">Clear · 通透</option></select></label>
-      <label className="glass-control-row glass-color-row"><span>染色颜色</span><input aria-label="染色颜色" type="color" value={settings.color} onChange={event => change("color", event.target.value)}/><code>{settings.color}</code></label>
-      {slider("tint", "染色浓度")}
+      <div className="glass-debug-status">{native ? "固定原生玻璃 · 主题填充实时预览" : "网页预览 · 原生材质请在桌面窗口查看"}</div>
+      <div className="glass-control-row"><span>玻璃底层：标准 · 固定</span></div>
+      <ThemeFillControls activeColor={settings.color} mode={document.documentElement.dataset.mode === 'dark' ? 'dark' : 'light'}/>
+      <div className="glass-debug-status">当前填充：{resolveFillColor(settings.color, document.documentElement.dataset.mode === 'dark' ? 'dark' : 'light', readFillPalette()).toUpperCase()}</div>
+      {slider("tint", "主题填充浓度")}
       {slider("veil", "白色罩层")}
       {slider("highlight", "顶部高光")}
       {slider("edge", "边缘高光")}
-      {error && <p className="glass-debug-error">玻璃更新失败：{error}</p>}
       <label className="glass-control-row"><span>当前空间参数 · 可选中复制</span><textarea aria-label="当前玻璃参数" readOnly value={JSON.stringify({ space:spaceName, ...settings }, null, 2)}/></label>
       <button className="glass-debug-reset" type="button" onClick={reset}>重置当前空间材质</button>
     </div>}
