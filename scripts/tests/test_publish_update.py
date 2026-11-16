@@ -225,6 +225,22 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(result['writePermission'], 'not_reported_by_api')
         self.assertEqual(remote.mutations(), [])
 
+    def test_explicit_public_source_expectation_preserves_visibility_and_receipt(self):
+        remote = Remote(self.artifacts)
+        remote.source['private'] = False
+        result = self.run_release(remote, validate_only=True, source_private=False)
+        self.assertFalse(result['sourcePrivate'])
+        self.assertEqual(remote.mutations(), [])
+        receipt = self.run_release(remote, source_private=False)
+        self.assertFalse(receipt['sourcePrivate'])
+        self.assertFalse(remote.source['private'])
+
+    def test_public_expectation_rejects_private_source_before_mutation(self):
+        remote = Remote(self.artifacts)
+        with self.assertRaises(publish.ReleaseError):
+            self.run_release(remote, source_private=False)
+        self.assertEqual(remote.mutations(), [])
+
     def test_repository_identity_visibility_and_reported_write_denial_stop_before_mutation(self):
         cases = [('source', 'private', False), ('repository', 'private', True),
                  ('source', 'full_name', 'other/source'), ('repository', 'full_name', 'other/updates'),

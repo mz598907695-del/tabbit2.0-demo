@@ -168,7 +168,7 @@ def verify_repository(repository, full_name, private):
     if not isinstance(repository, dict) or repository.get('full_name', '').lower() != full_name.lower():
         raise ReleaseError('Repository identity does not match the configured release destination/source')
     if repository.get('private') is not private:
-        raise ReleaseError('Source repository must remain private and update repository must remain public')
+        raise ReleaseError('Repository visibility does not match the expected source/update visibility; no visibility changes are permitted')
 
 
 def get_list(api, path):
@@ -234,10 +234,10 @@ def verify_asset_set(artifacts, assets, complete=False):
         raise ReleaseError('Published release differs from local output; use a new version instead of overwriting it')
 
 
-def publish_release(artifacts, release_api, source_api, *, validate_only=False, sleep=time.sleep, log=print):
+def publish_release(artifacts, release_api, source_api, *, validate_only=False, source_private=True, sleep=time.sleep, log=print):
     # Credentials may belong to collaborators or an App. Authorize by the fixed repositories,
     # not /user or a personal account name; never create or change repository visibility.
-    verify_repository(source_api('GET', '/repos/' + SOURCE_REPO), SOURCE_REPO, True)
+    verify_repository(source_api('GET', '/repos/' + SOURCE_REPO), SOURCE_REPO, source_private)
     repository = release_api('GET', '/repos/' + REPO)
     verify_repository(repository, REPO, False)
     if repository.get('archived') or repository.get('disabled'):
@@ -257,7 +257,7 @@ def publish_release(artifacts, release_api, source_api, *, validate_only=False, 
         require_newer_stable_release(artifacts, releases)
     if validate_only:
         return {'validated': True, 'version': artifacts.version, 'sourceRepository': SOURCE_REPO,
-                'updateRepository': REPO, 'sourcePrivate': True, 'updatePublic': True,
+                'updateRepository': REPO, 'sourcePrivate': source_private, 'updatePublic': True,
                 'writePermission': 'reported' if permissions.get('push') else 'not_reported_by_api',
                 'releaseState': 'draft' if release and release['draft'] else 'published' if release else 'new',
                 'files': artifacts.files, 'remoteChanges': False}
@@ -309,7 +309,7 @@ def publish_release(artifacts, release_api, source_api, *, validate_only=False, 
 
     assets = release_assets(release_api, release)
     verify_asset_set(artifacts, assets, complete=True)
-    verify_repository(source_api('GET', '/repos/' + SOURCE_REPO), SOURCE_REPO, True)
+    verify_repository(source_api('GET', '/repos/' + SOURCE_REPO), SOURCE_REPO, source_private)
     verify_repository(release_api('GET', '/repos/' + REPO), REPO, False)
     if release['draft']:
         require_draft(release_api, release, artifacts.tag)
@@ -321,7 +321,7 @@ def publish_release(artifacts, release_api, source_api, *, validate_only=False, 
     verify_asset_set(artifacts, assets, complete=True)
     receipt = {'repository': f'https://github.com/{REPO}', 'release': release['html_url'],
                'version': artifacts.version, 'files': [{'name': asset['name'], 'url': asset['browser_download_url'],
-                                                       'digest': asset['digest']} for asset in assets], 'sourcePrivate': True}
+                                                       'digest': asset['digest']} for asset in assets], 'sourcePrivate': source_private}
     (artifacts.directory / 'publish-receipt.json').write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + '\n')
     return receipt
 
@@ -332,12 +332,15 @@ def main(argv=None):
     mode.add_argument('--publish', action='store_true', help='Upload artifacts and publish the release')
     mode.add_argument('--validate-only', '--dry-run', action='store_true', help='Validate artifacts/repository access using read-only requests')
     parser.add_argument('--version', help='Artifact version in release/<version>; defaults to tauri.conf.json')
+    parser.add_argument('--source-visibility', choices=['private', 'public'], default='private',
+                        help='Expected existing source visibility; validates but never changes repository access')
     args = parser.parse_args(argv)
     try:
         artifacts = ReleaseArtifacts(ROOT, args.version)
         verify_artifact_signature(artifacts)
         release_token, source_token = resolve_tokens()
-        receipt = publish_release(artifacts, GitHubAPI(release_token), GitHubAPI(source_token), validate_only=args.validate_only)
+        receipt = publish_release(artifacts, GitHubAPI(release_token), GitHubAPI(source_token),
+                                  validate_only=args.validate_only, source_private=args.source_visibility == 'private')
         print(json.dumps(receipt, ensure_ascii=False), flush=True)
         return 0
     except ReleaseError as error:

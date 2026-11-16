@@ -114,8 +114,8 @@ jobs:
           TABBIT_RELEASE_TOKEN: ${{ steps.app-token.outputs.token || secrets.TABBIT_RELEASE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python3 scripts/publish-update.py --version "$RELEASE_VERSION" --validate-only
-          python3 scripts/publish-update.py --version "$RELEASE_VERSION" --publish
+          python3 scripts/publish-update.py --version "$RELEASE_VERSION" --source-visibility public --validate-only
+          python3 scripts/publish-update.py --version "$RELEASE_VERSION" --source-visibility public --publish
       - name: Verify public update endpoint
         if: inputs.publish
         run: |

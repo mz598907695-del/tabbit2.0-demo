@@ -59,18 +59,20 @@ node scripts/verify-update-artifacts.mjs --version 0.1.10
 本地发布者需要对源码仓库有读取权限、对公开更新仓库有写权限。发布脚本支持 `TABBIT_RELEASE_TOKEN`（公开更新仓库）与 `GITHUB_TOKEN`（源码仓库）分别授权，也支持一个可访问两个仓库的 `GH_TOKEN`，缺省时尝试 Git credential helper。使用 GitHub CLI 登录的成员可以将自己的令牌传给单次发布命令：
 
 ```sh
-GH_TOKEN="$(gh auth token)" python3 scripts/publish-update.py --version 0.1.10 --validate-only
-GH_TOKEN="$(gh auth token)" python3 scripts/publish-update.py --version 0.1.10 --publish
+GH_TOKEN="$(gh auth token)" python3 scripts/publish-update.py --version 0.1.10 --source-visibility public --validate-only
+GH_TOKEN="$(gh auth token)" python3 scripts/publish-update.py --version 0.1.10 --source-visibility public --publish
 ```
 
 `--validate-only`（别名 `--dry-run`）只检查产物、仓库状态和权限，不创建或修改 Release。只有 `--publish` 才上传并公开更新。
 
+2026-11-16 核对：源码仓库当前为公开状态。`--source-visibility public` 显式校验这一现有状态，发布过程不改变仓库可见性或访问权限。省略该参数时仍要求私有源码仓库；预期与实际不一致时停止发布。
+
 ## 下载托管
 
-当前代码仓库为私有仓库，免登录客户端不能直接读取它的 Release。
+安装与更新继续使用独立的公开资源仓库，保持已有客户端的更新地址不变。
 公开资源仓库 [mz598907695-del/tabbit-demo-updates](https://github.com/mz598907695-del/tabbit-demo-updates)
 只发布安装和更新文件，不发布源码。2026-11-11 已发布首个支持更新的版本 0.1.2，
-原代码仓库继续保持私有。
+当时源码仓库为私有；当前状态见上方发布参数说明。
 
 应用检查地址：
 `https://github.com/mz598907695-del/tabbit-demo-updates/releases/latest/download/latest.json`
@@ -78,7 +80,7 @@ GH_TOKEN="$(gh auth token)" python3 scripts/publish-update.py --version 0.1.10 -
 发布时先上传当前版本的更新包，再上传对应签名和清单，全部完成后才把版本设为公开最新版本。
 发布后用不带账号的请求核对下载地址，不能将个人访问令牌嵌入应用。
 发布脚本只上传四个白名单文件，先检查版本与签名，建立草稿，核对 GitHub 返回的各文件 SHA-256，再公开该版本。
-它不会上传源码，不会改变原代码仓库的私有状态，也不会替换已发布版本中内容不同的文件。
+它不会上传源码，不会改变源码仓库的可见性，也不会替换已发布版本中内容不同的文件。
 后续发布必须提高版本号，不能重新打包同版本后覆盖已发布内容。
 
 构建脚本的 `--base-url` 可以为其他 HTTPS 对象存储生成下载清单，但当前团队发布流程固定使用上述更新仓库。已有客户端的检查地址必须继续可用，不能只修改新版本配置就切断旧客户端的更新入口。
