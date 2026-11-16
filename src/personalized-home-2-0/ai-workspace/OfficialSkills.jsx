@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from '../icons';
 import './workspace-files.css';
+import { SKILL_TYPES } from './workspace-skills';
 
-export default function OfficialSkills({ section, onOpen }) {
+export default function OfficialSkills({ section, onOpen, listView = false }) {
   const railRef = useRef(null);
   const [edges, setEdges] = useState({ left:false, right:false });
   const [scrolling, setScrolling] = useState(false);
@@ -26,22 +27,23 @@ export default function OfficialSkills({ section, onOpen }) {
     window.addEventListener('resize', measure);
     measure();
     return () => { clearTimeout(stopTimer); observer.disconnect(); rail.removeEventListener('scroll', scroll); rail.removeEventListener('scrollend', stop); window.removeEventListener('resize', measure); };
-  }, [section.items]);
+  }, [section.items, listView]);
   function move(direction) {
     const rail = railRef.current;
     rail.scrollBy({ left:direction * rail.clientWidth, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
   }
-  return <section id={`aiws-section-${section.id}`} data-skill-section={section.id} className="aiws-section aiws-official" aria-label={section.label}>
-    <div className="aiws-section-heading"><div className="aiws-official-heading"><h2>{section.label}</h2><span>自动更新</span></div><div className="aiws-official-arrows">
+  return <section id={`aiws-section-${section.id}`} data-skill-section={section.id} className={`aiws-section aiws-official${listView ? ' is-list' : ''}`} aria-label={section.label}>
+    <div className="aiws-section-heading"><div className="aiws-official-heading"><h2>{section.label}</h2><span>自动更新</span></div>{!listView && <div className="aiws-official-arrows">
       <button aria-label="向左浏览官方预装" disabled={!edges.left} onClick={() => move(-1)}><ChevronLeft size={14}/></button>
       <button aria-label="向右浏览官方预装" disabled={!edges.right} onClick={() => move(1)}><ChevronRight size={14}/></button>
-    </div></div>
+    </div>}</div>
     <div className="aiws-official-rail" ref={railRef} data-left={scrolling && edges.left} data-right={scrolling && edges.right}>
       {section.items.map(item => <article className="aiwf-card aiws-official-card" key={item.id}>
         <button className="aiwf-card-open" aria-label={`查看 ${item.title}详情`} onClick={() => onOpen(item)}>
-          <img className="aiws-official-image" src={`/personalized-home-2-0/asset/official-skills/${item.officialIcon}.webp`} alt="" width="36" height="36"/>
+          <img className="aiws-official-image" src={`/personalized-home-2-0/asset/official-skills/${item.officialIcon || '1'}.webp`} alt="" width="36" height="36"/>
           <span className="aiws-official-copy"><span className="aiwf-card-title" title={item.title}>{item.title}</span><span className="aiwf-card-description" title={item.description}>{item.description}</span></span>
         </button>
+        {listView && <div className="aiws-official-meta"><span className="aiws-type">{SKILL_TYPES.find(([value]) => value === item.skillType)?.[1]}</span><span>{Number.isFinite(item.installCount) ? `${item.installCount.toLocaleString('zh-CN')} 人安装` : '安装人数未提供'}</span><span>默认可用 · 自动更新</span></div>}
       </article>)}
     </div>
   </section>;

@@ -5,8 +5,8 @@ import './unified-widget-kit.css';
 import '../standard-dialog.css';
 
 const WidgetLocale = createContext({ locale: 'zh-CN' });
-export function WidgetLocaleProvider({ locale = 'zh-CN', onChange, children }) {
-  const value = useMemo(() => ({ locale, onChange }), [locale, onChange]);
+export function WidgetLocaleProvider({ locale = 'zh-CN', children }) {
+  const value = useMemo(() => ({ locale }), [locale]);
   return <WidgetLocale.Provider value={value}>{children}</WidgetLocale.Provider>;
 }
 export function useWidgetNow(active = true, interval = 1000) {
@@ -23,7 +23,7 @@ export function WidgetShell({ title, icon, children, details, preview = false, c
   const [ownOpen, setOwnOpen] = useState(false);
   const open = detailOpen ?? ownOpen;
   const setOpen = value => { setOwnOpen(value); onDetailOpenChange?.(value); };
-  const { locale, onChange } = useContext(WidgetLocale);
+  const { locale } = useContext(WidgetLocale);
   const english = locale.startsWith('en');
   const close = () => { dialogRef.current?.close(); setOpen(false); openerRef.current?.focus({ preventScroll: true }); };
   useEffect(() => {
@@ -46,7 +46,7 @@ export function WidgetShell({ title, icon, children, details, preview = false, c
       {footer && <footer className="uw-footer">{footer}</footer>}
     </div>
     {open && details && createPortal(<dialog ref={dialogRef} className={`uw-dialog standard-dialog ${className}`} aria-label={english ? `${title} details` : `${title}详情`} lang={locale} data-board-interactive="true" onPointerDown={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()} onCancel={event => { event.preventDefault(); event.stopPropagation(); close(); }} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) close(); } }} onClose={() => setOpen(false)}>
-      <div className="uw-dialog-panel"><header className="uw-dialog-header"><h2>{title}</h2><div className="uw-dialog-tools">{onChange && <select className="uw-language" aria-label="语言 / Language" value={locale} onChange={event => onChange(event.target.value)}><option value="zh-CN">中文</option><option value="en-US">English</option></select>}<button type="button" className="uw-button uw-dialog-close" aria-label={english ? `Close ${title} details` : `关闭${title}详情`} onClick={close}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></button></div></header><div className="uw-detail-body">{typeof details === 'function' ? details({ close }) : details}</div></div>
+      <div className="uw-dialog-panel"><header className="uw-dialog-header"><h2>{title}</h2><div className="uw-dialog-tools"><button type="button" className="uw-button uw-dialog-close" aria-label={english ? `Close ${title} details` : `关闭${title}详情`} onClick={close}><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg></button></div></header><div className="uw-detail-body">{typeof details === 'function' ? details({ close }) : details}</div></div>
     </dialog>, rootRef.current?.closest('.personalized-home') || document.body)}
   </div>;
 }

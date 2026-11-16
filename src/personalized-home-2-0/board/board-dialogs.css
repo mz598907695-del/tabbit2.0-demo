@@ -247,7 +247,6 @@
 .board-library-ai-intro { display: flex; flex: 1; flex-direction: column; justify-content: center; min-height: 155px; }
 .board-library-ai-intro .widget-ai-artwork { width: min(300px, 100%); }
 .board-library-ai-intro h3 { margin: 12px 0 0; color: var(--muted); font-size: 13px; font-weight: 400; line-height: 24px; text-align: center; }
-.board-library-ai-card .tb-composer,
 .board-library-ai-card .tb-composer-icon,
 .board-library-ai-card .tb-composer-send { width: 28px; height: 28px; flex-basis: 28px; }
 .board-library-ai-card .tb-composer-toolbar { height: 28px; }
@@ -329,6 +328,8 @@
 .board-library-dialog [data-tooltip]:focus-visible::after { opacity: 1; }
 .board-library-copy { min-width: 0; }
 .board-library-title { margin: 0; color: var(--text); font-size: 15px; font-weight: 500; line-height: 24px; overflow-wrap: anywhere; }
+.board-library-variant { display: inline-flex; margin-left: 8px; padding: 0 7px; border-radius: 100px; background: var(--segmented); color: var(--muted); font-size: 10px; font-weight: 400; line-height: 20px; vertical-align: 1px; white-space: nowrap; }
+.board-library-card[data-library-style='spectrum'] .board-library-variant { background: #172d31; color: #7cdae8; }
 .board-library-copy p { min-height: 20px; margin: 5px 0 0; color: var(--muted); font-size: 12px; line-height: 20px; overflow-wrap: anywhere; }
 .board-library-feedback { min-height: 18px; margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 18px; overflow-wrap: anywhere; }
 .board-library-feedback.is-error { color: #bb3c3c; }

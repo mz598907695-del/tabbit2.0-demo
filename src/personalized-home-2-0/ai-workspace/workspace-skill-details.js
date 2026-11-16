@@ -4,11 +4,13 @@ export function getSkillDetails(item) {
   const kind = ['prompt', 'task', 'script'].includes(item.skillType) ? item.skillType : 'prompt';
   const steps = kind === 'task' ? ['提供目标与资料', '按步骤整理分析', '检查并保存结果']
     : kind === 'script' ? ['打开适用网页', '手动选择妙招', '查看页面效果'] : ['补充你的材料', '将提示词填入对话', '确认后发送'];
+  const updatedAt = item.updatedAt || item.date || '未提供';
+  const displayDate = /^\d{4}-\d{2}-\d{2}T/.test(updatedAt) ? new Date(updatedAt).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit' }) : updatedAt;
   return {
     kind, typeLabel: SKILL_TYPES.find(([value]) => value === kind)[1],
     category: SKILL_CATEGORIES.find(([value]) => value === item.category)?.[1] || '实用工具',
     author: item.author === 'Tabbit 官方' ? '官方' : item.author || '我',
-    version: item.version || '1.0', updatedAt: item.updatedAt || item.date || '未提供',
+    version: item.version || '1.0', updatedAt: displayDate,
     websites: Array.isArray(item.websites) && item.websites.length ? item.websites : ['全部网站'],
     prompt: item.prompt || item.description || '',
     taskDescription: item.taskDescription || item.description || '',

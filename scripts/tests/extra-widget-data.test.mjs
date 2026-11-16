@@ -22,7 +22,9 @@ test('expense amounts preserve decimal cents and reject ambiguous input', () => 
 test('quick links support web URLs and disallow executable or local schemes', () => {
   assert.equal(safeLink('example.com/path'), 'https://example.com/path');
   assert.equal(safeLink('https://example.com'), 'https://example.com/');
-  for (const value of ['javascript:alert(1)', 'file:///tmp/a', 'data:text/html,test', '']) assert.equal(safeLink(value), '');
+  assert.equal(safeLink(' example.com:8080/path '), 'https://example.com:8080/path');
+  assert.equal(safeLink('localhost:3000'), 'https://localhost:3000/');
+  for (const value of ['javascript:alert(1)', 'file:///tmp/a', 'data:text/html,test', 'mailto:test@example.com', 'javascript:foo@example.com', 'https://user:password@example.com', 'http:example.com', '']) assert.equal(safeLink(value), '');
 });
 test('time progress is computed from the actual selected period', () => {
   const value = timeProgress('day', new Date(2026, 10, 11, 12));

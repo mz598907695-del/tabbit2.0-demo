@@ -8,6 +8,9 @@ test('countdown validates dates and tracks calendar-day progress without time-of
   assert.equal(state.days,5); assert.equal(state.progress,.5);
   assert.equal(countdownState(config,new Date(2026,10,12)).days,-1);
   assert.equal(countdownState({targetDate:'2026-11-11'},new Date(2026,10,6)).progress,null);
+  const reversed=countdownState({startDate:'2026-11-15',targetDate:'2026-11-13'},new Date(2026,10,13));
+  assert.equal(reversed.error,'order'); assert.equal(reversed.progress,null); assert.equal(reversed.days,0);
+  assert.equal(countdownState({startDate:'2026-11-13',targetDate:'2026-11-13'}).error,null);
 });
 test('pomodoro stores a wall-clock deadline and transitions once after a background completion', () => {
   const config={minutes:25,remaining:1500,endAt:0};
@@ -51,4 +54,12 @@ test('conversion supports accurate offset temperatures and added dimensions', ()
   assert.equal(convertTaskValue('','time','h','s').result,null);
   assert.equal(convertTaskValue(1,'time','h','s').result,3600);
   assert.equal(convertTaskValue(1,'__proto__','h','s').error,'number');
+});
+test('conversion reports overflow and avoids overflowing safe intermediate calculations', () => {
+  assert.deepEqual(convertTaskValue(1e308,'temperature','c','f'),{result:null,error:'range'});
+  assert.deepEqual(convertTaskValue(1e308,'length','km','mm'),{result:null,error:'range'});
+  assert.equal(convertTaskValue(1e308,'length','km','km').result,1e308);
+  const fahrenheit=convertTaskValue(1e308,'temperature','f','c');
+  assert.equal(fahrenheit.error,null); assert.ok(Number.isFinite(fahrenheit.result));
+  assert.equal(fahrenheit.result,1e308*(5/9));
 });

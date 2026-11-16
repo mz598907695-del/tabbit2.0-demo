@@ -1,6 +1,8 @@
 /* V2 task widgets: the host owns the card surface. Controls and information
    reflow against this individual tile, never against the browser viewport. */
 .tw-widget .uw-main { gap:8px; }
+.tw-widget .tw-action { border-radius:999px; }
+.tw-widget .tw-icon-action { border-radius:50%; }
 .tw-widget :is(button,input,select,textarea) { font-family:inherit; }
 .tw-input,.tw-select,.tw-textarea { width:100%;min-width:0;border:1px solid var(--uw-line);border-radius:7px;background:var(--uw-track);color:inherit;padding:7px 9px;font:inherit;font-size:12px;line-height:1.4; }
 .tw-input::placeholder,.tw-textarea::placeholder { color:var(--uw-muted);opacity:.85; }
@@ -25,60 +27,70 @@
 .tw-detail .tw-input,.tw-detail .tw-select { min-height:36px;font-size:13px; }
 
 /* Countdown: a named event, one number, and elapsed calendar days. */
-.tw-countdown .uw-main { justify-content:center; }
+.tw-countdown .uw-main { justify-content:center;gap:10px; }
+.tw-countdown .tw-subline:not(.is-essential),.tw-countdown-progress { display:none; }
+.tw-countdown .tw-meta { font-size:10px;line-height:15px; }
 .tw-countdown-identity { flex:none;font-size:13px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
 .tw-countdown-number { --tw-countdown-size:55px;display:flex;align-items:flex-end;gap:6px;min-width:0;max-width:100%; }
 .tw-countdown-number .uw-dot-number { width:calc(var(--tw-countdown-size) * var(--uw-dot-aspect,1));height:auto;aspect-ratio:var(--uw-dot-aspect,auto);max-width:100%;flex:0 1 auto; }
 .tw-countdown-number .uw-dot-number.is-text { width:auto;aspect-ratio:auto; }
 .tw-countdown-number .uw-dot-number svg { height:auto; }
 .tw-countdown-number > .tw-countdown-unit { font-size:12px;line-height:16px;padding-bottom:2px;flex:none;color:var(--uw-muted); }
-.tw-countdown-progress { display:flex;height:30px;min-height:14px;max-width:200px;margin:4px 0; }
+.tw-countdown-progress { align-items:center;gap:10px;height:16px;min-height:14px;max-width:240px;margin:4px 0; }
+.tw-countdown-progress .uw-dots { flex:1;min-width:0; }
+.tw-countdown-progress > span { color:var(--uw-muted);font-size:10px; }
 .tw-countdown-progress .uw-dot-grid { max-width:200px; }
 
 /* Focus: exact time is central; ticks express elapsed time. */
 .tw-pomodoro .uw-main { align-items:center;justify-content:center;gap:6px; }
+.tw-card-phase { display:none; }
 .tw-segments { display:flex;gap:2px;padding:2px;width:max-content;max-width:100%;border:1px solid var(--uw-line);border-radius:20px;margin-inline:auto; }
 .tw-segments button { color:var(--uw-muted);background:transparent;border:0;border-radius:16px;padding:3px 11px;font-size:11px;line-height:17px;cursor:pointer; }
 .tw-segments button[aria-pressed=true] { background:var(--uw-track);color:inherit; }
 .tw-segments button:disabled { cursor:default; }
 .tw-timer-visual { display:flex;justify-content:center;align-items:center;flex:1;min-height:0;width:100%; }
-.tw-timer-visual .uw-tick-ring { width:min(100%,calc(100cqh - 133px));max-width:220px; }
+.tw-timer-visual .uw-tick-ring { width:min(100%,calc(100cqh - 108px));max-width:164px; }
 .tw-time-number { display:flex;width:100%;min-width:0;justify-content:center; }
 .tw-time-number .uw-dot-number { width:100%;height:38px; }
 .tw-timer-controls { display:flex;gap:6px;align-items:center;justify-content:center;flex:none; }
 .tw-timer-controls > .tw-action:first-child { min-width:75px; }
-.tw-timer-notice { font-size:10px;line-height:14px;color:var(--uw-accent);text-align:center;flex:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.tw-timer-notice { display:none;font-size:10px;line-height:14px;color:var(--uw-accent);text-align:center;flex:none;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .tw-timer-notice:empty { display:none; }
-.tw-timer-compact { display:none; }
+.tw-timer-compact { display:none;min-width:0;max-width:100%;gap:6px;align-items:baseline;justify-content:center; }
+.tw-timer-compact .uw-metric { max-width:100%; }
+.tw-timer-phase-label { color:var(--uw-muted);font-size:11px;line-height:16px; }
+.tw-timer-compact .tw-timer-split { display:none; }
 .tw-detail-ring { display:flex;align-items:center;justify-content:center; }
 .tw-detail-ring .tw-time-number .uw-dot-number { height:40px; }
 
-/* Random choice: selected dots correspond to the saved choice index. */
+/* Random choice: the selected answer and the next draw are the only focal points. */
 .tw-draw .uw-main { align-items:center;justify-content:center;gap:14px; }
-.tw-draw-dots { width:100%;height:30px;flex:none;max-width:120px; }
-.tw-draw-result { font-size:clamp(17px,9cqw,27px);line-height:1.5;font-weight:450;overflow-wrap:anywhere;text-align:center;min-width:0; }
+.tw-draw-result { font-size:clamp(17px,8cqw,24px);line-height:1.5;font-weight:450;overflow-wrap:anywhere;text-align:center;min-width:0; }
 .tw-draw .uw-main > .tw-draw-result { flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0;overflow:auto;scrollbar-width:thin; }
 .tw-detail .tw-draw-result { font-size:28px;padding:18px 0; }
-.tw-draw .tw-meta { text-align:center; }
+.tw-draw-action-row { display:flex;flex:none;align-items:center;justify-content:center;gap:10px;max-width:100%; }
+.tw-draw-action-row .tw-meta { display:none; }
 
 /* Notes remain real editors on the face, with scroll rather than line clamps. */
-.tw-note-editor { display:block;flex:1;min-width:0;min-height:0;width:100%;resize:none;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-size:14px;line-height:1.75;overflow:auto;scrollbar-width:thin; }
+.tw-note-editor { display:block;flex:1;min-width:0;min-height:0;width:100%;resize:none;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-size:13px;line-height:1.75;overflow:auto;scrollbar-width:thin; }
 .tw-note-editor::placeholder { color:var(--uw-muted);opacity:.85; }
 .tw-note-editor.is-detail { min-height:280px;resize:vertical;font-size:15px;padding:10px 12px;background:var(--uw-track);border-radius:9px; }
 .tw-note-compact { display:none; }
+.tw-note .tw-meta { display:none; }
 
 /* Calculator keeps the display compact enough for the full five-row keypad. */
 .tw-calculator .uw-main { gap:7px; }
 .tw-calculator-entry { display:flex;flex-direction:column;gap:4px;min-width:0;flex:none; }
 .tw-calculator-entry .tw-input { text-align:right;border:0;background:transparent;padding:0;line-height:20px;height:22px;font-size:12px;border-radius:3px; }
 .tw-calculator-entry output { display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;font-size:clamp(25px,11cqw,43px);line-height:1.15;letter-spacing:-.04em;font-weight:450; }
-.tw-calculator-card-keys { flex:1;min-height:0; }
+.tw-calculator-card-keys { display:none;flex:1;min-height:0; }
 .tw-calculator-keys { height:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));gap:4px; }
 .tw-calculator-keys button { display:flex;align-items:center;justify-content:center;min-width:0;min-height:19px;padding:1px;border:0;border-radius:6px;color:inherit;background:var(--uw-track);font-size:13px;line-height:17px;cursor:pointer; }
 .tw-calculator-keys button:hover { background:var(--uw-line); }
 .tw-calculator-keys button:disabled { cursor:default; }
 .tw-calculator-keys .is-equals { color:var(--uw-accent);background:color-mix(in srgb,var(--uw-accent) 15%,transparent);font-weight:600; }
-.tw-calculator-inline { display:none; }
+.tw-calculator .uw-main { justify-content:center; }
+.tw-calculator-inline { display:flex;justify-content:flex-end; }
 .tw-detail .tw-calculator-entry .tw-input { font-size:16px;line-height:26px;height:30px; }
 .tw-detail .tw-calculator-entry output { font-size:40px;white-space:normal;overflow-wrap:anywhere; }
 .tw-detail .tw-calculator-keys { height:auto;grid-template-rows:repeat(5,43px);gap:7px; }
@@ -92,243 +104,107 @@
 
 /* Conversion: editable quantity on top, converted quantity below. */
 .tw-converter .uw-main { justify-content:center;gap:9px; }
-.tw-converter-category { flex:none; }
+.tw-converter-category { display:none;flex:none; }
 .tw-converter-category > .tw-select-wrap { display:inline-block;width:auto;max-width:100%; }
 .tw-converter-category .tw-select { background:transparent;padding:3px 26px 3px 0;border:0; }
 .tw-converter-category .tw-select-wrap > svg { right:5px; }
-.tw-converter-card { min-width:0; }
+.tw-converter-card { min-width:0;width:100%; }
 .tw-converter-form { display:flex;flex-direction:column;gap:5px;min-width:0; }
-.tw-converter-row { display:grid;grid-template-columns:minmax(0,1fr) minmax(64px,34%);align-items:center;gap:8px;min-width:0; }
+.tw-converter-row { display:grid;grid-template-columns:minmax(0,1fr) 66px;align-items:center;gap:8px;min-width:0; }
 .tw-converter-row .tw-input { padding:5px 0;background:transparent;border:0;border-radius:3px;font-size:22px;line-height:28px;font-weight:450; }
-.tw-converter-row .tw-select { width:100%;font-size:12px;background:var(--uw-track);padding:5px 28px 5px 10px;border-color:transparent; }
+.tw-converter-row .tw-select { width:100%;font-size:12px;background:var(--uw-track);padding:5px 28px 5px 10px;border-color:transparent;border-radius:999px; }
 .tw-converter-row .tw-input[type=number] { appearance:textfield;-moz-appearance:textfield; }
 .tw-converter-row .tw-input::-webkit-inner-spin-button,.tw-converter-row .tw-input::-webkit-outer-spin-button { -webkit-appearance:none;margin:0; }
 .tw-converter-row output { font-size:26px;line-height:1.3;letter-spacing:-.025em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.tw-converter-direction { display:flex;align-items:center;gap:8px; }
-.tw-converter-direction > span { height:1px;flex:1;background:var(--uw-line); }
+.tw-converter-direction { display:flex;align-items:center;justify-content:center;gap:8px; }
+.tw-converter-direction > span { display:none; }
 .tw-converter-direction .tw-action { min-width:24px;min-height:24px;padding:3px;border:0; }
-.tw-converter-compact { display:none; }
-.tw-converter-compact .uw-metric { display:grid;grid-template-columns:minmax(0,1fr) auto;width:100%; }
-.tw-converter-compact .uw-metric strong { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+/* The summary is a complete equation; only micro columns reduce it to a result. */
+.tw-converter-compact { display:none;min-width:0;max-width:100%;gap:7px; }
+.tw-converter-source { display:inline-flex;align-items:baseline;gap:4px;min-width:0;color:var(--uw-muted);font-size:14px;line-height:20px; }
+.tw-converter-source > span { overflow-wrap:anywhere; }
+.tw-converter-source small { flex:none;font-size:11px; }
+.tw-converter-equals { color:var(--uw-muted);font-size:14px; }
+.tw-converter-compact .uw-metric { min-width:0;gap:4px; }
+.tw-converter-compact .uw-metric strong { font-size:29px; }
 .tw-detail .tw-converter-form { gap:8px; }
 .tw-detail .tw-converter-row { grid-template-columns:minmax(0,1fr) minmax(130px,44%); }
 .tw-detail .tw-converter-row .tw-input,.tw-detail .tw-converter-row output { font-size:32px; }
 .tw-detail .tw-select-wrap .tw-select { padding-right:32px; }
 .tw-detail .tw-converter-row .tw-select { font-size:13px;background:transparent;border-color:var(--uw-line); }
 
-/* To-do: completion and editing are direct manipulation, never fake previews. */
-.tw-todo .uw-main { gap:9px; }
-.tw-todo-summary { display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;font-size:11px;color:var(--uw-muted); }
-.tw-todo-summary .uw-dot-grid { width:65px;height:13px;flex:none; }
-.tw-todo-card-list { flex:1;min-height:0;overflow:auto;scrollbar-width:thin; }
-.tw-todo-list { margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;min-width:0; }
-.tw-todo-list li { display:flex;align-items:flex-start;gap:7px;font-size:12px;line-height:1.5;min-width:0; }
-.tw-todo-list input[type=checkbox] { flex:none;width:15px;height:15px;margin:3px 0 0;accent-color:var(--uw-accent);cursor:pointer; }
+/* Whole-row lists use their measured content height. Details retain every row. */
+.tw-todo .uw-main,.tw-timetable .uw-main { gap:8px; }
+.tw-todo-card-list { --tw-row-height:32px;flex:1;min-height:0;overflow:hidden; }
+.tw-todo-list { margin:0;padding:0;list-style:none;display:flex;flex-direction:column;min-width:0; }
+.tw-todo-list li { display:flex;align-items:center;gap:7px;min-width:0;font-size:12px;line-height:20px; }
+.tw-todo-card-list li { height:var(--tw-row-height);flex:none; }
+.tw-todo-list input[type=checkbox] { flex:none;width:15px;height:15px;margin:0;accent-color:var(--uw-accent);cursor:pointer; }
 .tw-todo-list li > span { min-width:0;flex:1;overflow-wrap:anywhere; }
-.tw-todo-card-list .tw-todo-list li > span { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden; }
-.tw-todo-card-list .tw-todo-list .tw-icon-action { opacity:0;transition:opacity .15s; }
-.tw-todo-card-list .tw-todo-list li:is(:hover,:focus-within) .tw-icon-action { opacity:.7; }
-@media (hover:none) { .tw-todo-card-list .tw-todo-list .tw-icon-action { opacity:.6; } }
-.tw-todo-list .is-done > span { color:var(--uw-muted);text-decoration:line-through;text-decoration-color:var(--uw-line); }
+.tw-todo-card-list li > span { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.tw-todo-list .is-done > span { color:var(--uw-muted);text-decoration:line-through; }
 .tw-todo-list .tw-icon-action { min-width:22px;min-height:22px;padding:3px;border:0;opacity:.55; }
-.tw-todo-list .tw-icon-action:hover { opacity:1; }
+.tw-todo-card-list .tw-icon-action { opacity:0; }
+.tw-todo-card-list li:is(:hover,:focus-within) .tw-icon-action { opacity:.7; }
+@media (hover:none) { .tw-todo-card-list .tw-icon-action { opacity:.6; } }
 .tw-card-add { flex:none; }
+.tw-list-footer { display:flex;flex:none;align-items:center;justify-content:space-between;gap:8px;min-height:26px; }
+.tw-add-trigger,.tw-more { display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:26px;padding:2px 0;border:0;background:transparent;color:var(--uw-muted);font:inherit;font-size:11px;line-height:18px;white-space:nowrap;cursor:pointer; }
+.tw-add-trigger svg { flex:none; }
+.tw-add-trigger:hover,.tw-more:hover { color:inherit; }
+.tw-add-trigger:disabled,.tw-more:disabled { opacity:.45;cursor:default; }
+.tw-more { font-size:10px; }
 .tw-add-line { display:flex;align-items:center;gap:5px;min-width:0; }
 .tw-add-line .tw-input { flex:1;min-width:0;padding:5px 7px;line-height:18px; }
-.tw-add-line .tw-icon-action { width:29px;height:29px; }
-.tw-todo-compact { display:none; }
+.tw-add-line .tw-icon-action { width:26px;min-width:26px;height:26px;min-height:26px; }
+.tw-card-add .tw-input { background:transparent;border-color:transparent;border-bottom-color:var(--uw-line);border-radius:0;padding:4px 0;font-size:11px; }
+.tw-todo-compact { display:none;gap:7px;min-width:0; }
+.tw-todo-compact-count { display:flex;align-items:baseline;gap:5px;min-width:0; }
+.tw-todo-compact .uw-metric strong { font-size:32px; }
+.tw-strip-unit { color:var(--uw-muted);font-size:10px;line-height:15px; }
+.tw-todo-next { color:var(--uw-muted);font-size:12px;line-height:18px;overflow:hidden;text-overflow:ellipsis; }
+.tw-todo-card-list > .tw-empty { padding-top:2px; }
 .tw-detail .tw-todo-list { gap:14px; }
 .tw-detail .tw-todo-list li { display:grid;grid-template-columns:17px minmax(0,1fr) auto auto;align-items:center;gap:10px;font-size:14px; }
-.tw-detail .tw-todo-list input[type=checkbox] { width:17px;height:17px;margin:0; }
+.tw-detail .tw-todo-list input[type=checkbox] { width:17px;height:17px; }
 .tw-detail .tw-todo-list .tw-icon-action { min-width:27px;min-height:27px; }
 .tw-detail .tw-todo-list .tw-input { flex:1; }
 
-/* Classes: a selected weekday and a time-ordered list. */
-.tw-timetable .uw-main { gap:10px; }
+.tw-card-weekdays { flex:none; }
+.tw-day-label { display:none;color:var(--uw-muted);font-size:10px;line-height:14px; }
 .tw-weekdays { display:flex;align-items:center;justify-content:space-between;gap:2px;min-width:0; }
-.tw-weekdays button { display:flex;align-items:center;justify-content:center;flex:1;min-width:0;padding:3px 0;border:0;border-radius:50%;aspect-ratio:1;max-width:30px;color:var(--uw-muted);background:transparent;font-size:11px;line-height:16px;cursor:pointer; }
+.tw-weekdays button { display:flex;align-items:center;justify-content:center;flex:1;min-width:0;max-width:28px;min-height:26px;aspect-ratio:1;padding:2px 0;border:0;border-radius:50%;color:var(--uw-muted);background:transparent;font-size:11px;line-height:16px;cursor:pointer; }
 .tw-weekdays button[aria-pressed=true] { background:var(--uw-track);color:inherit; }
 .tw-weekdays button:disabled { cursor:default; }
-.tw-lesson-card-list { flex:1;min-height:0;overflow:auto;scrollbar-width:thin; }
-.tw-lesson-list { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px;min-width:0; }
+.tw-lesson-card-list { --tw-row-height:44px;flex:1;min-height:0;overflow:hidden; }
+.tw-lesson-list { list-style:none;padding:0;margin:0;display:flex;flex-direction:column;min-width:0; }
 .tw-lesson-list li { display:flex;align-items:flex-start;gap:10px;min-width:0; }
-.tw-lesson-time { display:flex;flex-direction:column;gap:3px;color:var(--uw-muted);font-size:11px;line-height:1.3;flex:none; }
+.tw-lesson-card-list li { flex:none;height:var(--tw-row-height);padding:3px 0; }
+.tw-lesson-time { display:flex;flex-direction:column;gap:3px;color:var(--uw-muted);font-size:11px;line-height:15px;flex:none;font-variant-numeric:tabular-nums; }
 .tw-lesson-time small { font-size:10px;opacity:.7; }
-.tw-lesson-copy { display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;border-left:1px solid var(--uw-line);padding-left:10px; }
-.tw-lesson-copy strong { font-size:13px;line-height:1.4;font-weight:500;overflow-wrap:anywhere; }
-.tw-lesson-copy > span { font-size:11px;line-height:1.5;color:var(--uw-muted);overflow-wrap:anywhere; }
+.tw-lesson-copy { display:flex;flex-direction:column;gap:2px;min-width:0;flex:1; }
+.tw-lesson-copy strong { font-size:12px;line-height:18px;font-weight:450;overflow-wrap:anywhere; }
+.tw-lesson-copy > span { font-size:10px;line-height:14px;color:var(--uw-muted);overflow-wrap:anywhere; }
+.tw-lesson-card-list .tw-lesson-copy > * { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
 .tw-lesson-heading { display:flex;gap:12px;align-items:center;justify-content:space-between; }
 .tw-lesson-heading strong { font-size:14px;font-weight:500; }
-.tw-lesson-compact { display:none; }
+.tw-lesson-compact { display:none;min-width:0;gap:5px; }
+.tw-lesson-compact strong { min-width:0;font-size:13px;line-height:20px;font-weight:450;overflow:hidden;text-overflow:ellipsis; }
+.tw-lesson-compact > span { color:var(--uw-muted);font-size:11px;line-height:16px; }
 .tw-detail .tw-weekdays { gap:8px; }
 .tw-detail .tw-weekdays button { max-width:42px;font-size:12px; }
+.tw-detail .tw-lesson-list { gap:16px; }
 .tw-detail .tw-lesson-time { font-size:12px; }
 .tw-detail .tw-lesson-copy strong { font-size:14px; }
 .tw-detail .tw-lesson-copy > span { font-size:12px; }
 .tw-detail .tw-lesson-list .tw-action { min-width:26px;min-height:26px;border:0;padding:4px; }
 
-/* Modest tiles have one focus and retain usable actions. */
-@container uw (max-width:210px) {
-  .tw-widget .uw-main { gap:6px; }
-  .tw-countdown-number { --tw-countdown-size:45px; }
-  .tw-draw .uw-main { gap:9px; }
-  .tw-draw-dots { max-width:90px;height:23px; }
-  .tw-draw-result { font-size:19px; }
-  .tw-note-editor { font-size:13px;line-height:1.6; }
-  .tw-converter-row { grid-template-columns:minmax(0,1fr) minmax(60px,36%);gap:5px; }
-  .tw-converter-row .tw-select { font-size:11px;padding-left:7px;padding-right:24px; }
-  .tw-converter-row .tw-select-wrap > svg { right:6px;width:12px; }
-  .tw-converter-row .tw-input,.tw-converter-row output { font-size:21px; }
-  .tw-weekdays { gap:1px; }
-  .tw-weekdays button { font-size:10px; }
-  .tw-lesson-list li { gap:7px; }
-  .tw-lesson-copy { padding-left:7px; }
-  .tw-lesson-copy strong { font-size:12px; }
-  .tw-todo-list li { gap:5px; }
-  .tw-todo-summary .uw-dot-grid { width:42px; }
-}
-@container uw (max-height:240px) {
-  .tw-card-phase { display:none; }
-  .tw-timer-visual .uw-tick-ring { width:min(100%,calc(100cqh - 104px)); }
-  .tw-timer-notice { display:none; }
-  .tw-calculator-card-keys { display:none; }
-  .tw-calculator .uw-main { justify-content:center; }
-  .tw-calculator-inline { display:flex;justify-content:flex-end; }
-  .tw-countdown-progress { height:22px;margin:0; }
-}
-@container uw (max-height:210px) {
-  .tw-timer-visual { display:none; }
-  .tw-timer-compact { display:flex;align-items:baseline;gap:6px;justify-content:center;min-width:0; }
-  .tw-timer-compact > span { font-size:11px;color:var(--uw-muted); }
-  .tw-timer-compact .uw-metric strong { font-size:clamp(27px,16cqw,38px); }
-  .tw-converter-category { display:none; }
-  .tw-todo-summary { display:none; }
-  .tw-countdown .uw-main { display:grid;grid-template-columns:minmax(0,1fr) fit-content(56%);grid-template-rows:auto auto;align-content:center;column-gap:16px;row-gap:4px; }
-  .tw-countdown-identity { grid-column:1;grid-row:1;font-size:12px; }
-  .tw-countdown .tw-subline { grid-column:1;grid-row:2;font-size:10px; }
-  .tw-countdown-number { grid-column:2;grid-row:1 / span 2;align-self:center;align-items:flex-end;justify-content:flex-end;gap:6px; }
-  .tw-countdown-number { --tw-countdown-size:48px; }
-  .tw-countdown .tw-meta,.tw-countdown-progress { display:none; }
-  .tw-draw-dots { display:none; }
-  .tw-draw .tw-meta { display:none; }
-}
-@container uw (max-height:160px) {
-  .tw-timer-visual { display:none; }
-  .tw-timer-compact { display:flex;align-items:baseline;gap:5px;justify-content:center;min-width:0; }
-  .tw-timer-compact > span { font-size:10px;color:var(--uw-muted); }
-  .tw-timer-compact .uw-metric strong { font-size:clamp(24px,16cqw,34px); }
-  .tw-timer-controls .tw-action { min-height:24px;padding:3px 6px;font-size:10px; }
-  .tw-timer-controls > .tw-action:first-child { min-width:54px; }
-  .tw-timer-controls .tw-icon-action { min-width:24px;width:24px; }
-  .tw-note .tw-meta { display:none; }
-  .tw-calculator-inline { display:none; }
-  .tw-calculator-entry { gap:2px; }
-  .tw-converter-card { display:none; }
-  .tw-converter-compact { display:flex;flex-direction:column;gap:4px;min-width:0; }
-  .tw-converter-compact > span { color:var(--uw-muted);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-todo-card-list,.tw-card-add,.tw-card-weekdays,.tw-lesson-card-list,.tw-timetable .tw-card-action { display:none; }
-  .tw-todo-compact { display:flex;gap:5px;min-width:0;flex-direction:column; }
-  .tw-todo-compact > span { color:var(--uw-muted);font-size:11px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-lesson-compact { display:flex;flex-direction:column;gap:3px;min-width:0; }
-  .tw-lesson-compact strong { font-size:13px;font-weight:500;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-lesson-compact > span { font-size:10px;color:var(--uw-muted);line-height:1.4; }
-}
-@container uw (max-width:150px) {
-  .tw-widget .uw-layout { gap:6px; }
-  .tw-widget .uw-main { gap:5px; }
-  .tw-countdown .uw-main { display:flex;flex-direction:column;align-items:flex-start;justify-content:center; }
-  .tw-countdown-number { justify-content:flex-start; }
-  .tw-countdown-number { --tw-countdown-size:34px; }
-  .tw-countdown-number > .tw-countdown-unit { font-size:10px; }
-  .tw-countdown .tw-subline,.tw-countdown .tw-meta,.tw-countdown-progress { display:none; }
-  .tw-countdown-identity { font-size:10px;line-height:14px;max-width:100%; }
-  .tw-timer-visual,.tw-card-phase { display:none; }
-  .tw-timer-compact { display:flex;flex-direction:column;gap:4px;align-items:center; }
-  .tw-timer-compact > span { display:none; }
-  .tw-timer-compact .uw-metric strong { font-size:27px; }
-  .tw-timer-controls { gap:4px; }
-  .tw-timer-controls > .tw-action:first-child { min-width:51px; }
-  .tw-timer-controls .tw-action { padding:3px 5px;min-height:24px;font-size:10px; }
-  .tw-timer-controls .tw-icon-action { min-width:24px;width:24px; }
-  .tw-draw .uw-main { gap:6px; }
-  .tw-draw-result { font-size:13px;line-height:1.4; }
-  .tw-draw-dots,.tw-draw .tw-meta { display:none; }
-  .tw-draw .tw-action { font-size:10px;padding:3px 5px;min-height:25px; }
-  .tw-draw .tw-action svg { width:12px;height:12px; }
-  .tw-note-editor { font-size:12px;line-height:1.6; }
-  .tw-note .tw-meta { display:none; }
-  .tw-calculator-card-keys { display:none; }
-  .tw-calculator-inline { display:flex; }
-  .tw-calculator-entry output { font-size:27px; }
-  .tw-converter-card,.tw-converter-category { display:none; }
-  .tw-converter-compact { display:flex;flex-direction:column;gap:5px; }
-  .tw-converter-compact > span { font-size:10px;color:var(--uw-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-converter-compact .uw-metric { flex-wrap:wrap;gap:3px; }
-  .tw-converter-compact .uw-metric strong { font-size:25px; }
-  .tw-todo-summary,.tw-todo-card-list,.tw-card-add,.tw-card-weekdays,.tw-lesson-card-list,.tw-timetable .tw-card-action { display:none; }
-  .tw-todo-compact { display:flex;flex-direction:column;gap:5px; }
-  .tw-todo-compact > span { font-size:11px;color:var(--uw-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-lesson-compact { display:flex;flex-direction:column;gap:3px;min-width:0; }
-  .tw-lesson-compact strong { font-size:12px;font-weight:500;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-lesson-compact > span { font-size:10px;color:var(--uw-muted);line-height:1.4; }
-}
-@container uw (max-width:150px) and (max-height:160px) {
-  .tw-calculator-inline { display:none; }
-}
-/* Very short or single-cell cards become a glanceable value plus the same
-   full-detail action. No essential control is squeezed into a clipped row. */
-@container uw (max-height:90px) {
-  .tw-widget .uw-main { justify-content:center; }
-  .tw-countdown-identity,.tw-countdown .tw-subline,.tw-card-phase,.tw-timer-controls,.tw-timer-visual,.tw-timer-notice,.tw-draw-dots,.tw-draw .tw-card-action,.tw-draw .tw-meta,.tw-calculator-entry .tw-input,.tw-calculator-inline,.tw-calculator-card-keys,.tw-converter-category,.tw-converter-card,.tw-converter-compact > span,.tw-todo-summary,.tw-todo-card-list,.tw-card-add,.tw-todo-compact > span,.tw-card-weekdays,.tw-lesson-card-list,.tw-timetable .tw-card-action,.tw-lesson-compact > span { display:none; }
-  .tw-countdown .uw-main { display:flex; }
-  .tw-countdown-number .uw-dot-number { width:auto;max-width:100%;height:auto;aspect-ratio:auto; }
-  .tw-countdown-number .uw-dot-fallback { font-size:23px; }
-  .tw-timer-compact { display:flex; }
-  .tw-timer-compact .uw-metric strong { font-size:23px; }
-  .tw-draw .uw-main > .tw-draw-result { flex:none;font-size:12px;line-height:1.4;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left; }
-  .tw-note-editor { display:none; }
-  .tw-note-compact { display:block;font-size:12px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-  .tw-note .tw-meta { display:none; }
-  .tw-calculator-entry output { text-align:left;font-size:23px; }
-  .tw-converter-compact,.tw-todo-compact { display:flex; }
-  .tw-converter-compact .uw-metric strong { font-size:23px; }
-  .tw-lesson-compact { display:flex; }
-  .tw-lesson-compact strong { font-size:12px; }
-  .tw-widget .tw-error { display:none; }
-}
-@container uw (max-width:100px) {
-  .tw-countdown-number .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
-  .tw-countdown-number .uw-dot-fallback { font-size:22px; }
-  .tw-countdown-identity { display:none; }
-  .tw-timer-controls,.tw-draw .tw-card-action { display:none; }
-  .tw-timer-compact .uw-metric strong { font-size:clamp(15px,25cqw,23px); }
-  .tw-draw .uw-main > .tw-draw-result { font-size:12px; }
-  .tw-calculator-entry .tw-input,.tw-calculator-inline { display:none; }
-  .tw-calculator-entry output { font-size:22px; }
-  .tw-converter-compact .uw-metric strong { font-size:22px; }
-  .tw-lesson-compact strong { white-space:normal;overflow-wrap:anywhere; }
-}
-@container uw (max-width:130px) and (max-height:65px) {
-  .tw-widget .uw-layout { position:relative;flex-direction:row;align-items:center;padding:7px 10px;gap:0; }
-  .tw-widget .uw-header { flex:none;width:0;min-height:0;height:0; }
-  .tw-widget .uw-title { display:none; }
-  .tw-widget .uw-expand { top:calc(50% - 11px);right:8px;width:22px;height:22px; }
-  .tw-widget .uw-main { margin-right:27px;min-width:0; }
-  .tw-countdown-number .uw-dot-fallback,.tw-timer-compact .uw-metric strong,.tw-converter-compact .uw-metric strong,.tw-todo-compact .uw-metric strong,.tw-calculator-entry output { font-size:21px; }
-  .tw-timer-compact { align-items:flex-start; }
-  .tw-countdown-number > .tw-countdown-unit,.tw-converter-compact .uw-metric > span { font-size:10px; }
-}
-@container uw (max-width:70px) and (max-height:65px) {
-  .tw-widget .uw-layout { padding:5px; }
-  .tw-widget .uw-main { margin-right:20px; }
-  .tw-widget .uw-expand { width:18px;height:18px;top:calc(50% - 9px);right:3px; }
-  .tw-widget .uw-expand svg { width:11px;height:11px; }
-  .tw-countdown-number .uw-dot-fallback,.tw-timer-compact .uw-metric strong,.tw-converter-compact .uw-metric strong,.tw-todo-compact .uw-metric strong,.tw-calculator-entry output { font-size:14px; }
-  .tw-countdown-number > .tw-countdown-unit,.tw-converter-compact .uw-metric > span { display:none; }
-  .tw-timer-compact .uw-metric strong { font-size:10px; }
-  .tw-lesson-compact strong,.tw-note-compact,.tw-draw .uw-main > .tw-draw-result { font-size:10px;white-space:nowrap; }
-}
-
+/* Main readouts share the dot alphabet; editable values keep normal type. */
+.tw-calculator-entry output,.tw-converter-row output { display:flex;align-items:center; }
+.tw-calculator-entry output { justify-content:flex-end; }
+.tw-converter-row output { justify-content:flex-start; }
+.tw-calculator-entry output .uw-dot-number,.tw-converter-row output .uw-dot-number { display:block;flex:none;width:calc(1em * var(--uw-dot-aspect,2));height:1em;max-width:100%;aspect-ratio:var(--uw-dot-aspect,2); }
+.tw-calculator-entry output .uw-dot-fallback,.tw-converter-row output .uw-dot-fallback { font-size:inherit;line-height:1; }
 
 /* Detail pages share the same information order: current state, controls, then
    preferences. These blocks are outside the face's size container. */
@@ -368,47 +244,6 @@
 .tw-detail .tw-empty { text-align:center;padding:20px 12px; }
 .tw-detail .tw-note-editor.is-detail { min-height:240px;padding:16px;font-size:15px;line-height:1.9; }
 
-/* A wider face uses the room for readable information rather than larger type. */
-@container uw (min-width:280px) and (min-height:161px) {
-  .tw-converter-category { display:block; }
-  .tw-converter .uw-main { gap:6px; }
-  .tw-converter-form { gap:3px; }
-  .tw-converter-row { grid-template-columns:minmax(0,1fr) 78px; }
-  .tw-converter-row .tw-input,.tw-converter-row output { font-size:25px; }
-  .tw-converter-direction .tw-action { min-height:22px; }
-  .tw-todo-summary { display:flex; }
-  .tw-todo-summary .uw-dot-grid { width:74px; }
-  .tw-todo .uw-main { gap:7px; }
-}
-/* A short, wide converter places the two quantities side by side, keeping
-   both native unit selectors and the swap action within the available height. */
-@container uw (min-width:280px) and (min-height:161px) and (max-height:210px) {
-  .tw-converter-card .tw-converter-form { display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:8px;align-items:center; }
-  .tw-converter-card .tw-converter-row { grid-template-columns:minmax(0,1fr);gap:4px; }
-  .tw-converter-card .tw-converter-row .tw-input,.tw-converter-card .tw-converter-row output { height:34px;line-height:34px;padding:0;font-size:25px; }
-  .tw-converter-card .tw-converter-direction { justify-content:center; }
-  .tw-converter-card .tw-converter-direction > span { display:none; }
-}
-@container uw (max-width:210px) and (min-width:151px) and (min-height:161px) {
-  .tw-todo-card-list .tw-todo-list { gap:6px; }
-  .tw-todo-card-list .tw-todo-list li { font-size:11px;line-height:1.5; }
-  .tw-todo-card-list .tw-todo-list .tw-icon-action { display:none; }
-  .tw-lesson-copy > span,.tw-lesson-time small { display:none; }
-  .tw-weekdays button { font-size:10px; }
-  .tw-weekdays { gap:1px; }
-}
-@container uw (max-width:150px) and (min-height:211px) {
-  .tw-todo-compact > span { display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;white-space:normal;line-height:1.6; }
-  .tw-lesson-compact strong { white-space:normal;overflow-wrap:anywhere;line-height:1.6; }
-  .tw-converter-compact > span { white-space:normal;overflow-wrap:anywhere; }
-}
-@container uw (max-width:70px) and (min-height:66px) {
-  .tw-todo-compact .uw-metric strong,.tw-converter-compact .uw-metric strong,.tw-calculator-entry output { font-size:16px; }
-  .tw-converter-compact .uw-metric { display:flex;flex-direction:column;align-items:flex-start;gap:3px; }
-  .tw-converter-compact .uw-metric > span { margin-left:0;font-size:10px; }
-  .tw-converter-compact > span,.tw-todo-compact > span { display:none; }
-  .tw-lesson-compact > span { display:none; }
-}
 @media (max-width:480px) {
   .tw-detail.uw-stack { gap:16px; }
   .tw-detail .tw-converter-row { grid-template-columns:minmax(0,1fr) minmax(112px,48%);gap:8px; }
@@ -422,220 +257,258 @@
   .tw-timetable-detail-summary { padding:12px; }
 }
 
-/* Editorial faces: one prominent reading, restrained marks and quiet controls.
-   The containing board still owns every outer surface and card radius. */
-.tw-countdown-progress { align-items:center;gap:10px; }
-.tw-countdown-progress .uw-dots { flex:1;min-width:0; }
-.tw-countdown-progress > span { flex:none;color:var(--uw-muted);font-size:10px;line-height:14px;font-variant-numeric:tabular-nums; }
-@container uw (min-width:151px) and (min-height:161px) {
-  .tw-widget .tw-action { border-radius:999px;background:color-mix(in srgb,currentColor 2%,transparent);border-color:color-mix(in srgb,currentColor 10%,transparent); }
-  .tw-widget .tw-action:hover { background:var(--uw-track); }
-  .tw-widget .tw-icon-action { border-radius:50%; }
-  .tw-draw-dots { height:18px;max-width:92px;opacity:.85; }
-  .tw-draw-result { font-weight:500;letter-spacing:-.025em; }
-  .tw-draw .tw-card-action { padding-top:2px; }
-  .tw-draw .tw-meta { font-size:10px;letter-spacing:.02em; }
-  .tw-note-editor { line-height:1.8;letter-spacing:.005em; }
-  .tw-note .tw-meta { padding-top:6px;font-size:10px; }
-  .tw-converter-category .tw-select { color:var(--uw-muted);font-size:11px; }
-  .tw-converter-row .tw-select { border-radius:999px;background:color-mix(in srgb,currentColor 4%,transparent); }
-  .tw-converter-row output,.tw-converter-row .tw-input { font-weight:450;font-variant-numeric:tabular-nums;letter-spacing:-.04em; }
-  .tw-converter-direction > span { background:color-mix(in srgb,currentColor 8%,transparent); }
-  .tw-converter-direction .tw-action { background:transparent; }
-  .tw-todo-card-list .tw-todo-list { gap:0; }
-  .tw-todo-card-list .tw-todo-list li { padding:6px 0;border-bottom:1px solid color-mix(in srgb,currentColor 6%,transparent);align-items:center; }
-  .tw-todo-card-list .tw-todo-list li:last-child { border-bottom:0; }
-  .tw-todo-card-list .tw-todo-list input[type=checkbox] { margin:0; }
-  .tw-todo-card-list .tw-todo-list .tw-icon-action { background:transparent; }
-  .tw-card-add .tw-add-line { gap:6px; }
-  .tw-card-add .tw-input { background:transparent;border-color:transparent;border-bottom-color:var(--uw-line);border-radius:0;padding:5px 0;font-size:11px; }
-  .tw-todo-summary { font-size:10px;letter-spacing:.01em; }
-  .tw-card-weekdays .tw-weekdays { padding:2px;background:color-mix(in srgb,currentColor 3%,transparent);border-radius:999px; }
-  .tw-card-weekdays .tw-weekdays button[aria-pressed=true] { background:color-mix(in srgb,currentColor 8%,transparent); }
-  .tw-lesson-card-list .tw-lesson-list { gap:12px;padding-top:2px; }
-  .tw-lesson-card-list .tw-lesson-copy { border-left-color:color-mix(in srgb,currentColor 9%,transparent); }
-  .tw-lesson-card-list .tw-lesson-time { font-variant-numeric:tabular-nums; }
-  .tw-timetable .tw-card-action { justify-content:flex-start; }
-  .tw-timetable .tw-card-action .tw-action { font-size:11px; }
+/* Regular and tall cards: editable quantities and complete lists. */
+@container uw (min-width:151px) and (min-height:230px) {
+  .tw-calculator .uw-main { gap:6px;justify-content:flex-start; }
+  .tw-calculator-card-keys { display:block; }
+  .tw-calculator-inline { display:none; }
+  .tw-calculator .uw-main > .tw-calculator-entry { display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);align-items:center;gap:8px; }
+  .tw-calculator .uw-main > .tw-calculator-entry .tw-input { text-align:left;font-size:11px;height:24px;line-height:24px;color:var(--uw-muted); }
+  .tw-calculator .uw-main > .tw-calculator-entry output { font-size:28px;line-height:32px; }
+  .tw-calculator .uw-main > .tw-calculator-entry[data-long-result=true] { grid-template-columns:minmax(0,1fr);gap:0; }
+  .tw-calculator .uw-main > .tw-calculator-entry[data-long-result=true] .tw-input { height:16px;line-height:16px; }
+  .tw-calculator-keys button { border-radius:8px;min-height:18px; }
 }
-@container uw (min-width:211px) and (min-height:211px) {
-  .tw-countdown .uw-main { justify-content:flex-start;gap:6px; }
-  .tw-countdown-identity { font-size:13px;font-weight:450;line-height:20px; }
-  .tw-countdown-number { align-items:flex-end;gap:6px;margin-top:2px; }
+@container uw (min-width:191px) and (min-height:300px) {
+  .tw-countdown .uw-main { justify-content:flex-start; }
   .tw-countdown-number { --tw-countdown-size:65px; }
-  .tw-countdown-number > .tw-countdown-unit { padding-bottom:3px;font-size:12px; }
-  .tw-countdown .tw-subline { font-size:11px;line-height:16px; }
-  .tw-countdown-progress { flex:none;max-width:none;height:16px;min-height:0;margin:6px 0 0; }
-  .tw-countdown-progress .uw-dots { gap:4px;justify-content:space-between; }
-  .tw-countdown-progress .uw-dots i { max-width:4px; }
-  .tw-countdown .tw-meta { margin-top:auto;font-size:10px;line-height:15px; }
-  .tw-draw .uw-main { gap:12px; }
-  .tw-draw .tw-draw-result { font-size:23px;line-height:1.45; }
-  .tw-draw .tw-action { padding-inline:12px;min-height:29px;font-size:11px; }
-  .tw-note-editor { font-size:14px; }
-  .tw-converter .uw-main { justify-content:space-between;gap:10px; }
+  .tw-countdown-progress { display:flex;margin-top:auto; }
+  .tw-countdown .tw-meta { margin-top:4px; }
+  .tw-card-phase { display:block; }
+  .tw-timer-notice:not(:empty) { display:block; }
+  .tw-timer-visual .uw-tick-ring { width:min(100%,calc(100cqh - 145px));max-width:220px; }
+  .tw-draw-action-row .tw-meta { display:block;font-size:10px; }
+  .tw-note .tw-meta { display:block;font-size:10px; }
+  .tw-note-count { display:none; }
+  .tw-converter-category { display:block; }
   .tw-converter-card { margin-block:auto; }
-  .tw-converter-form { gap:8px; }
-  .tw-converter-row .tw-input { font-size:29px;line-height:36px;padding-block:0; }
-  .tw-converter-row output { font-size:32px;line-height:36px; }
-  .tw-converter-row .tw-select { min-height:28px;font-size:11px; }
-  .tw-todo .uw-main { gap:8px; }
-  .tw-todo-card-list .tw-todo-list li { min-height:31px; }
-  .tw-todo-card-list .tw-todo-list li > span { font-size:12px;line-height:18px; }
-  .tw-todo-card-list .tw-todo-list .tw-icon-action { min-height:20px;min-width:20px;width:20px;padding:2px; }
-  .tw-timetable .uw-main { gap:10px; }
-  .tw-lesson-copy strong { font-size:13px;line-height:19px; }
-  .tw-lesson-copy > span { font-size:10px;line-height:15px; }
+  .tw-converter-row .tw-input { font-size:27px;line-height:34px; }
+  .tw-converter-row output { font-size:31px;line-height:36px; }
 }
-/* At regular card height the ring is the focus; mode tabs remain in details.
-   Taller faces can afford both, while short faces retain the tested summary. */
-@container uw (min-width:151px) and (min-height:211px) and (max-height:280px) {
-  .tw-card-phase { display:none; }
-  .tw-pomodoro .uw-main { gap:7px; }
-  .tw-timer-visual { flex:1;min-height:0; }
-  .tw-timer-visual .uw-tick-ring { width:min(100%,calc(100cqh - 108px));max-width:162px; }
-  .tw-time-number .uw-dot-number { height:34px; }
-  .tw-ring-caption { font-size:10px;line-height:14px; }
-  .tw-timer-controls .tw-action { min-height:28px;padding:4px 10px;font-size:11px; }
-  .tw-timer-controls .tw-icon-action { width:28px;min-width:28px;padding:5px; }
+
+/* A wide face puts the event and its value, or two quantities, in separate groups. */
+@container uw (min-width:300px) and (min-height:161px) and (max-height:299px) {
+  .tw-countdown .uw-main { display:grid;grid-template-columns:minmax(0,1fr) fit-content(55%);grid-template-rows:auto auto;align-content:center;column-gap:16px;row-gap:6px; }
+  .tw-countdown-identity { grid-column:1;grid-row:1; }
+  .tw-countdown-number { grid-column:2;grid-row:1 / span 2;align-self:center;--tw-countdown-size:56px; }
+  .tw-countdown .tw-meta,.tw-countdown .tw-subline.is-essential { grid-column:1;grid-row:2;margin:0; }
+  .tw-countdown .uw-main:has(.tw-subline.is-essential) .tw-meta { display:none; }
+  .tw-converter-category { display:none; }
+  .tw-converter-card .tw-converter-form { display:grid;grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);align-items:center;gap:12px; }
+  .tw-converter-card .tw-converter-row { display:flex;flex-direction:column;align-items:stretch;gap:6px; }
+  .tw-converter-card .tw-converter-row .tw-input,.tw-converter-card .tw-converter-row output { height:34px;padding:0;font-size:27px;line-height:34px; }
+  .tw-converter-card .tw-select-wrap { width:100%;max-width:110px; }
+}
+@container uw (min-width:340px) and (min-height:211px) and (max-height:299px) {
+  .tw-pomodoro .uw-main { display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px; }
+  .tw-timer-visual .uw-tick-ring { width:min(100%,calc(100cqh - 82px));max-width:180px; }
+  .tw-timer-controls { flex-direction:column; }
+  .tw-timer-controls .tw-icon-action { border-color:transparent; }
   .tw-timer-notice { display:none; }
 }
-@container uw (min-width:151px) and (min-height:241px) {
-  .tw-calculator .uw-main { gap:8px; }
-  .tw-calculator-entry { gap:2px; }
-  .tw-calculator-entry .tw-input { height:18px;line-height:18px;font-size:11px;color:var(--uw-muted); }
-  .tw-calculator-entry output { font-size:31px;line-height:35px; }
-  .tw-calculator-keys { gap:4px; }
-  .tw-calculator-keys button { border-radius:999px;background:color-mix(in srgb,currentColor 4%,transparent);font-size:12px;line-height:17px;min-height:18px; }
-  .tw-calculator-keys button:hover { background:var(--uw-line); }
-  .tw-calculator-keys .is-equals { background:color-mix(in srgb,var(--uw-accent) 14%,transparent);color:var(--uw-accent); }
+
+/* Short cards keep the answer and one action; full controls remain in details. */
+@container uw (max-height:229px) {
+  .tw-countdown-number { --tw-countdown-size:45px; }
+  .tw-countdown .tw-meta { display:none; }
+  .tw-timer-visual { display:none; }
+  .tw-timer-compact { display:flex; }
+  .tw-timer-compact .uw-metric strong { font-size:34px; }
+  .tw-timer-notice { display:none; }
+  .tw-converter-card { display:none; }
+  .tw-converter-compact { display:flex;flex-direction:column;align-items:flex-start; }
+  .tw-converter-equals { display:none; }
+  .tw-converter-source::after { content:'=';margin-left:3px; }
 }
-@container uw (min-width:151px) and (max-width:210px) and (min-height:161px) and (max-height:210px) {
-  .tw-todo-card-list .tw-todo-list li { padding:4px 0; }
-  .tw-draw .uw-main { gap:8px; }
-  .tw-draw .tw-draw-result { font-size:18px;line-height:1.45; }
-  .tw-timetable .tw-card-action .tw-action { min-height:26px;padding:3px 8px; }
+@container uw (max-height:210px) {
+  .tw-widget .uw-main { gap:6px; }
+  .tw-card-weekdays .tw-weekdays { display:none; }
+  .tw-day-label { display:block; }
+  .tw-todo-card-list { --tw-row-height:28px; }
+  .tw-lesson-card-list { --tw-row-height:30px; }
+  .tw-lesson-card-list .tw-lesson-copy > span,.tw-lesson-card-list .tw-lesson-time small { display:none; }
+  .tw-lesson-card-list li { align-items:center;padding:3px 0; }
+}
+@container uw (min-width:300px) and (min-height:161px) and (max-height:229px) {
+  .tw-converter-card { display:block; }
+  .tw-converter-compact { display:none; }
+  .tw-pomodoro .uw-main { flex-direction:row;justify-content:space-between;gap:12px; }
+  .tw-timer-controls { flex-direction:row; }
+  .tw-countdown .tw-meta { display:block; }
+}
+@container uw (max-height:160px) {
+  .tw-countdown .uw-main { flex-direction:row;align-items:center;justify-content:flex-start;gap:10px; }
+  .tw-countdown-identity { flex:1;min-width:0;font-size:12px; }
+  .tw-countdown-number { --tw-countdown-size:32px;flex:none;max-width:60%; }
+  .tw-countdown .tw-subline { display:none; }
+  .tw-pomodoro .uw-main { flex-direction:row;justify-content:space-between; }
+  .tw-timer-compact .uw-metric strong { font-size:28px; }
+  .tw-timer-controls .tw-icon-action { display:none; }
+  .tw-timer-controls > .tw-action:first-child { min-width:28px;padding:4px 7px; }
+  .tw-draw .uw-main { flex-direction:row;gap:10px; }
+  .tw-draw .uw-main > .tw-draw-result { justify-content:flex-start;text-align:left;font-size:15px; }
+  .tw-draw-action-row .tw-action { padding:4px 7px;font-size:11px; }
+  .tw-calculator .uw-main { flex-direction:row;align-items:center;gap:8px; }
+  .tw-calculator-entry { flex:1;min-width:0; }
+  .tw-calculator-entry output { font-size:27px; }
+  .tw-calculator-inline .tw-action { min-width:28px;padding:4px 6px; }
+  .tw-converter .uw-main { justify-content:center; }
+  .tw-converter-compact { flex-direction:row;align-items:baseline;gap:6px;overflow-x:auto;scrollbar-width:none; }
+  .tw-converter-source { flex:none;white-space:nowrap;font-size:13px; }
+  .tw-converter-source::after { content:none; }
+  .tw-converter-equals { display:block; }
+  .tw-converter-compact .uw-metric { flex:none; }
+  .tw-converter-compact .uw-metric strong { font-size:26px; }
+  .tw-todo-card-list,.tw-card-add,.tw-card-weekdays,.tw-lesson-card-list,.tw-timetable .tw-card-action { display:none; }
+  .tw-todo .uw-main,.tw-timetable .uw-main { justify-content:center; }
+  .tw-todo-compact { display:flex;flex-direction:column; }
+  .tw-todo-next { white-space:nowrap; }
+  .tw-lesson-compact { display:flex;flex-direction:column; }
+  .tw-lesson-compact strong { white-space:nowrap; }
 }
 
-/* Wide strips use only a compact value or one-line summary. The shared kit
-   owns the padding, header visibility and details-button geometry. */
-.tw-todo-compact .tw-strip-unit { display:none; }
-@container uw (min-width:131px) and (max-height:70px) {
-  .tw-widget .uw-main { min-width:0;margin-right:0;gap:0;justify-content:center;align-items:stretch; }
-  .tw-countdown .uw-main { flex-direction:row;align-items:center;justify-content:flex-start;gap:6px; }
-  .tw-countdown-number { order:0;flex:none;justify-content:flex-start;gap:4px; }
-  .tw-countdown-number .uw-dot-fallback { font-size:24px;line-height:1.2; }
-  .tw-countdown-number > .tw-countdown-unit { font-size:12px; }
-  .tw-countdown-identity { display:block;order:1;flex:1;min-width:0;font-size:12px;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--uw-muted); }
-  .tw-countdown-identity::before { content:'·';margin-right:6px; }
-  .tw-timer-compact { display:flex;flex-direction:row;align-items:baseline;justify-content:flex-start;gap:6px; }
-  .tw-timer-compact .uw-metric strong,.tw-converter-compact .uw-metric strong,.tw-todo-compact .uw-metric strong,.tw-calculator-entry output { font-size:24px;line-height:1.2; }
-  .tw-timer-compact > span { display:block;font-size:12px;line-height:18px; }
-  .tw-converter-compact { flex-direction:row;align-items:baseline;gap:4px;min-width:0; }
-  .tw-converter-compact .uw-metric { display:flex;justify-content:flex-start;width:auto;gap:4px;min-width:0; }
-  .tw-converter-compact .uw-metric > span { font-size:12px;line-height:18px; }
-  .tw-converter-compact > span { display:none; }
-  .tw-todo-compact { display:flex;flex-direction:row;align-items:baseline;gap:4px;min-width:0; }
-  .tw-todo-compact .uw-metric { flex:none; }
-  .tw-todo-compact .tw-strip-unit { display:block;flex:none;font-size:12px;line-height:18px; }
-  .tw-todo-compact > span:last-child { display:block;flex:1;min-width:0;font-size:12px;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .tw-todo-compact > span:last-child::before { content:'·';margin-inline:2px 5px; }
-  .tw-draw .uw-main > .tw-draw-result,.tw-note-compact,.tw-lesson-compact strong { display:block;max-width:100%;font-size:12px;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left; }
-  .tw-lesson-compact { flex-direction:row;align-items:center;min-width:0; }
-  .tw-lesson-compact > span { display:none; }
+/* Narrow columns stack meaningfully, instead of shrinking a wide layout. */
+@container uw (max-width:190px) {
+  .tw-widget .uw-main { gap:6px; }
+  .tw-countdown-number { --tw-countdown-size:40px; }
+  .tw-countdown-identity { max-width:100%;font-size:12px; }
+  .tw-note-editor { font-size:12px;line-height:1.65; }
+  .tw-timer-visual .uw-tick-ring { max-width:142px; }
+  .tw-converter-row { grid-template-columns:minmax(0,1fr) 57px;gap:6px; }
+  .tw-converter-row .tw-input,.tw-converter-row output { font-size:22px; }
+  .tw-converter-row .tw-select { font-size:11px;padding:5px 22px 5px 7px; }
+  .tw-converter-row .tw-select-wrap > svg { right:5px;width:12px; }
+  .tw-todo-card-list .tw-icon-action { display:none; }
+  .tw-todo-card-list li > span { font-size:11px; }
+  .tw-card-weekdays .tw-weekdays { display:none; }
+  .tw-day-label { display:block; }
+  .tw-lesson-list li { gap:7px; }
+  .tw-lesson-copy strong { font-size:11px; }
 }
-
-/* Short cards keep the timer's value and controls without vertical clipping. */
-@container uw (min-width:151px) and (min-height:91px) and (max-height:130px) {
-  .tw-pomodoro .uw-main { gap:2px; }
-  .tw-timer-controls .tw-action { line-height:16px; }
+@container uw (max-width:150px) {
+  .tw-countdown .uw-main { flex-direction:column;align-items:flex-start;justify-content:center; }
+  .tw-countdown-number { --tw-countdown-size:34px;max-width:100%; }
+  .tw-countdown-identity { flex:none;font-size:11px;line-height:16px; }
+  .tw-countdown .tw-subline,.tw-countdown .tw-meta { display:none; }
+  .tw-pomodoro .uw-main { flex-direction:column;justify-content:center; }
+  .tw-card-phase,.tw-timer-visual { display:none; }
+  .tw-timer-compact { display:flex;flex-direction:column;align-items:flex-start;gap:5px; }
+  .tw-timer-compact .uw-metric strong { font-size:27px; }
+  .tw-timer-controls .tw-icon-action { display:none; }
+  .tw-timer-controls > .tw-action:first-child { min-width:48px;min-height:27px;padding:3px 7px;font-size:11px; }
+  .tw-draw .uw-main { flex-direction:column;gap:8px; }
+  .tw-draw .uw-main > .tw-draw-result { font-size:14px;line-height:1.5;text-align:left;justify-content:flex-start; }
+  .tw-draw-action-row .tw-action { font-size:10px;padding:3px 6px;min-height:27px; }
+  .tw-calculator .uw-main { flex-direction:column;align-items:stretch;justify-content:center; }
+  .tw-calculator-entry { flex:none; }
+  .tw-calculator-entry output { font-size:26px; }
+  .tw-converter-category,.tw-converter-card { display:none; }
+  .tw-converter-compact { display:flex;flex-direction:column;align-items:flex-start;gap:5px;overflow:visible; }
+  .tw-converter-source { flex:none;font-size:12px;white-space:normal; }
+  .tw-converter-source::after { content:'=';margin-left:3px; }
+  .tw-converter-equals { display:none; }
+  .tw-converter-compact .uw-metric { flex-wrap:nowrap; }
+  .tw-converter-compact .uw-metric strong { font-size:27px; }
+  .tw-todo-card-list,.tw-card-add,.tw-card-weekdays,.tw-lesson-card-list,.tw-timetable .tw-card-action { display:none; }
+  .tw-todo .uw-main,.tw-timetable .uw-main { justify-content:center; }
+  .tw-todo-compact { display:flex;flex-direction:column; }
+  .tw-todo-next { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;white-space:normal;overflow:hidden; }
+  .tw-lesson-compact { display:flex;flex-direction:column; }
+  .tw-lesson-compact strong { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow-wrap:anywhere; }
 }
-
-/* In the thinnest tall tile the unit gets its own line in either language. */
-@container uw (max-width:70px) and (min-height:71px) {
-  .tw-countdown-number { flex-direction:column;align-items:flex-start;gap:2px;max-width:100%; }
-  .tw-countdown-number .uw-dot-number { width:100%;max-width:100%;aspect-ratio:auto; }
-  .tw-countdown-number .uw-dot-fallback { font-size:20px;overflow-wrap:anywhere; }
-  .tw-countdown-number > .tw-countdown-unit { font-size:10px;line-height:14px; }
-}
-
-/* Short list faces show complete rows. The full editable lists stay in details. */
-@container uw (min-width:151px) and (min-height:161px) and (max-height:210px) {
-  .tw-todo .uw-main { gap:6px; }
-  .tw-todo-summary { display:flex;font-size:10px;line-height:14px; }
-  .tw-todo-card-list .tw-todo-list { gap:0; }
-  .tw-todo-card-list .tw-todo-list li { min-height:24px;height:24px;padding:2px 0;box-sizing:border-box; }
-  .tw-todo-card-list .tw-todo-list li:nth-child(n+3) { display:none; }
-  .tw-todo-card-list .tw-todo-list li > span { display:block;font-size:11px;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .tw-todo-card-list .tw-todo-list .tw-icon-action { min-height:18px;height:18px;min-width:18px;width:18px;padding:2px; }
-  .tw-lesson-card-list .tw-lesson-list { gap:0;padding-top:0; }
-  .tw-lesson-card-list .tw-lesson-list li:nth-child(n+2) { display:none; }
-  .tw-lesson-card-list .tw-lesson-time small,.tw-lesson-card-list .tw-lesson-copy > span { display:none; }
-  .tw-lesson-card-list .tw-lesson-copy strong { display:block;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-  .tw-lesson-card-list .tw-empty { line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-}
-@container uw (min-width:151px) and (min-height:161px) and (max-height:175px) {
-  .tw-todo-card-list .tw-todo-list li:nth-child(n+2) { display:none; }
-  .tw-card-weekdays { display:none; }
-}
-
-
-.tw-timer-compact .tw-timer-split { display:none; }
-/* The thinnest column keeps whole time groups and whole lines of note text. */
-@container uw (max-width:70px) and (min-height:101px) {
-  .tw-timer-compact .uw-metric { display:none; }
-  .tw-timer-compact .tw-timer-split { display:flex;flex-direction:column;gap:3px;font-size:20px;line-height:22px;letter-spacing:-.025em;color:inherit; }
-  .tw-timer-split > span { display:block;white-space:nowrap; }
+@container uw (max-width:150px) and (max-height:160px) {
+  .tw-timer-controls,.tw-calculator-inline { display:none; }
+  .tw-todo-compact { gap:5px; }
+  .tw-todo-next { display:block;white-space:nowrap;line-height:18px; }
   .tw-note-editor { display:none; }
-  .tw-note-compact { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:36px;overflow:hidden;white-space:normal;overflow-wrap:anywhere;font-size:11px;line-height:18px;margin:0; }
-}
-@container uw (max-width:70px) and (min-height:151px) {
-  .tw-note-compact { -webkit-line-clamp:5;max-height:90px; }
+  .tw-note-compact { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:36px;overflow:hidden;overflow-wrap:anywhere;white-space:normal;font-size:12px;line-height:18px; }
 }
 
-
-/* All displayed results use the same dot alphabet. Native inputs and list
-   annotations retain regular type so editing and scanning remain straightforward. */
-.tw-calculator-entry output,.tw-converter-row output { display:flex;align-items:center; }
-.tw-calculator-entry output { justify-content:flex-end; }
-.tw-converter-row output { justify-content:flex-start; }
-.tw-calculator-entry output .uw-dot-number,.tw-converter-row output .uw-dot-number { display:block;flex:none;width:calc(1em * var(--uw-dot-aspect,2));height:1em;max-width:100%;aspect-ratio:var(--uw-dot-aspect,2); }
-.tw-calculator-entry output .uw-dot-fallback,.tw-converter-row output .uw-dot-fallback { font-size:inherit;line-height:1; }
-.tw-todo-empty { display:flex;flex-direction:column;justify-content:center;align-items:flex-start;height:100%;min-height:0;gap:8px; }
-.tw-todo-empty > .uw-dot-number { flex:none;width:calc(28px * var(--uw-dot-aspect,.77));height:28px; }
-.tw-todo-empty .tw-empty { font-size:11px;line-height:16px; }
-@container uw (min-width:211px) and (min-height:211px) {
-  .tw-todo-empty > .uw-dot-number { width:calc(44px * var(--uw-dot-aspect,.77));height:44px; }
-}
-@container uw (min-width:151px) and (min-height:161px) and (max-height:210px) {
-  .tw-todo-empty { gap:5px; }
-  .tw-todo-empty > .uw-dot-number { width:calc(24px * var(--uw-dot-aspect,.77));height:24px; }
-  .tw-todo-empty .tw-empty { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden; }
-}
+/* One-line strips are summaries. Nothing hidden here is removed from details. */
 @container uw (max-height:90px) {
-  .tw-calculator-entry output { justify-content:flex-start; }
-}
-@container uw (max-width:80px) or (max-height:70px) {
-  .tw-calculator-entry output .uw-dot-number,.tw-converter-row output .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
-  .tw-calculator-entry output .uw-dot-number svg,.tw-converter-row output .uw-dot-number svg { display:none; }
-  .tw-calculator-entry output .uw-dot-fallback,.tw-converter-row output .uw-dot-fallback { display:block; }
+  .tw-widget .uw-main { justify-content:center; }
+  .tw-countdown .uw-main { flex-direction:row;align-items:center;justify-content:flex-start;gap:7px; }
+  .tw-countdown-number { order:0;max-width:100%;gap:4px; }
+  .tw-countdown-identity { order:1;flex:1;min-width:0;color:var(--uw-muted);font-size:12px; }
+  .tw-countdown .tw-meta,.tw-timer-controls,.tw-timer-visual,.tw-card-phase,.tw-timer-notice,.tw-draw-action-row,.tw-calculator-entry .tw-input,.tw-calculator-inline,.tw-calculator-card-keys { display:none; }
+  .tw-countdown-number .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
+  .tw-countdown-number .uw-dot-fallback { font-size:23px; }
+  .tw-countdown-number > .tw-countdown-unit { font-size:11px;line-height:15px; }
+  .tw-pomodoro .uw-main { align-items:flex-start; }
+  .tw-timer-compact { flex-direction:row;align-items:baseline;justify-content:flex-start; }
+  .tw-timer-compact .uw-metric strong { font-size:23px; }
+  .tw-draw .uw-main > .tw-draw-result { display:block;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:18px; }
+  .tw-note-editor { display:none; }
+  .tw-note-compact { display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;line-height:18px; }
+  .tw-calculator-entry output { justify-content:flex-start;font-size:23px; }
+  .tw-calculator-entry output .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
+  .tw-converter-compact { flex-direction:row;align-items:baseline;gap:5px;overflow-x:auto;scrollbar-width:none; }
+  .tw-converter-source { white-space:nowrap; }
+  .tw-converter-source::after { content:none; }
+  .tw-converter-equals { display:block; }
+  .tw-converter-compact .uw-metric strong { font-size:22px; }
+  .tw-todo-compact { flex-direction:row;align-items:center;gap:7px; }
+  .tw-todo-compact-count { flex:none;gap:4px; }
+  .tw-todo-compact .uw-metric strong { font-size:23px; }
+  .tw-todo-next { display:block;white-space:nowrap;font-size:12px; }
+  .tw-lesson-compact { flex-direction:row;align-items:baseline;gap:7px; }
+  .tw-lesson-compact .tw-lesson-day { display:none; }
+  .tw-lesson-compact strong { display:block;flex:1;white-space:nowrap;font-size:12px;line-height:18px; }
+  .tw-lesson-start { order:-1;flex:none; }
+  .tw-widget .tw-error { display:none; }
 }
 
-.tw-todo-summary-count { display:inline-flex;align-items:center;gap:4px;min-width:0;line-height:18px; }
-.tw-todo-summary-count > .uw-dot-number { flex:none;width:calc(18px * var(--uw-dot-aspect,.77));height:18px;color:var(--uw-ink); }
-.tw-todo-summary[data-empty=true] { display:none; }
-
-/* Keep day counts readable when a compact card cannot afford two columns. */
-@container uw (min-width:151px) and (max-width:210px) and (min-height:136px) {
-  .tw-countdown .uw-main { display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px; }
-  .tw-countdown-number { align-self:flex-start;justify-content:flex-start;--tw-countdown-size:45px; }
-  .tw-countdown-identity { max-width:100%; }
+/* Micro columns retain a readable value, a unit or phase, and the details action. */
+@container uw (max-width:100px) {
+  .tw-countdown-identity,.tw-timer-controls,.tw-draw-action-row,.tw-calculator-entry .tw-input,.tw-calculator-inline { display:none; }
+  .tw-countdown-number { align-items:baseline;gap:3px; }
+  .tw-countdown-number .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
+  .tw-countdown-number .uw-dot-fallback { font-size:22px; }
+  .tw-countdown-number > .tw-countdown-unit { font-size:10px; }
+  .tw-draw .uw-main > .tw-draw-result { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;flex:none;max-height:54px;overflow:hidden;font-size:12px;line-height:18px;white-space:normal; }
+  .tw-note-editor { display:none; }
+  .tw-note-compact { display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;max-height:54px;overflow:hidden;white-space:normal;overflow-wrap:anywhere;font-size:11px;line-height:18px; }
+  .tw-calculator-entry output { justify-content:flex-start;font-size:20px; }
+  .tw-calculator-entry output .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
+  .tw-converter-compact .uw-metric strong { font-size:22px; }
+  .tw-converter-source,.tw-converter-equals { display:none; }
+  .tw-todo-next { display:none; }
+  .tw-lesson-compact strong { font-size:11px;line-height:17px; }
+  .tw-lesson-compact .tw-lesson-day { display:none; }
 }
-@container uw (min-width:71px) and (max-width:150px) {
-  .tw-countdown-number[data-long-number=true] .uw-dot-number { width:auto;aspect-ratio:auto; }
-  .tw-countdown-number[data-long-number=true] .uw-dot-number svg { display:none; }
-  .tw-countdown-number[data-long-number=true] .uw-dot-fallback { display:block;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums; }
-}
-@container uw (max-width:70px) and (min-height:71px) {
+@container uw (max-width:70px) and (min-height:91px) {
+  .tw-countdown-number { flex-direction:column;align-items:flex-start;gap:2px; }
+  .tw-countdown-number .uw-dot-fallback { font-size:20px; }
   .tw-countdown-number[data-long-number=true] .uw-dot-fallback { font-size:14px; }
+  .tw-timer-compact { flex-direction:column;align-items:flex-start;gap:5px; }
+  .tw-timer-compact .uw-metric { display:none; }
+  .tw-timer-compact .tw-timer-split { display:flex;flex-direction:column;gap:2px;font-size:20px;line-height:22px;color:inherit; }
+  .tw-timer-split > span { display:block;white-space:nowrap; }
+  .tw-timer-phase-label { font-size:9px;line-height:12px; }
+  .tw-todo-compact-count { flex-direction:column;gap:3px; }
+  .tw-todo-compact .uw-metric strong { font-size:20px; }
+  .tw-strip-unit { font-size:9px;line-height:12px; }
+  .tw-converter-compact .uw-metric { flex-direction:column;align-items:flex-start;gap:3px; }
+  .tw-converter-compact .uw-metric strong { font-size:18px; }
+  .tw-converter-compact .uw-metric strong > .uw-dot-number { width:auto;height:auto;aspect-ratio:auto; }
+  .tw-converter-compact .uw-metric > span { font-size:10px; }
+  .tw-note-compact { -webkit-line-clamp:2;max-height:36px; }
+  .tw-lesson-compact { gap:4px; }
+  .tw-lesson-compact .tw-lesson-start { font-size:9px; }
+}
+@container uw (max-width:130px) and (max-height:70px) {
+  .tw-countdown-identity,.tw-timer-phase-label,.tw-todo-next { display:none; }
+  .tw-countdown-number .uw-dot-fallback,.tw-converter-compact .uw-metric strong,.tw-todo-compact .uw-metric strong,.tw-calculator-entry output { font-size:20px; }
+  .tw-timer-compact .uw-metric strong { font-size:18px; }
+  .tw-draw .uw-main > .tw-draw-result,.tw-note-compact { display:block;white-space:nowrap;font-size:11px; }
+  .tw-lesson-compact .tw-lesson-start { display:none; }
+}
+@container uw (max-width:70px) and (max-height:70px) {
+  .tw-widget .uw-layout { padding:4px;gap:3px; }
+  .tw-widget .uw-expand { width:18px;height:18px;min-width:18px;padding:2px; }
+  .tw-widget .uw-expand .iconfont { font-size:12px; }
+  .tw-countdown-number > .tw-countdown-unit,.tw-converter-compact .uw-metric > span,.tw-strip-unit { display:none; }
+  .tw-countdown-number .uw-dot-fallback,.tw-converter-compact .uw-metric strong,.tw-todo-compact .uw-metric strong,.tw-calculator-entry output { font-size:14px; }
+  .tw-timer-compact .uw-metric strong { font-size:10px; }
+  .tw-draw .uw-main > .tw-draw-result,.tw-note-compact,.tw-lesson-compact strong { font-size:10px; }
 }

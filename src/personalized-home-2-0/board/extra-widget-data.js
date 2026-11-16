@@ -53,7 +53,16 @@ export function habitStreak(dates, now = new Date()) {
   return streak;
 }
 export function safeLink(value) {
-  try { const url = new URL(String(value).includes('://') ? value : `https://${value}`); return ['https:', 'http:'].includes(url.protocol) && url.hostname ? url.href : ''; } catch { return ''; }
+  const input = String(value ?? '').trim();
+  if (!input) return '';
+  const hasWebScheme = /^https?:\/\//i.test(input);
+  const hostWithPort = /^[^\s/?#:@]+:\d+(?:[/?#]|$)/.test(input);
+  // A non-web scheme is not a hostname; prepending HTTPS can turn it into credentials.
+  if (!hasWebScheme && /^[a-z][a-z\d+.-]*:/i.test(input) && !hostWithPort) return '';
+  try {
+    const url = new URL(hasWebScheme ? input : `https://${input}`);
+    return ['https:', 'http:'].includes(url.protocol) && url.hostname && !url.username && !url.password ? url.href : '';
+  } catch { return ''; }
 }
 export function amountToCents(value) {
   if (!/^\d{1,9}(?:\.\d{1,2})?$/.test(String(value).trim())) return null;

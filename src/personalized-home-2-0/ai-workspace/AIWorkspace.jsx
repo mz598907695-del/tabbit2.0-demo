@@ -160,6 +160,7 @@ export default function AIWorkspace({ children, homeTools, wallpaper, reflection
     };
   }, [modal]);
   function navigate(next, nextFilter, trigger) {
+    if (nextFilter !== 'public' && window.location.hash.startsWith('#skill-public=')) history.replaceState(null, '', window.location.pathname + window.location.search);
     onNavigatePage?.();
     ({ page: next, filter: nextFilter } = resolveWorkspaceRoute(next, nextFilter, workspaceData));
     if (next === 'bookmarks') {
@@ -186,6 +187,17 @@ export default function AIWorkspace({ children, homeTools, wallpaper, reflection
     setNotificationOpen(false);
     if (restoreFocus) requestAnimationFrame(() => notificationAnchor?.isConnected && notificationAnchor.focus?.({ preventScroll:true }));
   },[notificationAnchor]);
+  useEffect(() => {
+    const openSharedSkill = () => {
+      if (window.location.hash.startsWith('#skill-public=')) {
+        setContentVisited(true); setContentPage('skills'); setPage('skills');
+        setFilter('public'); setNavigationKey(key => key + 1);
+      }
+    };
+    openSharedSkill();
+    window.addEventListener('hashchange', openSharedSkill);
+    return () => window.removeEventListener('hashchange', openSharedSkill);
+  }, []);
   function changeVariant(next) {
     setVariant(next);
     const url = new URL(window.location.href);
@@ -274,7 +286,7 @@ export default function AIWorkspace({ children, homeTools, wallpaper, reflection
     for (const id of Object.keys(workspaceData)) {
       if (id === 'assets' || !Array.isArray(workspaceData[id])) continue;
       const Icon = destinations.find(destination => destination[0] === id)?.[2] || Folder;
-      for (const item of getWorkspaceItems(workspaceData, id)) {
+      for (const item of getWorkspaceItems(workspaceData, id).filter(entry => !entry.deleted)) {
         entries.push({ id, label:item.title, description:TYPE_LABELS[item.type] || item.type, filter:`detail:${item.id}`, Icon });
       }
     }

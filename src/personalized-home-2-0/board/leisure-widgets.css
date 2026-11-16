@@ -48,6 +48,19 @@
  .lw-joke-copy{font-size:17px;line-height:1.6}
  .lw-smile-art{width:100px;height:86px}
 }
+@container uw (min-width:191px) and (max-width:299px) and (min-height:191px) and (max-height:299px){
+ .lw-workday .uw-main{gap:10px;justify-content:center}
+ .lw-workday-time{flex:1;gap:8px}
+ .lw-workday-time .uw-dot-number{height:46px}
+ .lw-workday-seconds b{font-size:16px;line-height:20px}
+ .lw-shift-label,.lw-footer>span:first-child{display:none}
+ .lw-shift-progress{gap:0}
+ .lw-shift-progress .uw-dot-grid{height:8px}
+ .lw-footer{justify-content:flex-end;font-size:10px}
+ .lw-joke .uw-main{align-items:center;justify-content:center;gap:12px}
+ .lw-smile-art{width:58px;height:50px;align-self:center}
+ .lw-joke-copy{font-size:13px;line-height:1.65;-webkit-line-clamp:3;width:100%}
+}
 
 @container uw (max-width:70px){
  .lw-time-compact{writing-mode:horizontal-tb;white-space:normal;font-size:18px;line-height:1.2;letter-spacing:-.02em;width:100%;text-align:center}

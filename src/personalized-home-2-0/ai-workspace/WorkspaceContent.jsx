@@ -10,6 +10,9 @@ import WorkspaceTasks from './WorkspaceTasks';
 import WorkspaceUsage from './WorkspaceUsage';
 import UsageRecordsDialog from './UsageRecordsDialog';
 import WorkspaceSkillDetail from './WorkspaceSkillDetail';
+import SkillEditor from './SkillEditor';
+import { duplicateSkill, saveSkillDraft } from './skill-management';
+import { parseSkillPublicHash, isSkillPublicRevoked, unpublishSkill } from './skill-publication';
 import WorkspaceAICardDetail from './WorkspaceAICardDetail';
 import { getFileShareText, refreshWorkspaceOutputs } from './file-actions';
 import { getSkillCatalogue, saveSkill } from './workspace-skills';
@@ -114,6 +117,10 @@ function Detail({ page, item, onClose, onNavigate, onNewChat, onUpdate, inline =
 }
 export default function WorkspaceContent({ wallpaper, active = true, page = 'chats', variant = 1, data, setData, initialFilter, navigationKey, onNavigate, onNewChat, onFilterChange }) {
   const [shareItem, setShareItem] = useState(null);
+  const [skillEditor, setSkillEditor] = useState(null);
+  const [authorFilter, setAuthorFilter] = useState(null);
+  const [publicDetail, setPublicDetail] = useState(null);
+  const [publicError, setPublicError] = useState('');
   const [pageUI, setPageUI] = useState({}); const [detail, setDetail] = useState(null); const [create, setCreate] = useState(false); const [plans, setPlans] = useState(false); const [notice, setNotice] = useState('');
   const contentRef = useRef(null);
   const detailTrigger = useRef(null);
@@ -133,9 +140,15 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
   const ui = { ...DEFAULT_UI, view: page === 'tasks' ? 'list' : 'grid', filter: page === 'usage' ? 'membership' : 'all', ...pageUI[page] };
   const setUI = patch => setPageUI(previous => ({ ...previous, [page]: { ...DEFAULT_UI, view: page === 'tasks' ? 'list' : 'grid', ...previous[page], ...patch } }));
   const items = useMemo(() => page === 'skills' ? getSkillCatalogue(data.skills) : getWorkspaceItems(data, page), [data, page]);
-  useEffect(() => { if (!active) { setDetail(null); setCreate(false); setPlans(false); setShareItem(null); } }, [active]);
+  useEffect(() => { if (!active) { setSkillEditor(null); setPublicDetail(null); setPublicError(''); setDetail(null); setCreate(false); setPlans(false); setShareItem(null); } }, [active]);
   useEffect(() => {
-    setDetail(null); setCreate(false); setPlans(false); setShareItem(null); setNotice('');
+    setDetail(null); setSkillEditor(null); setPublicDetail(null); setPublicError(''); setAuthorFilter(null); setCreate(false); setPlans(false); setShareItem(null); setNotice('');
+    if (page === 'skills' && initialFilter === 'public') {
+      const shared = parseSkillPublicHash(window.location.hash);
+      if (shared && !isSkillPublicRevoked(shared.sourceId || shared.id, shared.publishedAt)) setPublicDetail(shared);
+      else setPublicError('这个妙招链接已下架或无法读取。');
+      return;
+    }
     listScroll.current = 0; detailTrigger.current = null;
     if (!initialFilter) return;
     if (initialFilter === 'create' || initialFilter.startsWith('create:')) { setCreate(initialFilter.split(':')[1] || true); return; }
@@ -147,26 +160,64 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
   useEffect(() => { onFilterChange?.(ui.filter); }, [ui.filter, page, onFilterChange]);
   const filtered = useMemo(() => filterWorkspaceItems(items, ui), [items, ui.query, ui.filter, ui.kind, ui.sort]);
   const selected = items.find(item => item.id === detail);
-  const skillDetail = active && page === 'skills' && selected;
+  const publicOwner = publicDetail && items.find(item => item.type === 'custom' && item.publication?.status === 'published' && item.id === (publicDetail.sourceId || publicDetail.id) && item.publication?.publicationId === (publicDetail.publicationId || publicDetail.publication?.publicationId));
+  useEffect(() => {
+    if (!publicDetail || !active || page !== 'skills') return;
+    const sourceId = publicDetail.sourceId || publicDetail.id;
+    const saved = data.skills.find(item => item.id === sourceId);
+    if (saved?.deleted || (saved?.type === 'custom' && saved.publication?.status === 'unpublished') || isSkillPublicRevoked(sourceId, publicDetail.publishedAt || publicDetail.publication?.publishedAt)) {
+      setPublicDetail(null); setDetail(null); setPublicError('这个妙招链接已下架或无法读取。');
+    }
+  }, [data.skills, publicDetail, active, page]);
+  const skillDetail = active && page === 'skills' && (publicDetail || selected);
+  const displayedSkill = publicDetail ? publicOwner || publicDetail : selected;
   const cardDetail = active && page === 'files' && selected?.type === 'card' && selected;
-  const secondaryDetail = skillDetail || cardDetail;
+  const secondaryDetail = skillDetail || cardDetail || publicError;
   useLayoutEffect(() => {
     const host = contentRef.current?.closest('.aiw-page-host');
     if (secondaryDetail && host) host.scrollTop = 0;
     else if (restoreList.current && host) host.scrollTop = listScroll.current;
     restoreList.current = false;
   }, [secondaryDetail?.id, page]);
-  function updateItem(item) { setData(previous => page === 'files' ? updateWorkspaceOutput(previous, item) : { ...previous, [page]: page === 'skills' ? saveSkill(previous.skills, item) : previous[page].map(existing => existing.id === item.id ? item : existing) }); }
-  function openDetail(item) { if (page === 'chats') { onNavigate('chats', `detail:${item.id}`); return; } detailTrigger.current = document.activeElement; listScroll.current = contentRef.current?.closest('.aiw-page-host')?.scrollTop || 0; setDetail(item.id); if (page === 'notifications' && item.unread) updateItem({ ...item, unread: false }); }
+  function updateItem(item) {
+    if (page === 'skills') {
+      const next = { ...data, skills:saveSkill(data.skills, item) };
+      try { localStorage.setItem('personalized-home-2-0-ai-workspace-demo-v1', JSON.stringify(next)); }
+      catch { setNotice('保存失败，浏览器存储空间不足或不可用。请缩小导入内容或封面后重试。'); throw new Error('保存失败，浏览器存储空间不足或不可用。'); }
+      setData(next); return;
+    }
+    setData(previous => page === 'files' ? updateWorkspaceOutput(previous, item) : { ...previous, [page]: previous[page].map(existing => existing.id === item.id ? item : existing) });
+  }
+  function openDetail(item) { if (page === 'skills') { setPublicError(''); setPublicDetail(item._publicView ? item : null); } if (page === 'chats') { onNavigate('chats', `detail:${item.id}`); return; } detailTrigger.current = document.activeElement; listScroll.current = contentRef.current?.closest('.aiw-page-host')?.scrollTop || 0; setDetail(item.id); if (page === 'notifications' && item.unread) updateItem({ ...item, unread: false }); }
   function closeDetail() {
     restoreList.current = true;
-    setDetail(null);
+    setDetail(null); setPublicDetail(null); setPublicError('');
+    if (window.location.hash.startsWith('#skill-public=')) history.replaceState(null, '', window.location.pathname + window.location.search);
     requestAnimationFrame(() => {
       const trigger = detailTrigger.current;
       if (trigger?.isConnected && trigger.getClientRects().length && !trigger.closest('[inert]')) trigger.focus?.({ preventScroll: true });
       else if (page === 'skills') contentRef.current?.querySelector('.aiws-header button')?.focus({ preventScroll: true });
       else if (page === 'files') contentRef.current?.querySelector('.aiwp-page-header button')?.focus({ preventScroll: true });
     });
+  }
+  function showAuthor(author) {
+    setDetail(null); setPublicDetail(null); setPublicError(''); setAuthorFilter(author); setUI({ query:'', kind:'all' });
+    if (window.location.hash.startsWith('#skill-public=')) history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+  function saveEditedSkill(form) {
+    const existing = skillEditor?.id ? items.find(item => item.id === skillEditor.id) : null;
+    const saved = saveSkillDraft(form, existing, id('skill'));
+    updateItem(saved); setAuthorFilter(null); setSkillEditor(null); setCreate(false); setPublicDetail(null); setDetail(saved.id);
+    setUI({ skillScope:'mine', query:'', kind:'all' });
+  }
+  function copySkill(item) { const copy = duplicateSkill(item, id('skill')); updateItem(copy); setAuthorFilter(null); setPublicDetail(null); setDetail(copy.id); setUI({ skillScope:'mine' }); }
+  function removeSkill(item) { updateItem({ ...unpublishSkill(item), deleted:true }); closeDetail(); setNotice(`已删除「${item.title}」`); }
+  function updateSkill(item) {
+    updateItem(item);
+    if (publicDetail && item.type === 'custom') {
+      if (item.publication?.status === 'published') setPublicDetail({ ...item.publication.snapshot, sourceId:item.id, id:item.id, publicationId:item.publication.publicationId, publishedAt:item.publication.publishedAt });
+      else { setPublicDetail(null); setDetail(item.id); }
+    }
   }
   function refreshOutputs() {
     try {
@@ -194,7 +245,9 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
   const grid = GRID_PAGES.has(page) && ui.view === 'grid';
   const countFor = filter => filter === 'all' ? items.length : filter === 'pinned' ? items.filter(item => item.pinned).length : items.filter(item => filter === 'installed' ? item.type === 'installed' || item.installed : item.type === filter).length;
   return <section ref={contentRef} className={`aiw-content aiw-content-${page} aiw-content-variant-${variant} ${inlinePreview && !cardDetail ? 'has-inspector' : ''}`} aria-label={`${module.label}内容`}>
-    {skillDetail && <WorkspaceSkillDetail key={selected.id} item={selected} backLabel={ui.skillScope === 'mine' ? '返回我的妙招' : '返回发现妙招'} onBack={closeDetail} onUpdate={updateItem} onUse={onNewChat}/>}
+    {notice && skillDetail && <p className="aiw-inline-feedback" role="status">{notice}</p>}
+    {skillDetail && <WorkspaceSkillDetail key={`${displayedSkill.id}-${Boolean(publicDetail)}`} item={displayedSkill} publicView={Boolean(publicDetail)} isOwner={displayedSkill.type === 'custom' && (!publicDetail || Boolean(publicOwner))} backLabel={authorFilter ? '返回作者妙招' : ui.skillScope === 'mine' ? '返回我的妙招' : '返回发现妙招'} onBack={closeDetail} onUpdate={updateSkill} onUse={onNewChat} onEdit={item => { setPublicDetail(null); setDetail(item.id); setSkillEditor(item); }} onDuplicate={copySkill} onDelete={removeSkill} onAuthor={showAuthor} onViewPublic={item => setPublicDetail({ ...item.publication.snapshot, sourceId:item.id, id:item.id, publicationId:item.publication.publicationId, publishedAt:item.publication.publishedAt })}/>}
+    {publicError && <div className="aiw-empty" role="status"><h2>{publicError}</h2><button className="aiw-button" onClick={closeDetail}>返回妙招</button></div>}
     {cardDetail && <WorkspaceAICardDetail key={selected.id} item={selected} backLabel={ui.filter === 'card' ? '返回 AI 卡片' : '返回 AI 输出物'} onBack={closeDetail} chats={data.chats} onNavigate={onNavigate} onShare={setShareItem}/>}
     <div className="aiw-content-primary" hidden={Boolean(secondaryDetail)} inert={Boolean(secondaryDetail)}>
     {page === 'skills' ? null : page === 'files' ? <WorkspaceFilesHeader ui={ui} setUI={setUI} onCreate={primaryAction} onRefresh={refreshOutputs}/> : <WorkspacePageHeader key={page} page={page} title={page === 'usage' ? '会员计划' : module.label} action={module.action} onAction={primaryAction} tabs={PAGE_TABS[page] || []} ui={ui} setUI={setUI} searchable={page !== 'usage'} hasViews={page !== 'tasks' && GRID_PAGES.has(page)} counts={page === 'tasks' ? Object.fromEntries(PAGE_TABS.tasks.map(([value]) => [value, countFor(value)])) : undefined}
@@ -203,7 +256,7 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
     />}
     {notice && <p className="aiw-inline-feedback" role="status"><Check size={14}/>{notice}<button aria-label="关闭提示" onClick={() => setNotice('')}><X size={13}/></button></p>}
     <div className="aiw-content-browser"><div className="aiw-content-results" id={page === 'files' ? undefined : `aiw-${page}-results`} role={['files','skills'].includes(page) ? undefined : 'tabpanel'} aria-labelledby={['files','skills'].includes(page) ? undefined : `aiw-${page}-tab-${ui.filter}`}>
-    {page === 'skills' ? <WorkspaceSkills active={active && !skillDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem} onCreate={primaryAction}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'shares' ? <WorkspaceShares items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <WorkspaceUsage wallpaper={wallpaper} filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)} onPurchaseCoupons={() => setPlans('coupons')} onUsageRecords={() => setPlans('records')}/> : <>
+    {page === 'skills' ? <WorkspaceSkills active={active && !secondaryDetail} items={items} ui={ui} setUI={setUI} onCreate={primaryAction} onOpen={openDetail} onUpdate={updateItem} authorFilter={authorFilter} onAuthor={showAuthor} onClearAuthor={() => { setAuthorFilter(null); setUI({query:"",kind:"all"}); }}/> : page === 'files' ? <WorkspaceFiles items={filtered} ui={ui} onOpen={openDetail} selectedId={inlinePreview ? detail : null} chats={data.chats} onNavigate={onNavigate} onNotice={setNotice} onShare={setShareItem} onCreate={primaryAction}/> : page === 'tasks' ? <WorkspaceTasks items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'shares' ? <WorkspaceShares items={filtered} query={ui.query} onOpen={openDetail} onUpdate={updateItem}/> : page === 'usage' ? <WorkspaceUsage wallpaper={wallpaper} filter={ui.filter} onNavigate={onNavigate} onPlans={() => setPlans(true)} onPurchaseCoupons={() => setPlans('coupons')} onUsageRecords={() => setPlans('records')}/> : <>
       {ui.query && <p className="aiw-results-label" role="status">找到 {filtered.length} 项相关内容</p>}
       {!filtered.length ? <EmptyState icon={ICONS[page]} title={ui.query ? '没有找到相关内容' : '这里还没有内容'} description={ui.query ? '换个关键词，或者切换分类试试。' : '从添加第一项内容开始。'} action={!ui.query && !['notifications'].includes(page) ? module.action : null} onAction={primaryAction}/> : <div className={`aiw-content-items ${grid ? 'aiw-content-grid' : 'aiw-content-list'}`}>
         {filtered.map(item => {
@@ -225,7 +278,8 @@ export default function WorkspaceContent({ wallpaper, active = true, page = 'cha
     </div>
     </div>
     {shareItem && <ShareOutput item={shareItem} onClose={() => setShareItem(null)}/>}
-    {create && <CreateForm page={page} defaultType={typeof create === 'string' ? create : undefined} onClose={() => setCreate(false)} onSave={saveCreated}/>}
+    {(skillEditor || (create && page === 'skills')) && <SkillEditor item={skillEditor} onClose={() => { setSkillEditor(null); setCreate(false); }} onSave={saveEditedSkill}/>}
+    {create && page !== 'skills' && <CreateForm page={page} defaultType={typeof create === 'string' ? create : undefined} onClose={() => setCreate(false)} onSave={saveCreated}/>}
     {plans === 'records' ? <UsageRecordsDialog onClose={() => setPlans(false)}/> : plans === 'coupons' ? <Modal title="购买重置券" onClose={() => setPlans(false)}><div className="aiw-detail-body"><p>使用重置券，可立即开启新的用量周期。</p><p className="aiw-form-note">当前为界面演示，不会生成订单或扣费。</p></div></Modal> : plans && <Modal title="会员计划" onClose={() => setPlans(false)}><div className="aiw-detail-body"><p className="aiw-form-note">用于比较框架的权益示例，不会产生订单或扣费。</p><div className="aiw-plan-options">{[['标准版', '日常提问与轻量探索'], ['专业版', '更多用量，支持深度工作'], ['进阶版', '高频协作与复杂任务']].map(([title, text]) => <article key={title}><CreditCard size={18}/><h3>{title}</h3><p>{text}</p>{title === '专业版' && <span className="aiw-status">当前示例计划</span>}</article>)}</div></div></Modal>}
   </section>;
 }
