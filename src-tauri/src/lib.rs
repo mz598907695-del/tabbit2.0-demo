@@ -17,9 +17,9 @@ struct GlassState {
 fn glass_state() -> &'static std::sync::Mutex<GlassState> {
     static STATE: std::sync::OnceLock<std::sync::Mutex<GlassState>> = std::sync::OnceLock::new();
     STATE.get_or_init(|| std::sync::Mutex::new(GlassState {
-        tint: [242, 247, 255, 128],
+        tint: [0, 0, 0, 0],
         clear: false,
-        opacity: 0.6,
+        opacity: 1.0,
         dark: false,
     }))
 }
@@ -340,7 +340,7 @@ pub fn run() {
                     } else if let Ok(pointer) = window.ns_view() {
                         unsafe {
                             let view = &*(pointer as *const objc2_app_kit::NSView);
-                            if let Err(error) = configure_backplate(view, [242, 247, 255, 128], false, 0.6, false) {
+                            if let Err(error) = configure_backplate(view, [0, 0, 0, 0], false, 1.0, false) {
                                 eprintln!("failed to initialize native backplate: {error}");
                             }
                         }
