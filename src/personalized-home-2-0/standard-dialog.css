@@ -45,7 +45,7 @@ dialog.standard-confirm-dialog { width:320px; text-align:center; }
 .standard-confirm-dialog .standard-dialog-actions button { flex:1; }
 /* Apply the same chrome to larger, scrollable widget/editor dialogs. */
 dialog.standard-dialog :is(.board-dialog-header,.uw-dialog-header) { padding:20px 20px 16px; }
-dialog.standard-dialog :is(.board-dialog-body,.uw-detail-body) { padding:0 20px 20px; }
+dialog.standard-dialog :is(.board-dialog-body:not(.board-library-body),.uw-detail-body) { padding:0 20px 20px; }
 dialog.standard-dialog .board-dialog-footer { padding:0 20px 20px; gap:10px; border-top:0; }
 dialog.standard-dialog :is(.board-dialog-primary,.board-dialog-secondary) { min-height:36px; padding:8px 12px; border-radius:10px; font-size:14px; line-height:20px; }
 dialog.standard-dialog .board-dialog-primary { background:var(--nine-color-fill-action-inverse); color:var(--nine-color-text-on-neutral); }

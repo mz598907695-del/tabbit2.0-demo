@@ -4,7 +4,7 @@ import { attachCapsuleLens } from './liquidGlassLens.js';
 export function useLiquidGlassLens(enabled) {
   useEffect(() => {
     if (!enabled) return undefined;
-    const capsule = document.querySelector('.page-indicator-capsule');
+    const capsule = document.querySelector('.home .page-indicator-capsule');
     return capsule ? attachCapsuleLens(capsule) : undefined;
   }, [enabled]);
 }

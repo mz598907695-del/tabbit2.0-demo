@@ -35,7 +35,13 @@ function Gallery({ item, detail, Icon, color }) {
       </div>}
       {count > 1 && <><button className="aiwsd-gallery-arrow is-prev" aria-label="上一张说明图" onClick={() => change(-1)}><ChevronLeft size={18}/></button><button className="aiwsd-gallery-arrow is-next" aria-label="下一张说明图" onClick={() => change(1)}><ChevronRight size={18}/></button></>}
     </div>
-    {count > 1 && <div className="aiwsd-gallery-dots" role="group" aria-label="选择说明图">{Array.from({ length: count }, (_, i) => <button key={i} aria-label={`第 ${i + 1} 张说明图`} aria-current={index === i ? 'true' : undefined} onClick={() => setIndex(i)}><span/></button>)}</div>}
+    {count > 1 && <div className="aiwsd-gallery-pagination">
+      <div className="page-indicator-capsule" role="group" aria-label="选择说明图">
+        {Array.from({ length: count }, (_, i) => <button key={i} type="button" className="page-indicator-page" aria-label={`第 ${i + 1} 张说明图`} aria-pressed={index === i} onClick={() => setIndex(i)}>
+          <span className="page-indicator-dot" aria-hidden="true"><span className="page-indicator-fill"/></span>
+        </button>)}
+      </div>
+    </div>}
     <span className="aiwsd-gallery-status" aria-live="polite">第 {index + 1} 张，共 {count} 张</span>
   </section>;
 }
@@ -135,7 +141,7 @@ export default function WorkspaceSkillDetail({ item, backLabel, onBack, onUpdate
   }
   return <WorkspaceSecondaryPage title={`${display.title}${publicView ? '公开版' : '详情'}`} backLabel={backLabel} onBack={onBack}
     actions={<button className="aiw-secondary-copy" onClick={copyContent}><Copy size={15}/><span>复制内容</span></button>}>
-    <header className="aiwsd-heading"><span className="aiws-skill-icon" style={{ '--aiws-icon-accent': color }}><Icon size={28} strokeWidth={1.6}/></span>
+    <header className="aiwsd-heading"><span className="aiwsd-heading-icon" aria-hidden="true"><Icon size={20} strokeWidth={1.6}/></span>
       <div><h1 tabIndex={-1}>{display.title}</h1><p>{detail.typeLabel}<span>·</span>{detail.category}{publicView && <><span>·</span>公开版</>}</p></div>
       <div className="aiwsd-heading-actions"><button className="aiw-button" disabled={!enabled && (installed || isOwner)} onClick={trial}>试用</button>
         {official ? <span className="aiwsd-preinstalled"><Check size={15}/>官方预装 · 自动更新</span> : !isOwner && !publicView && <button className={`aiw-button ${installed ? 'aiwsd-installed' : 'aiw-button-primary'}`} aria-pressed={installed} onClick={() => onUpdate({ ...item, type: item.type === 'installed' ? 'community' : item.type, installed: !installed, enabled: !installed ? true : item.enabled })}>{installed ? <Check size={16}/> : <Plus size={16}/>}<span>{installed ? '卸载' : '安装'}</span></button>}
@@ -154,7 +160,7 @@ export default function WorkspaceSkillDetail({ item, backLabel, onBack, onUpdate
     <div className="aiwsd-layout"><main className="aiwsd-main">
       {display.cover ? <img className="aiwsd-public-cover" src={display.cover} alt={`${display.title}封面`}/> : <Gallery item={display} detail={detail} Icon={Icon} color={color}/>}
       <section className="aiwsd-section"><h2>简介</h2><p>{display.description || '暂无简介'}</p>{display.examples?.length > 0 && <><h3>示例问法</h3><ul>{display.examples.map((example,index)=><li key={index}>{example}</li>)}</ul></>}</section>
-      {!publicView && <section className="aiwsd-section">
+      {!publicView && (detail.kind === 'prompt' || detail.kind === 'script') && <section className="aiwsd-section">
         {detail.kind === 'prompt' && <Choice label="一键发送" value={Boolean(item.autoSend)} options={[[false, '关闭'], [true, '开启']]} onChange={autoSend => onUpdate({ ...item, autoSend })} description={item.autoSend ? '已保存一键发送偏好；本地试用仍只填入草稿。' : '选择妙招后填入输入框，由你确认发送。'}/>}
         {detail.kind === 'script' && <Choice label="运行方式" value={item.runMode || 'manual'} options={[["manual", '手动运行'], ['auto', '自动运行']]} onChange={runMode => onUpdate({ ...item, runMode })} description="运行偏好仅保存在本地，此原型不会向网页注入或运行脚本。"/>}
       </section>}

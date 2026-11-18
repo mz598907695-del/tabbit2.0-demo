@@ -51,7 +51,7 @@ export function normalizeBoardShortcutUrl(value) {
   return address.href;
 }
 
-function BoardModal({ title, description, className = '', initialFocusRef, skipRestoreFocusRef, anchorRef, homeAnchorRef, onClose, alert = false, header, children }) {
+function BoardModal({ title, description, className = '', initialFocusRef, skipRestoreFocusRef, anchorRef, homeAnchorRef, minHomeWidth = 64, onClose, alert = false, header, children }) {
   const id = useId();
   const dialogRef = useRef(null);
   const backdropDown = useRef(false);
@@ -71,9 +71,14 @@ function BoardModal({ title, description, className = '', initialFocusRef, skipR
         const viewBottom = viewTop + (viewport?.height || innerHeight);
         let left = Math.max(viewLeft, rect.left), right = Math.min(viewRight, rect.right);
         let top = Math.max(viewTop, rect.top), bottom = Math.min(viewBottom, rect.bottom);
-        // On stacked screens the homepage can be below the settings. Keep the
-        // modal usable in the visible viewport when its anchor is offscreen.
-        if (right - left < 64) { left = viewLeft; right = viewRight; }
+        // On narrow or stacked screens the homepage may not have room for the dialog.
+        if (right - left < minHomeWidth) {
+          left = viewLeft;
+          right = viewRight;
+          dialog.style.setProperty('--board-modal-fallback-width', `${right - left}px`);
+        } else {
+          dialog.style.removeProperty('--board-modal-fallback-width');
+        }
         if (bottom - top < 160) { top = viewTop; bottom = viewBottom; }
         dialog.style.maxWidth = `${Math.max(0, right - left - 32)}px`;
         dialog.style.maxHeight = `${Math.max(0, bottom - top - 32)}px`;
@@ -567,7 +572,7 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
   const header = <header className="board-library-header">
     <div className="board-library-destination">
       <label htmlFor={`${id}-page`}>添加到</label>
-      <span className="overlay-select-wrap"><select id={`${id}-page`} aria-describedby={capacityMessage ? `${id}-capacity` : undefined} value={targetPageId} disabled={!pages.length} onChange={event => { setTargetId(event.target.value); setFeedback({}); dismissToast(); }}>
+      <span className="board-library-select"><select id={`${id}-page`} aria-describedby={capacityMessage ? `${id}-capacity` : undefined} value={targetPageId} disabled={!pages.length} onChange={event => { setTargetId(event.target.value); setFeedback({}); dismissToast(); }}>
         {pages.length ? pages.map(page => <option key={page.id} value={page.id}>{page.name}{(page.items?.length || 0) >= MAX_BOARD_ITEMS ? '（已满）' : ''}</option>) : <option value="">暂无看板</option>}
       </select><ChevronDown size={12} aria-hidden="true" /></span>
     </div>
@@ -586,11 +591,12 @@ export function BoardLibrary({ catalog = [], pages = [], currentPageId, onAdd, o
       >{entry.label}</button>)}
     </div>
     <div className="board-library-header-actions">
-    <LibrarySearch key={category} value={queries[category]} onChange={value => setQueries(current => ({ ...current, [category]: value }))} placeholder={category === 'shortcuts' ? '搜索网站' : '搜索小组件'} />
-    <button className="board-dialog-close" type="button" aria-label="关闭添加内容" onClick={onClose}><X size={18} /></button></div>
+      <LibrarySearch key={category} value={queries[category]} onChange={value => setQueries(current => ({ ...current, [category]: value }))} placeholder={category === 'shortcuts' ? '搜索网站' : '搜索小组件'} />
+      <button className="board-library-close" type="button" aria-label="关闭添加内容" onClick={onClose}><X size={16} aria-hidden="true" /></button>
+    </div>
   </header>;
 
-  return <BoardModal title="添加内容" className="board-library-dialog" homeAnchorRef={homeAnchorRef} initialFocusRef={firstFocusRef} skipRestoreFocusRef={skipRestoreFocusRef} header={header} onClose={onClose}>
+  return <BoardModal title="添加内容" className="board-library-dialog" homeAnchorRef={homeAnchorRef} minHomeWidth={320} initialFocusRef={firstFocusRef} skipRestoreFocusRef={skipRestoreFocusRef} header={header} onClose={onClose}>
     <div ref={bodyRef} className="board-dialog-body board-library-body" data-category={category}>
       {capacityMessage && <p className="board-library-capacity" id={`${id}-capacity`} role="status" aria-live="polite">{capacityMessage}</p>}
       <div className="board-library-panel" id={`${id}-panel-shortcuts`} role="tabpanel" aria-labelledby={`${id}-category-shortcuts`} hidden={category !== 'shortcuts'}>

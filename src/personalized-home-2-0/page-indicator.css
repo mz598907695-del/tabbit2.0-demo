@@ -41,17 +41,17 @@
 }
 
 /* Shared floating surface, with only its fill alpha reduced. */
-:scope[data-theme] .home .page-indicator .page-indicator-capsule {
+:scope[data-theme] :is(.home .page-indicator, .aiwsd-gallery-pagination) .page-indicator-capsule {
   background: rgb(from var(--nine-color-fill-floating) r g b / 0.3);
   -webkit-backdrop-filter: blur(4px) saturate(100%);
   backdrop-filter: blur(4px) saturate(100%);
   transition: background-color 300ms var(--nine-motion-easing-standard);
 }
-:scope[data-theme] .home .page-indicator:hover .page-indicator-capsule {
+:scope[data-theme] :is(.home .page-indicator, .aiwsd-gallery-pagination):hover .page-indicator-capsule {
   background: var(--nine-color-fill-floating);
 }
 @media (prefers-reduced-transparency: reduce) {
-  :scope[data-theme] .home .page-indicator .page-indicator-capsule {
+  :scope[data-theme] :is(.home .page-indicator, .aiwsd-gallery-pagination) .page-indicator-capsule {
     background: var(--nine-color-fill-floating);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
@@ -331,7 +331,7 @@
 
 .page-indicator-confirm:disabled { opacity: .4; cursor: not-allowed; }
 .page-indicator-confirm:active:not(:disabled), .page-indicator-form-close:active { transform: scale(.97); }
-.page-indicator button:focus-visible, .page-indicator input:focus-visible { outline: 1px solid var(--focus-indicator); outline-offset: -1px; }
+.page-indicator button:focus-visible, .page-indicator input:focus-visible, .page-indicator-page:focus-visible { outline: 1px solid var(--focus-indicator); outline-offset: -1px; }
 .page-indicator-page:focus-visible { outline-offset: -1px !important; }
 
 :scope[data-theme="dark"] .page-indicator-capsule,
